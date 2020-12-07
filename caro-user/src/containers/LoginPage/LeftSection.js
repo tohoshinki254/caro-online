@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 
+
 const LeftSection = () => {
     const classes = useStyle();
     return (
@@ -15,6 +16,7 @@ const LeftSection = () => {
 
 const useStyle = makeStyles({
     container: {
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -31,10 +33,10 @@ const useStyle = makeStyles({
     text: {
         fontWeight: 'bold',
         fontSize: '1em',
-        marginTop: '7%',
+        marginTop: '12%',
         color: 'dimgray',
         textDecoration: 'underline',
-        cursor: 'pointer'
+        cursor: 'pointer',
     }
 });
 

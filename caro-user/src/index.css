@@ -1,6 +1,11 @@
 @font-face{
-    font-family: 'NerkoOne';
-    src: url('./fonts/NerkoOne-Regular.ttf');
+  font-family: 'NerkoOne';
+  src: url('./fonts/NerkoOne-Regular.ttf');
+}
+
+@font-face{
+  font-family: 'RussoOne';
+  src: url('./fonts/RussoOne-Regular.ttf');
 }
 
 html, body {

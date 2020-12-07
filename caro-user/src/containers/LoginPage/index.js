@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import LeftSection from './LeftSection';
+import RightSection from './RightSection';
 
 
 const LoginPage = () => {
@@ -12,11 +13,11 @@ const LoginPage = () => {
                     <Grid item xs={3} />
                     <Grid className={classes.formSection} item xs={6}> 
                         <Grid container>
-                            <Grid className={classes.rightLine} item xs={6}>
+                            <Grid className={classes.rightLine} item xs={6} >
                                 <LeftSection />
                             </Grid>
-                            <Grid item xs={6}>
-
+                            <Grid className={classes.paddingRightSection} item xs={6}>
+                                <RightSection />
                             </Grid>
                         </Grid>
                     </Grid>
@@ -58,6 +59,12 @@ const useStyle = makeStyles({
         borderRight: 'solid',
         borderRightColor: 'gray',
         borderRightWidth: '1.5px'
+    },
+    paddingRightSection: {
+        paddingTop: '1%',
+        paddingLeft: '5%',
+        paddingRight: '10%',
+        paddingBottom: '1%'
     }
 });
 
