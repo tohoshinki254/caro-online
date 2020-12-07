@@ -1,10 +1,10 @@
 import React from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
-import LeftSection from './LeftSection';
 import RightSection from './RightSection';
+import LeftSection from '../LoginPage/LeftSection';
 
 
-const LoginPage = () => {
+const RegisterPage = () => {
     const classes = useStyle();
     return (
         <div className={classes.container}>
@@ -14,7 +14,7 @@ const LoginPage = () => {
                     <Grid className={classes.formSection} item xs={6}> 
                         <Grid container>
                             <Grid className={classes.rightLine} item xs={6} >
-                                <LeftSection text={'Create an account'} pathLink="/register" />
+                                <LeftSection text={'Login now'} pathLink="/login" />
                             </Grid>
                             <Grid className={classes.paddingRightSection} item xs={6}>
                                 <RightSection />
@@ -68,4 +68,4 @@ const useStyle = makeStyles({
     }
 });
 
-export default LoginPage;
+export default RegisterPage;
