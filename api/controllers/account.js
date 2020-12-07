@@ -12,7 +12,7 @@ module.exports = {
             const email = req.body.email;
             const isAdmin = req.body.isAdmin;
 
-            if (username && password && name && email && isAdmin) {
+            if (username && password && name && email && isAdmin !== undefined) {
                 const checkUser = await accountDAO.findOne({ username: username });
                 if (checkUser === null) {
                     password = await bcrypt.hash(password, salt);
