@@ -42,5 +42,36 @@ module.exports = {
                 message: e.message
             })
         }
+    },
+
+    login: async (req, res, next) => {
+        const username = req.body.username;
+        const password = req.body.password;
+        if (username && password) {
+            const user = await accountDAO.findOne({ username: username });
+            if (user === null) {
+                res.status(401).json({
+                    message: "Username not existed."
+                });
+                return;
+            }
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (isMatch) {
+                const payload = { _id: user.id, name: user.name, username: user.username };
+                const token = jwt.sign(payload, process.env.SECRET_KEY);
+                res.status(200).json({
+                    message: "Successful",
+                    token: token
+                });
+            } else {
+                res.status(401).json({
+                    message: 'Password is wrong.'
+                });
+            }
+        } else {
+            res.status(400).json({
+                message: "username or password is undefine."
+            });
+        }
     }
 }
