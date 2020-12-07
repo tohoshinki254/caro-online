@@ -10,7 +10,7 @@ jwtOptions.secretOrKey = process.env.SECRET_KEY;
 
 const strategy = new JwtStrategy(jwtOptions, async (jwt_payload, next) => {
     const account = await accountDAO.findById(jwt_payload._id);
-    if (user) {
+    if (account) {
         next(null, account);
     } else {
         next(null, false);
@@ -19,12 +19,12 @@ const strategy = new JwtStrategy(jwtOptions, async (jwt_payload, next) => {
 
 passport.use(strategy);
 
-passport.serializeUser((user, done) => {
-    done(null, user);
+passport.serializeUser((account, done) => {
+    done(null, account);
 });
 
-passport.deserializeUser((user, done) => {
-    done(null, user);
+passport.deserializeUser((account, done) => {
+    done(null, account);
 });
 
 module.exports = passport;

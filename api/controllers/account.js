@@ -48,16 +48,16 @@ module.exports = {
         const username = req.body.username;
         const password = req.body.password;
         if (username && password) {
-            const user = await accountDAO.findOne({ username: username });
-            if (user === null) {
+            const account = await accountDAO.findOne({ username: username });
+            if (account === null) {
                 res.status(401).json({
                     message: "Username not existed."
                 });
                 return;
             }
-            const isMatch = await bcrypt.compare(password, user.password);
+            const isMatch = await bcrypt.compare(password, account.password);
             if (isMatch) {
-                const payload = { _id: user.id, name: user.name, username: user.username };
+                const payload = { _id: account.id, name: account.name, username: account.username };
                 const token = jwt.sign(payload, process.env.SECRET_KEY);
                 res.status(200).json({
                     message: "Successful",
@@ -70,8 +70,50 @@ module.exports = {
             }
         } else {
             res.status(400).json({
-                message: "username or password is undefine."
+                message: "username or password is undefined."
             });
+        }
+    },
+
+    update: async (req, res, next) => {
+        try {
+            const name = req.body.name;
+            const newPassword = req.body.newPassword;
+            const oldPassword = req.body.oldPassword;
+            const email = req.body.email;
+
+            const account = await accountDAO.findById(req.user._id);
+            if (name) {
+                account.name = name;
+            }
+            if (email) {
+                account.email = email;
+            }
+
+            if (newPassword && oldPassword) {
+                const isMatch = await bcrypt.compare(oldPassword, account.password);
+                if (!isMatch) {
+                    res.status(400).json({
+                        message: "old password is wrong."
+                    });
+                    return;
+                }
+
+                const hash = await bcrypt.hash(newPassword, salt);
+                account.password = hash;
+            }
+
+            await account.save();
+            const payload = { _id: account._id, name: account.name, username: account.username };
+            const token = jwt.sign(payload, process.env.SECRET_KEY);
+            res.status(200).json({
+                message: "Successful",
+                token: token
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            })
         }
     }
 }
