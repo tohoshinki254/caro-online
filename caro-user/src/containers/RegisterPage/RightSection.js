@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles, Typography, withStyles, TextField, Button } from '@material-ui/core';
-
+import { fetchWithoutAuthentication } from '../../api/fetch-data';
+import { API_URL } from '../../global/constants';
 
 const RightSection = () => {
     const classes = useStyle();
@@ -9,6 +10,10 @@ const RightSection = () => {
     const [name, setName] = useState({value: '', error: false});
     const [password, setPassword] = useState({value: '', error: false});
     const [rePassword, setRePassword] = useState({value: '', error: false});
+
+    const [loading, setLoading] = useState(false);
+    const [registerSuccess, setRegisterSuccess] = useState(false);
+    const [output, setOutput] = useState('');
 
     const handleUsernameChange = (event) => {
       const value = event.target.value;
@@ -43,6 +48,38 @@ const RightSection = () => {
       const newName = {value: value, error: value === ''}
       setName(newName)
     }
+
+    const handleRegister = () => {
+      const isAdmin = false;
+      if (username.value !== "" && password.value !== "" && name.value !== "" && email.value !== "" && rePassword !== "") {
+        setLoading(true);
+        const data = {
+          username: username.value,
+          password: password.value,
+          name: name.value,
+          email: email.value,
+          isAdmin: isAdmin
+        }
+        fetchWithoutAuthentication(API_URL + 'user/register', 'POST', data)
+          .then(
+            (data) => {
+              setRegisterSuccess(true);
+              setLoading(false);
+            },
+            (error) => {
+              setLoading(false);
+              setOutput(error.message);
+            }
+          )
+      } else {
+        alert('Enter full information');
+      }
+    }
+
+    if (registerSuccess) {
+      alert('Register successfully');
+    }
+
     return (
         <div className={classes.container}>
             <Typography className={classes.register}>Register</Typography>
@@ -83,7 +120,8 @@ const RightSection = () => {
                 helperText={rePassword.error ? 'Does not match password above':''}
                 onChange={handleRePasswordChange}
             />
-            <ColorButton className={classes.signUpButton} variant="contained" color="primary">
+            <Typography className={classes.errorRegisterText}>{output}</Typography>
+            <ColorButton onClick={handleRegister} className={classes.signUpButton} variant="contained" color="primary">
                 Sign Up
             </ColorButton>                                                                
         </div>
@@ -140,6 +178,11 @@ const useStyle = makeStyles({
     signUpButton: {
         width: '40%',
         marginTop: '10%'
+    },
+    errorRegisterText: {
+      color: 'red',
+      fontSize: '0.9em',
+      marginTop: '2%'
     }
 });
 
