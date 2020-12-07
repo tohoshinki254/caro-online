@@ -12,22 +12,22 @@ const RightSection = () => {
 
     const handleUsernameChange = (event) => {
       const value = event.target.value;
-      const patt =/^[a-zA-Z0-9.\-_$@*!]{6,16}$/;
-      const newUsername = {value: value, error: !patt.test(value)}
+      const pattern =/^[a-zA-Z0-9.\-_$@*!]{6,16}$/;
+      const newUsername = {value: value, error: !pattern.test(value)}
       setUsername(newUsername);
     }
 
     const handleEmailChange = (event) => {
       const value = event.target.value;
-      const patt =/^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      const newEmail = {value: value, error: !patt.test(value)}
+      const pattern =/^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      const newEmail = {value: value, error: !pattern.test(value)}
       setEmail(newEmail);
     }
 
     const handlePasswordChange = (event) => {
       const value = event.target.value;
-      const patt = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-      const newPass = {value: value, error: !patt.test(value)}
+      const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+      const newPass = {value: value, error: !pattern.test(value)}
       setPassword(newPass);
       setRePassword({value: rePassword.value, error: !(value === rePassword)})
     }
