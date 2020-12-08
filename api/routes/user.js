@@ -8,7 +8,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
-    accountController.login(req, res, next);
+    accountController.loginUser(req, res, next);
 });
 
 router.put('/', passport.authenticate('jwt', { session: false }), async (req, res, next) => {

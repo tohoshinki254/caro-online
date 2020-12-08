@@ -44,12 +44,43 @@ module.exports = {
         }
     },
 
-    login: async (req, res, next) => {
+    loginUser: async (req, res, next) => {
         const username = req.body.username;
         const password = req.body.password;
         if (username && password) {
             const account = await accountDAO.findOne({ username: username });
-            if (account === null) {
+            if (account === null || isAdmin) {
+                res.status(401).json({
+                    message: "Username not existed."
+                });
+                return;
+            }
+            const isMatch = await bcrypt.compare(password, account.password);
+            if (isMatch) {
+                const payload = { _id: account.id, name: account.name, username: account.username };
+                const token = jwt.sign(payload, process.env.SECRET_KEY);
+                res.status(200).json({
+                    message: "Successful",
+                    token: token
+                });
+            } else {
+                res.status(401).json({
+                    message: 'Password is wrong.'
+                });
+            }
+        } else {
+            res.status(400).json({
+                message: "username or password is undefined."
+            });
+        }
+    },
+
+    loginAdmin: async (req, res, next) => {
+        const username = req.body.username;
+        const password = req.body.password;
+        if (username && password) {
+            const account = await accountDAO.findOne({ username: username });
+            if (account === null || !isAdmin) {
                 res.status(401).json({
                     message: "Username not existed."
                 });
