@@ -17,6 +17,7 @@ const HomePage = () => {
     if (!isLogined){
         return <Redirect to='/login' />
     }
+
     return (
         <>
             <Grid container>

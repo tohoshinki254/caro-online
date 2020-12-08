@@ -9,7 +9,7 @@ const User = ({user}) => {
         <div className={classes.container}>
             <Grid container>
                 <Grid item xs={10}>
-                    <Typography style={{fontWeight: 'bold'}}>Riven</Typography>
+                <Typography style={{fontWeight: 'bold'}}> {user.name} </Typography>
                 </Grid>
                 <Grid item xs={2}>
                     <FiberManualRecordIcon className={classes.dotIcon} />

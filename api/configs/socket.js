@@ -12,8 +12,8 @@ module.exports = {
         });
         socket.on('update-status', async (data) => {
             const user = await accountDAO.findById(data._id);
-            if (user){
-                user.isOnline = data.isOnline;
+            if (user && user.isOnline !== data.isOnline){
+                user.isOnline = data.isOnline;  
                 await user.save();
                 const onlineList = await getOnlineList();
                 io.emit('update-online-list', onlineList)                
