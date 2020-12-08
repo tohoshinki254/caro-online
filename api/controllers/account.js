@@ -146,5 +146,5 @@ module.exports = {
                 message: e.message
             })
         }
-    }
+    },
 }

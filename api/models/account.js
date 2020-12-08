@@ -7,7 +7,8 @@ const accountSchema = new mongoose.Schema({
     password: String,
     name: String,
     email: String,
-    isAdmin: Boolean
+    isAdmin: Boolean,
+    isOnline: Boolean,
 });
 
 module.exports = mongoose.model('accounts', accountSchema);
