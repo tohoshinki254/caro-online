@@ -51,7 +51,7 @@ const RightSection = () => {
 
     const handleRegister = () => {
       const isAdmin = false;
-      if (username.value !== "" && password.value !== "" && name.value !== "" && email.value !== "" && rePassword !== "") {
+      if (!username.error && !password.error && !name.error && !email.error  && !rePassword.error ) {
         setLoading(true);
         const data = {
           username: username.value,
@@ -72,7 +72,7 @@ const RightSection = () => {
             }
           )
       } else {
-        alert('Enter full information');
+        alert('Plase enter correct information');
       }
     }
 

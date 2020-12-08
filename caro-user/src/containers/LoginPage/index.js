@@ -1,28 +1,34 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import LeftSection from './LeftSection';
 import RightSection from './RightSection';
+import { Redirect } from 'react-router-dom';
+import { AppContext } from '../../contexts/AppContext';
 
 
 const LoginPage = () => {
     const classes = useStyle();
+    const {isLogined} = useContext(AppContext);
+    
+    if (isLogined) return <Redirect to ='/home'/>
+    
     return (
         <div className={classes.container}>
             <div className={classes.mark} />
-                <Grid container>
-                    <Grid item xs={3} />
-                    <Grid className={classes.formSection} item xs={6}> 
-                        <Grid container>
-                            <Grid className={classes.rightLine} item xs={6} >
-                                <LeftSection text={'Create an account'} pathLink="/register" />
-                            </Grid>
-                            <Grid className={classes.paddingRightSection} item xs={6}>
-                                <RightSection />
-                            </Grid>
+            <Grid container>
+                <Grid item xs={3} />
+                <Grid className={classes.formSection} item xs={6}> 
+                    <Grid container>
+                        <Grid className={classes.rightLine} item xs={6} >
+                            <LeftSection text={'Create an account'} pathLink="/register" />
+                        </Grid>
+                        <Grid className={classes.paddingRightSection} item xs={6}>
+                            <RightSection />
                         </Grid>
                     </Grid>
-                    <Grid item xs={3} />
                 </Grid>
+                <Grid item xs={3} />
+            </Grid>
         </div>
     );
 }

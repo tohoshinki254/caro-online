@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
 import { fetchWithoutAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
+import Loading from '../../components/Loading';
+import { Redirect } from 'react-router-dom';
+import { AppContext } from '../../contexts/AppContext';
 
 const RightSection = () => {
     const classes = useStyle();
@@ -13,7 +16,9 @@ const RightSection = () => {
     const [output, setOutput] = useState('');
     const [username, setUsername] = useState({value: '', error: false});
     const [password, setPassword] = useState({value: '', error: false});
+    const {setIsLogined} = useContext(AppContext);
 
+    
     const handleUsernameChange = (event) => {
       let value = event.target.value;
       const newUsername = { value: value, error: value === '' };
@@ -50,11 +55,16 @@ const RightSection = () => {
       }
     }
 
+    useEffect(() => {
+      if (loginSuccess) setIsLogined(true);
+    }, [setIsLogined, loginSuccess])
+
     if (loginSuccess) {
-      alert('Login successfully');
+      return <Redirect to='/home' />
     }
 
     return (
+      <>
         <div className={classes.container}>
             <Typography className={classes.login}>Log In</Typography>
             <CssTextField className={classes.username} 
@@ -94,6 +104,8 @@ const RightSection = () => {
                 <img className={classes.icon} src="/assets/icons/google.svg" alt='google-icon'/>
             </div>         
         </div>
+      </>
+
     );
 }
 

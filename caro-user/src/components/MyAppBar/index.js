@@ -5,7 +5,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppRoundedIcon from '@material-ui/icons/ExitToAppRounded';
 import {Link} from 'react-router-dom';
 import decode from 'jwt-decode';
-import { TOKEN_NAME } from '../../constants';
+import { TOKEN_NAME } from '../../global/constants';
 
 const MyAppBar = ({isLogined}) => {
     const classes = useStyle();

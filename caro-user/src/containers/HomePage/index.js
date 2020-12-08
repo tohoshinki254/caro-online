@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import ListRoom from './ListRoom';
@@ -7,13 +7,20 @@ import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
 import SearchIcon from '@material-ui/icons/Search';
 import OnlineUsers from './OnlineUsers';
+import { AppContext } from '../../contexts/AppContext';
+import { Redirect } from 'react-router-dom';
 
 const HomePage = () => {
     const classes = useStyle();
+    const {isLogined} = useContext(AppContext);
+
+    if (!isLogined){
+        return <Redirect to='/login' />
+    }
     return (
         <>
             <Grid container>
-                <MyAppBar />
+                <MyAppBar isLogined />
             </Grid>
             <Grid container>
                 <Grid item xs={8}>

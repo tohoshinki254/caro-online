@@ -11,7 +11,7 @@ const User = ({user}) => {
                 <Grid item xs={10}>
                     <Typography style={{fontWeight: 'bold'}}>Riven</Typography>
                 </Grid>
-                <Grid item xs={2} justify='center'>
+                <Grid item xs={2}>
                     <FiberManualRecordIcon className={classes.dotIcon} />
                 </Grid>
             </Grid>
