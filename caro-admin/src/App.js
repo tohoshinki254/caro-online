@@ -1,5 +1,6 @@
 import { Redirect, Route, Switch } from "react-router-dom";
 import LoginPage from "./containers/LoginPage";
+import RegisterPage from './containers/RegisterPage';
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
             <Redirect to="/login" />
         </Route>
         <Route path='/login' component={LoginPage} />
+        <Route path='/register' component={RegisterPage} /> 
     </Switch>
   );
 }
