@@ -49,7 +49,7 @@ module.exports = {
         const password = req.body.password;
         if (username && password) {
             const account = await accountDAO.findOne({ username: username });
-            if (account === null || isAdmin) {
+            if (account === null || account.isAdmin) {
                 res.status(401).json({
                     message: "Username not existed."
                 });
