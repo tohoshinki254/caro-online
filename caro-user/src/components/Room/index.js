@@ -6,8 +6,8 @@ const Room = ({room}) => {
     return (
         <div className={classes.container}>
             <img className={classes.image} src="/assets/images/board-room.png" alt="room"/>
-            <Typography>ID: 123</Typography>
-            <Typography>Let's play Tic Tac Toe</Typography>
+            <Typography style={{fontWeight: 'bold'}}>ID: 123</Typography>
+            <Typography >Let's play Tic Tac Toe</Typography>
         </div>
     )
 }

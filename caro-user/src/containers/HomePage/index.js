@@ -6,6 +6,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
 import SearchIcon from '@material-ui/icons/Search';
+import OnlineUsers from './OnlineUsers';
 
 const HomePage = () => {
     const classes = useStyle();
@@ -15,7 +16,12 @@ const HomePage = () => {
                 <MyAppBar />
             </Grid>
             <Grid container>
-                <Typography className={classes.room}>All Room</Typography>
+                <Grid item xs={8}>
+                    <Typography className={classes.room}>All Room</Typography>
+                </Grid>
+                <Grid item xs={4}>
+                    <Typography className={classes.user}>User</Typography>
+                </Grid>
             </Grid>
             <Grid className={classes.mainSection} container>
                 <Grid className={classes.leftSection} item xs={8}>
@@ -49,8 +55,22 @@ const HomePage = () => {
                         <ListRoom />
                     </Grid>
                 </Grid>
-                <Grid item xs={4}>
-
+                <Grid className={classes.rightSection} item xs={4}>
+                    <div className={classes.userContainer}>
+                        <MyTextField
+                            className={classes.searchUser} 
+                            fullWidth
+                            InputProps={{
+                                startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon style={{fontSize: '1.3rem'}} />
+                                </InputAdornment>
+                                ),
+                            }}
+                            placeholder={'Search User...'}
+                        />
+                        <OnlineUsers />                        
+                    </div>
                 </Grid>
             </Grid>
         </>
@@ -62,12 +82,12 @@ const useStyle = makeStyles({
     room: {
         fontFamily: 'NerkoOne',
         fontSize: '2rem',
-        marginLeft: '2%',
+        marginLeft: '3.5%',
         marginTop: '2%'
     },
     mainSection: {
         marginLeft: '2%',
-        marginTop: '1%'
+        marginTop: '0.5%'
     },
     leftSection: {
         borderColor: 'darkgray',
@@ -80,13 +100,38 @@ const useStyle = makeStyles({
         width: '60%',
         marginTop: '2%',
         marginLeft: '8%',
-        marginBottom: '8%'
+        marginBottom: '4%'
     },
     button: {
         marginTop: '4%',
         marginLeft: '8%',
         marginBottom: '8%',
         width: '60% '
+    },
+    user:{
+        fontFamily: 'NerkoOne',
+        fontSize: '2rem',
+        marginLeft: '9%',
+        marginTop: '4%'
+    },
+    rightSection: {
+        paddingLeft: '1%',
+        paddingRight: '6%'
+    },
+    userContainer: {
+        backgroundColor: 'ghostwhite',
+        height: '100%',
+        width: '100%',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
+        display: 'flex',
+        flexDirection: 'column',
+        paddingLeft: '12%'
+    },
+    searchUser: {
+        width: '88%',
+        marginTop: '4%',
+        marginBottom: '2%'
     }
 });
 export default HomePage;
