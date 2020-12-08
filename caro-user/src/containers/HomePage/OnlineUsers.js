@@ -10,6 +10,7 @@ const OnlineUsers = () => {
             <User />
             <User />
             <User />
+            <User />
         </>
     )
 }
