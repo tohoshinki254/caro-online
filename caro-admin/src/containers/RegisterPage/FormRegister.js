@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
+import { fetchWithAuthentication } from '../../api/fetch-data';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
 
 const FormRegister = () => {
     const classes = useStyle();
@@ -50,7 +52,34 @@ const FormRegister = () => {
     }
 
     const handleRegister = () => {
+        const isAdmin = true;
+        if (username.value !== "" && password.value !== "" && name.value !== "" && email.value !== "" && rePassword !== "") {
+            setLoading(true);
+            const data = {
+                username: username.value,
+                password: password.value,
+                name: name.value,
+                email: email.value,
+                isAdmin: isAdmin
+            }
+            fetchWithAuthentication(API_URL + 'admin/account', 'POST', localStorage.getItem(TOKEN_NAME), data)
+                .then(
+                    (data) => {
+                        setRegisterSuccess(true);
+                        setLoading(false);
+                    },
+                    (error) => {
+                        setLoading(false);
+                        setOutput(error.message);
+                    }
+                )
+        } else {
+            alert('Enter full information');
+        }
+    }
 
+    if (registerSuccess) {
+        alert('Create new admin successfully');
     }
 
     return (
