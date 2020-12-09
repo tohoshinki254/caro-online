@@ -1,13 +1,70 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
-
+import { fetchWithoutAuthentication } from '../../api/fetch-data';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
+import Loading from '../../components/Loading';
+import { Redirect } from 'react-router-dom';
+import { AppContext } from '../../contexts/AppContext';
 
 const RightSection = () => {
     const classes = useStyle();
+    const [loading, setLoading] = useState(false);
+    const [loginSuccess, setLoginSuccess] = useState(false);
+    const [output, setOutput] = useState('');
+    const [username, setUsername] = useState({value: '', error: false});
+    const [password, setPassword] = useState({value: '', error: false});
+    const {setIsLogined} = useContext(AppContext);
+
+    
+    const handleUsernameChange = (event) => {
+      let value = event.target.value;
+      const newUsername = { value: value, error: value === '' };
+      setUsername(newUsername);
+    }
+
+    const handlePasswordChange = (event) => {
+      let value = event.target.value;
+      const newPassword = { value: value, error: value === '' };
+      setPassword(newPassword);
+    }
+
+    const handleLogin = () => {
+      if (username.value !== "" && password.value !== "") {
+        setLoading(true);
+        const data = {
+          username: username.value,
+          password: password.value
+        }
+        fetchWithoutAuthentication(API_URL + 'user/login', 'POST', data)
+          .then(
+            (data) => {
+              localStorage.setItem(TOKEN_NAME, data.token);
+              setLoginSuccess(true);
+              setLoading(false);
+            },
+            (error) => {
+              setLoading(false);
+              setOutput(error.message);
+            }
+          )
+      } else {
+        alert('Enter username and password');
+      }
+    }
+
+    useEffect(() => {
+      if (loginSuccess) setIsLogined(true);
+    }, [setIsLogined, loginSuccess])
+
+    if (loginSuccess) {
+      return <Redirect to='/home' />
+    }
+
     return (
+      <>
         <div className={classes.container}>
             <Typography className={classes.login}>Log In</Typography>
             <CssTextField className={classes.username} 
@@ -19,6 +76,9 @@ const RightSection = () => {
                       </InputAdornment>
                     ),
                 }}
+                error={username.error}
+                onChange={handleUsernameChange}
+                value={username.value || ""}
             />
             <CssTextField className={classes.password} 
                 placeholder='Password'
@@ -30,8 +90,12 @@ const RightSection = () => {
                       </InputAdornment>
                     ),
                 }}
+                error={password.error}
+                onChange={handlePasswordChange}
+                value={password.value || ""}
             />
-            <ColorButton className={classes.loginButton} variant="contained" color="primary">
+            <Typography className={classes.errorLoginText}>{output}</Typography>
+            <ColorButton onClick={handleLogin} className={classes.loginButton} variant="contained" color="primary">
                 Login
             </ColorButton>
             <div className={classes.otherLogin}>
@@ -40,6 +104,8 @@ const RightSection = () => {
                 <img className={classes.icon} src="/assets/icons/google.svg" alt='google-icon'/>
             </div>         
         </div>
+      </>
+
     );
 }
 
@@ -109,6 +175,11 @@ const useStyle = makeStyles({
         width: '7%',
         marginLeft: '5%',
         cursor: 'pointer'
+    },
+    errorLoginText: {
+      color: 'red',
+      fontSize: '0.9em',
+      marginTop: '2%'
     }
 });
 

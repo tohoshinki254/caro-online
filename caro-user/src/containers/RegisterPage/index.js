@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import RightSection from './RightSection';
 import LeftSection from '../LoginPage/LeftSection';
+import { AppContext } from '../../contexts/AppContext';
+import { Redirect } from 'react-router-dom';
 
 
 const RegisterPage = () => {
     const classes = useStyle();
+
+    const {isLogined} = useContext(AppContext);
+    if (isLogined) return <Redirect to ='/home'/>
+    
     return (
         <div className={classes.container}>
             <div className={classes.mark} />
