@@ -21,7 +21,8 @@ module.exports = {
                         password: password,
                         name: name,
                         email: email,
-                        isAdmin: isAdmin
+                        isAdmin: isAdmin,
+                        isOnline: false
                     });
                     await newAccount.save();
                     res.status(200).json({
