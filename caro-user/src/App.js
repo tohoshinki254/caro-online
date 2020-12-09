@@ -1,24 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import {useState } from "react";
+import { Redirect, Route, Switch } from "react-router-dom";
+import Logout from "./components/Logout";
+import HomePage from "./containers/HomePage";
+import LoginPage from "./containers/LoginPage";
+import RegisterPage from "./containers/RegisterPage";
+import { AppContext } from "./contexts/AppContext";
+import { TOKEN_NAME } from "./global/constants";
+
 
 function App() {
+  const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);
+  const setIsLogined = (value) => {
+    setIsLoginedState(value);
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext.Provider value={{isLogined: isLogined, setIsLogined: setIsLogined}}>
+      <Switch>
+          <Route exact path='/'>
+              <Redirect to="/login" />
+          </Route>
+          <Route path='/login' component={LoginPage} />
+          <Route path='/register' component={RegisterPage} />
+          <Route path='/home' component={HomePage}/>
+          <Route path='/logout' component={Logout} />
+      </Switch>      
+    </AppContext.Provider>
+
   );
 }
 
