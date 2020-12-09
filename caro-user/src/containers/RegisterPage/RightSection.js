@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles, Typography, withStyles, TextField, Button } from '@material-ui/core';
 import { fetchWithoutAuthentication } from '../../api/fetch-data';
 import { API_URL } from '../../global/constants';
+import { Redirect } from 'react-router-dom';
 
 const RightSection = () => {
     const classes = useStyle();
@@ -77,7 +78,8 @@ const RightSection = () => {
     }
 
     if (registerSuccess) {
-      alert('Register successfully');
+      alert('Register successfully\nYou will be redirect to login page.');
+      return  <Redirect to='/login' />
     }
 
     return (
