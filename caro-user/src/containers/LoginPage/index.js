@@ -1,15 +1,20 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import LeftSection from './LeftSection';
 import RightSection from './RightSection';
 import { Redirect } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
+import Loading from '../../components/Loading';
 
 
 const LoginPage = () => {
     const classes = useStyle();
     const {isLogined} = useContext(AppContext);
-    
+    const [loading, setLoading] = useState(false);
+    const setLoadingValue = (value) => {
+        setLoading(value);
+    }
+
     if (isLogined) return <Redirect to ='/home'/>
     
     return (
@@ -23,12 +28,13 @@ const LoginPage = () => {
                             <LeftSection text={'Create an account'} pathLink="/register" />
                         </Grid>
                         <Grid className={classes.paddingRightSection} item xs={6}>
-                            <RightSection />
+                            <RightSection setLoading={setLoadingValue} />
                         </Grid>
                     </Grid>
                 </Grid>
                 <Grid item xs={3} />
             </Grid>
+            {loading && <Loading />}
         </div>
     );
 }
