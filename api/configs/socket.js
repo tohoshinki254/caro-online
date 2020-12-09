@@ -18,6 +18,6 @@ module.exports = {
                 const onlineList = await getOnlineList();
                 io.emit('update-online-list', onlineList)                
             }
-        })
+        });
     }
 }
