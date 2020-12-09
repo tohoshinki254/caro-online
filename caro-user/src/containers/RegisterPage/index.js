@@ -1,13 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import RightSection from './RightSection';
 import LeftSection from '../LoginPage/LeftSection';
 import { AppContext } from '../../contexts/AppContext';
 import { Redirect } from 'react-router-dom';
+import Loading from '../../components/Loading';
 
 
 const RegisterPage = () => {
     const classes = useStyle();
+    const [loading, setLoading] = useState(false);
+    const setLoadingValue = (value) => {
+        setLoading(value);
+    }
 
     const {isLogined} = useContext(AppContext);
     if (isLogined) return <Redirect to ='/home'/>
@@ -23,12 +28,13 @@ const RegisterPage = () => {
                                 <LeftSection text={'Login now'} pathLink="/login" />
                             </Grid>
                             <Grid className={classes.paddingRightSection} item xs={6}>
-                                <RightSection />
+                                <RightSection setLoading={setLoadingValue} />
                             </Grid>
                         </Grid>
                     </Grid>
                     <Grid item xs={3} />
                 </Grid>
+            {loading && <Loading />}    
         </div>
     );
 }

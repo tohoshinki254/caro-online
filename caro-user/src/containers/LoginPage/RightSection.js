@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
+import { makeStyles, Typography } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
 import { fetchWithoutAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
-import Loading from '../../components/Loading';
 import { Redirect } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
+import MyTextField from '../../components/MyTextField/index'
+import MyButton from '../../components/MyButton/index'
 
-const RightSection = () => {
+const RightSection = ({setLoading}) => {
     const classes = useStyle();
-    const [loading, setLoading] = useState(false);
     const [loginSuccess, setLoginSuccess] = useState(false);
     const [output, setOutput] = useState('');
     const [username, setUsername] = useState({value: '', error: false});
@@ -42,8 +42,8 @@ const RightSection = () => {
           .then(
             (data) => {
               localStorage.setItem(TOKEN_NAME, data.token);
-              setLoginSuccess(true);
               setLoading(false);
+              setLoginSuccess(true);
             },
             (error) => {
               setLoading(false);
@@ -67,7 +67,7 @@ const RightSection = () => {
       <>
         <div className={classes.container}>
             <Typography className={classes.login}>Log In</Typography>
-            <CssTextField className={classes.username} 
+            <MyTextField className={classes.username} 
                 placeholder='Username'
                 InputProps={{
                     startAdornment: (
@@ -80,7 +80,7 @@ const RightSection = () => {
                 onChange={handleUsernameChange}
                 value={username.value || ""}
             />
-            <CssTextField className={classes.password} 
+            <MyTextField className={classes.password} 
                 placeholder='Password'
                 type='password'
                 InputProps={{
@@ -95,9 +95,9 @@ const RightSection = () => {
                 value={password.value || ""}
             />
             <Typography className={classes.errorLoginText}>{output}</Typography>
-            <ColorButton onClick={handleLogin} className={classes.loginButton} variant="contained" color="primary">
+            <MyButton onClick={handleLogin} className={classes.loginButton} variant="contained" color="primary">
                 Login
-            </ColorButton>
+            </MyButton>
             <div className={classes.otherLogin}>
                 <Typography className={classes.otherLoginText}>Or login with: </Typography>
                 <img className={classes.icon} src="/assets/icons/facebook.svg" alt='facebook-icon'/>
@@ -109,37 +109,6 @@ const RightSection = () => {
     );
 }
 
-const ColorButton = withStyles((theme) => ({
-    root: {
-      color: 'white',
-      backgroundColor: 'dodgerblue',
-      '&:hover': {
-        backgroundColor: 'dodgerblue',
-      },
-    },
-}))(Button);
-
-const CssTextField = withStyles({
-    root: {
-      '& label.Mui-focused': {
-        color: 'black',
-      },
-      '& .MuiInput-underline:after': {
-        borderBottomColor: 'black',
-      },
-      '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-          borderColor: 'red',
-        },
-        '&:hover fieldset': {
-          borderColor: 'yellow',
-        },
-        '&.Mui-focused fieldset': {
-          borderColor: 'black',
-        },
-      },
-    },
-})(TextField);
 
 const useStyle = makeStyles({
     container: {
