@@ -10,7 +10,8 @@ const roomSchema = new mongoose.Schema({
     creatorWinner: Number,
     playerWinner: Number,
     createdTime: Date,
-    isPublic: Boolean
+    isPublic: Boolean,
+    name: String
 });
 
 module.exports = mongoose.model('rooms', roomSchema);
