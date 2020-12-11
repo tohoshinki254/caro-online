@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import ListRoom from './ListRoom';
@@ -9,11 +9,13 @@ import SearchIcon from '@material-ui/icons/Search';
 import OnlineUsers from './OnlineUsers';
 import { AppContext } from '../../contexts/AppContext';
 import { Redirect } from 'react-router-dom';
+import CreateRoomDialog from './CreateRoomDialog';
 
 const HomePage = () => {
     const classes = useStyle();
     const {isLogined} = useContext(AppContext);
-
+    const [openCreate, setOpenCreate] = useState(false);
+    const handleCloseCreate = () => setOpenCreate(false);
     if (!isLogined){
         return <Redirect to='/login' />
     }
@@ -49,7 +51,7 @@ const HomePage = () => {
                             />
                         </Grid>
                         <Grid item xs={3} >
-                            <MyButton className={classes.button}>
+                            <MyButton className={classes.button} onClick={() => setOpenCreate(true)} >
                                 Create Room
                             </MyButton>
                         </Grid>
@@ -81,6 +83,7 @@ const HomePage = () => {
                     </div>
                 </Grid>
             </Grid>
+            <CreateRoomDialog open={openCreate} onClose={handleCloseCreate} />
         </>
     );
 };

@@ -15,7 +15,7 @@ const ListRoom = () => {
                     setPublicRooms({ rooms: data.rooms, message: data.message });
                 },
                 (error) => {
-                    setPublicRooms({ message: error.message });
+                    setPublicRooms({rooms: [], message: error.message });
                 }
             )
         }
