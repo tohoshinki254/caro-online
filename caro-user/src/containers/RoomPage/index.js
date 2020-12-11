@@ -21,17 +21,19 @@ const RoomContainer = () => {
       <Grid container>
         <MyAppBar isLogined />
       </Grid>
-      <Grid container>
-        <Typography className={classes.idText}>ID: 123</Typography>
+      <Grid container item xs={12}>
+        <Typography align='center' className={classes.idText}>ID: 123</Typography>
       </Grid>
       <Grid className={classes.container} container alignItems='flex-start' justify='center'>
-        <Grid container item xs={3} direction='column' justify='space-between' alignItems='center'>
+        <Grid container item xs={3} direction='column' justify='flex-end' alignItems='flex-end'>
           <InfoBoard />
         </Grid>
         <Grid container item xs={6} direction='row'>
-          <Board />
+          <Grid container style={{paddingLeft: '3%', paddingRight: '3%'}}>
+            <Board />
+          </Grid>
         </Grid>
-        <Grid style={{ paddingLeft: '4%' }} item xs={3}>
+        <Grid style={{ paddingLeft: '1%' }} item xs={3}>
           <HistoryLog />
           <Chat />
         </Grid>
@@ -44,14 +46,15 @@ const RoomContainer = () => {
 const useStyle = makeStyles({
   container: {
     paddingLeft: '4%',
-    paddingTop: '2%',
+    paddingTop: '0.5%',
     paddingRight: '4%'
   },
   idText: {
     fontWeight: 'bold',
     paddingLeft: '4%',
     fontSize: '1.6rem',
-    marginTop: '2%'
+    marginTop: '0.5%',
+    width: '100%'
   }
 });
 

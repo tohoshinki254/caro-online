@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import {makeStyles, Typography } from '@material-ui/core';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL } from '../../global/constants';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 
 const Room = ({room}) => {
     const classes = useStyle();
-
+    let history = useHistory();
     const [joinSuccessful, setJoinSuccessful] = useState({ status: false, message: '' });
 
     const joinRoom = (room) => {
@@ -29,7 +29,7 @@ const Room = ({room}) => {
 
     if (joinSuccessful.status) {
         const to = '/room/' + room.roomId;
-        return <Redirect to={to} />
+        history.push(to);
     }
 
     return (

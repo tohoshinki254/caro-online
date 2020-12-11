@@ -38,32 +38,18 @@ const HomePage = () => {
             </Grid>
             <Grid className={classes.mainSection} container>
                 <Grid className={classes.leftSection} item xs={8}>
-                    <Grid style={{marginTop: '1%'}} container>
-                        <Grid item xs={3}>
-                            {/* <MyTextField
-                                className={classes.searchBar} 
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                      <InputAdornment position="start">
-                                        <SearchIcon style={{fontSize: '1.3rem'}} />
-                                      </InputAdornment>
-                                    ),
-                                }}
-                                placeholder={'Search room by ID'}
-                            /> */}
-                        </Grid>
-                        <Grid item xs={3} >
+                    <Grid style={{marginTop: '1%'}} container >
+                        <Grid container justify='center' item xs={4} >
                             <MyButton className={classes.button} onClick={() => setOpenJoin(true)} >
                                 Join Room
                             </MyButton>
                         </Grid>
-                        <Grid item xs={3} >
+                        <Grid  container justify='center' item xs={4} >
                             <MyButton className={classes.button} onClick={() => setOpenCreate(true)} >
                                 Create Room
                             </MyButton>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid container justify='center' item xs={4}>
                             <MyButton className={classes.button}>
                                 Play now
                             </MyButton>

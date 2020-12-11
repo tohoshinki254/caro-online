@@ -36,12 +36,12 @@ const useStyle = makeStyles({
     height: '350px',
     backgroundColor: '#bdbdbd',
     boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-    marginTop: '10%'
+    marginTop: '5%'
   },
   text: {
     marginTop: '2%',
     fontWeight: 'bold',
-    fontSize: '1.5rem',
+    fontSize: '1.2rem',
     marginBottom: '1%',
   },
   chatConent: {

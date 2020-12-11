@@ -24,8 +24,8 @@ const Cell = ({isX, onClick}) => {
 
 const useStyle = makeStyles({
     container: {
-        width: '40px',
-        height: '40px',
+        width: '100%',
+        height: '32px',
         backgroundColor: '#bdbdbd',
         display: 'flex',
         justifyContent: 'center',

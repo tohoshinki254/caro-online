@@ -26,7 +26,7 @@ const HistoryLog = () => {
 const useStyle = makeStyles({
   container: {
     width: '100%',
-    height: '300px',
+    height: '200px',
     backgroundColor: '#bdbdbd',
     borderRadius: '5px',
     display: 'flex',
@@ -37,7 +37,7 @@ const useStyle = makeStyles({
   text: {
     marginTop: '2%',
     fontWeight: 'bold',
-    fontSize: '1.5rem',
+    fontSize: '1.2rem',
     marginBottom: '2%',
   }
 });

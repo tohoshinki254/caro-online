@@ -2,11 +2,11 @@ import React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 
 
-const UserCard = ({minutes, isX = false, username, mark, style}) => {
+const UserCard = ({minutes, isX = false, username, mark, style, marginTop = '0%'}) => {
     const classes = useStyle();
     const color = isX ? '#b71c1c' : '#2f78f7'
     return (
-        <div className={classes.container} style={{borderColor: color}}>
+        <div className={classes.container} style={{borderColor: color, marginTop: marginTop}}>
             <Typography align='center' style={{fontWeight: 'bold', fontSize: '1.4rem'}}>{`${isX ? '[X]' : '[O]'} ${username}`}</Typography>
             <div className={classes.circle} style={{backgroundColor: color}}>
             <Typography className={classes.second} >{minutes}</Typography>
@@ -20,7 +20,7 @@ const UserCard = ({minutes, isX = false, username, mark, style}) => {
 const useStyle = makeStyles({
     container: {
         paddingTop: '2%',
-        width: '80%',
+        width: '100%',
         backgroundColor: '#bdbdbd',
         display: 'flex',
         flexDirection: 'column',
@@ -28,7 +28,7 @@ const useStyle = makeStyles({
         borderRadius: '10px',
         paddingBottom: '2%',
         boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-        borderWidth: '1px',
+        borderWidth: '2px',
         borderStyle: 'solid'
     },
     circle: {

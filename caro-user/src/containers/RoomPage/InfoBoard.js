@@ -9,20 +9,18 @@ const InfoBoard = () => {
   return (
     <div className={classes.container}>
       <UserCard username='Quang Thien' minutes='120' mark='1' />
-      <div style={{ marginTop: '30%' }}>
-        <UserCard username='Quang Thien' minutes='120' mark='1' isX />
-      </div>
+      <UserCard marginTop='10%' username='Quang Thien' minutes='120' mark='1' isX />
       <div className={classes.buttonContainer}>
         <MyButton
-          style={{ width: '35%' }}
+          style={{ width: '45%' }}
         >
           Draw
-                </MyButton>
+        </MyButton>
         <MyButton
-          style={{ width: '35%', marginLeft: '10%' }}
+          style={{ width: '45%', marginLeft: '10%' }}
         >
           Loose
-                </MyButton>
+        </MyButton>
       </div>
     </div>
   );
@@ -32,12 +30,16 @@ const InfoBoard = () => {
 const useStyle = makeStyles({
   container: {
     height: '100%',
-    width: '100%'
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end'
   },
   buttonContainer: {
     display: 'flex',
     width: '100%',
-    marginTop: '15%'
+    marginTop: '15%',
+    justifyContent: 'flex-end'
   }
 });
 
