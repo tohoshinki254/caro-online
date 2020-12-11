@@ -10,12 +10,15 @@ import OnlineUsers from './OnlineUsers';
 import { AppContext } from '../../contexts/AppContext';
 import { Redirect } from 'react-router-dom';
 import CreateRoomDialog from './CreateRoomDialog';
+import JoinRoomDialog from './JoinRoomDialog';
 
 const HomePage = () => {
     const classes = useStyle();
     const {isLogined} = useContext(AppContext);
     const [openCreate, setOpenCreate] = useState(false);
+    const [openJoin, setOpenJoin] = useState(false);
     const handleCloseCreate = () => setOpenCreate(false);
+    const handleCloseJoin = () => setOpenJoin(false);
     if (!isLogined){
         return <Redirect to='/login' />
     }
@@ -36,8 +39,8 @@ const HomePage = () => {
             <Grid className={classes.mainSection} container>
                 <Grid className={classes.leftSection} item xs={8}>
                     <Grid style={{marginTop: '1%'}} container>
-                        <Grid item xs={6}>
-                            <MyTextField
+                        <Grid item xs={3}>
+                            {/* <MyTextField
                                 className={classes.searchBar} 
                                 fullWidth
                                 InputProps={{
@@ -48,7 +51,12 @@ const HomePage = () => {
                                     ),
                                 }}
                                 placeholder={'Search room by ID'}
-                            />
+                            /> */}
+                        </Grid>
+                        <Grid item xs={3} >
+                            <MyButton className={classes.button} onClick={() => setOpenJoin(true)} >
+                                Join Room
+                            </MyButton>
                         </Grid>
                         <Grid item xs={3} >
                             <MyButton className={classes.button} onClick={() => setOpenCreate(true)} >
@@ -84,6 +92,7 @@ const HomePage = () => {
                 </Grid>
             </Grid>
             <CreateRoomDialog open={openCreate} onClose={handleCloseCreate} />
+            <JoinRoomDialog open={openJoin} onClose={handleCloseJoin}/>
         </>
     );
 };
