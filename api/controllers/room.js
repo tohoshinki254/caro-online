@@ -61,7 +61,7 @@ module.exports = {
             }
             const roomWithMaxId = await roomDAO.findOne().sort('-roomId');
             const newRoom = new roomDAO({
-                roomId: roomWithMaxId + 1,
+                roomId: roomWithMaxId.roomId + 1,
                 creator: req.user._id,
                 player: null,
                 isEnd: false,

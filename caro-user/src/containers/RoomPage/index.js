@@ -2,17 +2,16 @@ import React, { useContext } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import { AppContext } from '../../contexts/AppContext';
-import { Redirect } from 'react-router-dom';
+import { Redirect} from 'react-router-dom';
 import Board from './Board';
 import InfoBoard from './InfoBoard';
 import HistoryLog from './HistoryLog';
 import Chat from './Chat';
 
 
-const RoomContainer = () => {
+const RoomPage = ({match}) => {
   const classes = useStyle();
   const { isLogined } = useContext(AppContext);
-
   if (!isLogined) {
     return <Redirect to='/login' />
   }
@@ -22,7 +21,7 @@ const RoomContainer = () => {
         <MyAppBar isLogined />
       </Grid>
       <Grid container item xs={12}>
-        <Typography align='center' className={classes.idText}>ID: 123</Typography>
+        <Typography align='center' className={classes.idText}>{`ID: ${match.params.roomId}`}</Typography>
       </Grid>
       <Grid className={classes.container} container alignItems='flex-start' justify='center'>
         <Grid container item xs={3} direction='column' justify='flex-end' alignItems='flex-end'>
@@ -58,4 +57,4 @@ const useStyle = makeStyles({
   }
 });
 
-export default RoomContainer;
+export default RoomPage;

@@ -11,12 +11,14 @@ import { AppContext } from '../../contexts/AppContext';
 import { Redirect } from 'react-router-dom';
 import CreateRoomDialog from './CreateRoomDialog';
 import JoinRoomDialog from './JoinRoomDialog';
+import Loading from '../../components/Loading';
 
 const HomePage = () => {
     const classes = useStyle();
     const {isLogined} = useContext(AppContext);
     const [openCreate, setOpenCreate] = useState(false);
     const [openJoin, setOpenJoin] = useState(false);
+    const [loading, setLoading] = useState(false);
     const handleCloseCreate = () => setOpenCreate(false);
     const handleCloseJoin = () => setOpenJoin(false);
     if (!isLogined){
@@ -55,7 +57,7 @@ const HomePage = () => {
                             </MyButton>
                         </Grid>
                     </Grid>
-                    <Grid container>
+                    <Grid container style={{height: '450px', overflowX: 'hidden'}}>
                         <ListRoom />
                     </Grid>
                 </Grid>
@@ -77,8 +79,9 @@ const HomePage = () => {
                     </div>
                 </Grid>
             </Grid>
-            <CreateRoomDialog open={openCreate} onClose={handleCloseCreate} />
-            <JoinRoomDialog open={openJoin} onClose={handleCloseJoin}/>
+            <CreateRoomDialog setLoading={setLoading} open={openCreate} onClose={handleCloseCreate} />
+            <JoinRoomDialog setLoading={setLoading} open={openJoin} onClose={handleCloseJoin}/>
+            {loading && <Loading />}
         </>
     );
 };

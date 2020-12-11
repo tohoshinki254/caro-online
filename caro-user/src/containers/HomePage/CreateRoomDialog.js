@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, FormControlLabel, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MyTextField from '../../components/MyTextField';
 import MyCheckBox from '../../components/MyCheckBox';
 import MyButton from '../../components/MyButton';
+import { fetchWithAuthentication } from '../../api/fetch-data';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { useHistory } from 'react-router-dom';
 
 
-const CreateRoomDialog = ({ open = false, onClose }) => {
+const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
   const classes = useStyle();
+  const [name, setName] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
+  let history = useHistory();
+
+  const handleCreateRoom = () => {
+    if (name.length === 0) {
+      alert('Name is empty');
+      return;
+    }
+    setLoading(true);
+    fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), {isPublic: !isPrivate, name: name})
+      .then(
+        (data) => {
+          setLoading(false);
+          const to = `/room/${data.roomId}`;
+          history.push(to);
+        },
+        (erro) => {
+          setLoading(false);
+          alert(erro.message);
+        }
+      )
+  }
   return (
     <Dialog
       open={open}
@@ -30,14 +56,17 @@ const CreateRoomDialog = ({ open = false, onClose }) => {
       <div className={classes.container}>
         <MyTextField
           label='Name'
+          value={name}
+          onChange={(event) => setName(event.target.value)}
         />
         <FormControlLabel
           style={{marginTop: '2.5%'}}
-          control={<MyCheckBox />}
+          control={<MyCheckBox checked={isPrivate} onChange={(event) => setIsPrivate(event.target.checked)} />}
           label='Private Room'
         />
         <MyButton
           style={{marginTop: '2.5%'}}
+          onClick={handleCreateRoom}
         >
           Create
         </MyButton>

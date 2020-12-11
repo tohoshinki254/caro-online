@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {makeStyles, Typography } from '@material-ui/core';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL } from '../../global/constants';
-import { Redirect, useHistory } from 'react-router-dom';
+import {useHistory } from 'react-router-dom';
 
 const Room = ({room}) => {
     const classes = useStyle();
@@ -36,7 +36,7 @@ const Room = ({room}) => {
         <div className={classes.container} onClick={() => joinRoom(room)}>
             <img className={classes.image} src="/assets/images/board-room.png" alt="room"/>
             <Typography style={{fontWeight: 'bold'}}>ID: {room.roomId}</Typography>
-            <Typography >Let's play Tic Tac Toe</Typography>
+            <Typography >{room.name}</Typography>
         </div>
     )
 }

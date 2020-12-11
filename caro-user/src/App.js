@@ -43,7 +43,7 @@ function App() {
           <Route path='/register' component={RegisterPage} />
           <Route path='/home' component={HomePage}/>
           <Route path='/logout' component={Logout} />
-          <Route paht='/room/:roomId' component={RoomPage} />
+          <Route path='/room/:roomId' component={RoomPage} />
       </Switch>      
     </AppContext.Provider>
 
