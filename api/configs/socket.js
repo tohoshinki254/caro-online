@@ -19,5 +19,13 @@ module.exports = {
                 io.emit('update-online-list', onlineList)                
             }
         });
+        socket.on('join-room', (data) => {
+            socket.join(data.roomId);
+            if (!data.isCreator){
+                socket.to(`${data.roomId}`).emit('player-joined', data.name);
+            }
+        });
+
+
     }
 }

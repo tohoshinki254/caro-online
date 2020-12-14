@@ -13,6 +13,11 @@ router.get('/public', async (req, res, next) => {
 
 router.post('/', passport.authenticate('jwt', { session: false }), async(req, res, next) => {
     roomController.createRoom(req, res, next);
+});
+
+
+router.post('/detail', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
+    roomController.getDetailRoom(req, res, next);
 })
 
 module.exports = router;
