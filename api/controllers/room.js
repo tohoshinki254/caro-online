@@ -36,7 +36,6 @@ module.exports = {
             }
 
             room.player = playerId;
-            console.log(room);
             
             await room.save();
             res.status(200).json({

@@ -1,10 +1,21 @@
 const accountDAO = require('../models/account');
-const { userJoin, getCurrentUser, userLeave, formatMessage } = require('../utils/user-socket');
+const moment = require('moment');
 
 const getOnlineList = async () => {
     const res = await accountDAO.find({isOnline: true, isAdmin: false});
     return res;
 }
+
+const formatMessage = (id, name, text, roomId) => {
+    return {
+        id,
+        name,
+        text,
+        roomId,
+        time: moment().format('h:mm a')
+    };
+};
+
 module.exports = {
     configSocket: async(socket, io) => {
         socket.on('get-online-list', async () => {
@@ -21,29 +32,17 @@ module.exports = {
             }
         });
 
-        socket.on('join-room', ({ username, room }) => {
-            const user = userJoin(socket.id, username, room);
-
-            socket.join(user.room);
-
-            // Broadcast when a user connects
-            socket.broadcast
-                .to(user.room)
-                .emit('message', formatMessage('', `${user.username} has joined the room`));
+        socket.on('join-room', (data) => {
+            socket.join(data.roomId);
+            if (!data.isCreator){
+                socket.to(`${data.roomId}`).emit('player-joined', data.name);
+            }
         });
 
-        socket.on('chat-message', (message) => {
-            const user = getCurrentUser(socket.id);
-            io.to(user.room).emit('message', formatMessage(user.username, message));
-        });
-
-        socket.on('disconnect', () => {
-            const user = userLeave(socket.id);
+        socket.on('chat-message', async (data) => {
+            const user = await accountDAO.findById(data._id);
             if (user) {
-                io.to(user.room).emit(
-                    'message',
-                    formatMessage('', `${user.username} has left the room`)
-                );
+                io.emit('message', formatMessage(user._id, user.name, data.message, data.roomId));
             }
         });
     }
