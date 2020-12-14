@@ -34,6 +34,7 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
         }
       )
   }
+
   return (
     <Dialog
       open={open}

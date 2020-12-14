@@ -19,13 +19,13 @@ const ListRoom = () => {
                 }
             )
         }
-    }, [publicRooms, setPublicRooms]);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
-            {publicRooms.rooms.map((room) => (
-                <Grid item xs={3}>
-                    <Room room={room}/>
+            {publicRooms.rooms.map((room, index) => (
+                <Grid key={index} item xs={3}>
+                    <Room key={index} room={room}/>
                 </Grid>
             ))}      
         </>

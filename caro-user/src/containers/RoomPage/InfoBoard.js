@@ -4,12 +4,15 @@ import UserCard from '../../components/UserCard';
 import MyButton from '../../components/MyButton';
 
 
-const InfoBoard = () => {
+const InfoBoard = ({creator, player}) => {
   const classes = useStyle();
+  const defaultInfo = {name: 'N/A', mark: 0};
+  if (creator === null) creator = defaultInfo;
+  if (player === null) player = defaultInfo;
   return (
     <div className={classes.container}>
-      <UserCard username='Quang Thien' minutes='120' mark='1' />
-      <UserCard marginTop='10%' username='Quang Thien' minutes='120' mark='1' isX />
+      <UserCard name={player.name} minutes='120' mark={player.mark} />
+      <UserCard marginTop='10%' name={creator.name} minutes='120' mark={creator.mark} isX />
       <div className={classes.buttonContainer}>
         <MyButton
           style={{ width: '45%' }}

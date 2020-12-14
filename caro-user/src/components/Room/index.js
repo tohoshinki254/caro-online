@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import {makeStyles, Typography } from '@material-ui/core';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL } from '../../global/constants';
@@ -27,11 +27,12 @@ const Room = ({room}) => {
         }
     }
 
-    if (joinSuccessful.status) {
-        const to = '/room/' + room.roomId;
-        history.push(to);
-    }
-
+    useEffect(() => {
+        if (joinSuccessful.status){
+            const to = '/room/' + room.roomId;
+            history.push(to);
+        }
+    }, [joinSuccessful, history, room]);
     return (
         <div className={classes.container} onClick={() => joinRoom(room)}>
             <img className={classes.image} src="/assets/images/board-room.png" alt="room"/>

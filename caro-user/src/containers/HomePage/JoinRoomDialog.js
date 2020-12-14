@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import { Dialog, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MyTextField from '../../components/MyTextField';
@@ -12,7 +12,6 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
   let history = useHistory();
   const [roomId, setRoomId] = useState('');
   const [joinSuccessful, setJoinSuccessful] = useState({ status: false, message: '' });
-
   const joinRoom = () => {
     if (roomId.length === 0) {
       alert('Room Id is empty.');
@@ -39,10 +38,12 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
     }
   }
 
-  if (joinSuccessful.status) {
-    const to = '/room/' + roomId;
-    history.push(to);
-  }
+  useEffect(() => {
+    if (joinSuccessful.status){
+      const to = '/room/' + roomId;
+      history.push(to);
+    }
+  }, [joinSuccessful, history, roomId])
 
   return (
     <Dialog

@@ -12,6 +12,7 @@ import decode from 'jwt-decode';
 
 function App() {
   const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);
+
   const setIsLogined = (value) => {
     setIsLoginedState(value);
   }
@@ -28,8 +29,8 @@ function App() {
 
     window.addEventListener("beforeunload", (ev) => 
     {  
-        ev.preventDefault();
-        handleCloseTab();
+      ev.preventDefault();
+      handleCloseTab();
     });
 
   }, [])
