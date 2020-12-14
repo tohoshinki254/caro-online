@@ -39,8 +39,8 @@ const RoomPage = ({ match }) => {
 
             setInfoBoard({ creator: creator, player: player });
           },
-          (erro) => {
-            alert(erro.message);
+          (error) => {
+            alert(error.message);
           }
         )
     }
@@ -70,7 +70,7 @@ const RoomPage = ({ match }) => {
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>
           <HistoryLog />
-          <Chat />
+          <Chat roomId={match.params.roomId}/>
         </Grid>
       </Grid>
     </>

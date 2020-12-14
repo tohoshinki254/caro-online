@@ -1,27 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import Message from '../../components/Message';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
+import socketIOClient from "socket.io-client";
+import decode from 'jwt-decode';
 
-const Chat = () => {
+const Chat = ({ roomId }) => {
     const classes = useStyle();
+    const socket = socketIOClient(API_URL, { transports: ['websocket'] });
+    const [content, setContent] = useState('');
+    const [messages, setMessages] = useState([]);
+    const userInfo = decode(localStorage.getItem(TOKEN_NAME));
+
+    useEffect(() => {
+      socket.on('message', data => {
+        if (data !== undefined && data !== null) {
+          const temp = messages;
+          temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
+          setMessages([...temp]);
+          console.log(messages);
+        }
+      });
+    }, []);
+
+    const sendMessage = (message) => {
+      socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
+    };
+
     return (
       <div className={classes.container}>
         <Typography className={classes.text} align='center'>Chat</Typography>
-        <div className={classes.chatConent} >
-          <Message isX isSender username='quang thien' content='123' />
-          <Message isX isSender username='quang thien' content='123' />
-          <Message username='thien fake' content='123' />
-          <Message username='thien fake' content='123' />
-          <Message username='thien fake' content='123' />
+        <div className={classes.chatContent}>
+          {messages.map(message => message.id === userInfo._id ? 
+            <Message isX isSender username={message.name} content={message.mess} time={message.time}/>
+            : <Message username={message.name} content={message.mess} time={message.time}/>)}
         </div>
         <div className={classes.textField}>
           <MyTextField 
             placeholder='Enter content...'
             style={{width: '60%'}}
+            value={content}
+            onChange={event => setContent(event.target.value)}
           />
-          <MyButton style={{marginLeft: '15%'}}>
+          <MyButton style={{marginLeft: '15%'}} onClick={() => sendMessage(content)}>
             Send
           </MyButton>
         </div>
@@ -44,7 +67,7 @@ const useStyle = makeStyles({
     fontSize: '1.2rem',
     marginBottom: '1%',
   },
-  chatConent: {
+  chatContent: {
     width: '100%',
     height: '250px',
     overflowX: 'hidden',
