@@ -6,7 +6,7 @@ const Cell = ({isX, onClick}) => {
     const classes = useStyle();
     const color = isX ? '#b71c1c' : '#2f78f7';
     const fillValue = () => {
-        if (isX !== undefined){
+        if (isX !== undefined && isX !== null){
             if (isX === true){
                 return 'X'
             }else{

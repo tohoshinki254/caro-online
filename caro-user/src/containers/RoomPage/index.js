@@ -17,7 +17,17 @@ const RoomPage = ({ match }) => {
   const classes = useStyle();
   const { isLogined } = useContext(AppContext);
   const [infoBoard, setInfoBoard] = useState({ creator: null, player: null });
+  const [start, setStart] = useState(false);
+  const [yourTurn, setYourTurn] = useState(false);
 
+  const generateBoard = () => {
+    let board = [];
+    for (let i = 0; i < 18; i++){
+      board.push(Array(18).fill(null))
+    };
+    return board;
+  }
+  const board = generateBoard();
   useEffect(() => {
     const socket = socketIOClient(API_URL, { transports: ['websocket'] });
     if (localStorage.getItem(TOKEN_NAME) !== null) {
@@ -34,7 +44,7 @@ const RoomPage = ({ match }) => {
                 setInfoBoard({ creator: creator, player: player });
               })
             } else {
-              
+
             }
 
             setInfoBoard({ creator: creator, player: player });
@@ -65,7 +75,7 @@ const RoomPage = ({ match }) => {
         </Grid>
         <Grid container item xs={6} direction='row'>
           <Grid container style={{ paddingLeft: '3%', paddingRight: '3%' }}>
-            <Board />
+            <Board board={board} />
           </Grid>
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>
