@@ -16,7 +16,7 @@ const Chat = ({ roomId }) => {
 
     useEffect(() => {
       socket.on('message', data => {
-        if (data !== undefined && data !== null) {
+        if (data !== undefined && data !== null && data.roomId === roomId) {
           const temp = messages;
           temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
           setMessages([...temp]);
