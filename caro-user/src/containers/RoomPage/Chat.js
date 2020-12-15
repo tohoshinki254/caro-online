@@ -20,10 +20,9 @@ const Chat = ({ roomId }) => {
           const temp = messages;
           temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
           setMessages([...temp]);
-          console.log(messages);
         }
       });
-    }, [socket, messages]);
+    }, []);
 
     const sendMessage = (message) => {
       socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
