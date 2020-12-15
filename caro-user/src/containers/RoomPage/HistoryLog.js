@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import History from '../../components/History';
 
 
 const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
   const classes = useStyle();
+  const divRef = useRef(null);
+
+  useEffect(() => {
+    if (divRef) {
+      divRef.current.addEventListener('DOMNodeInserted', event => {
+        const { currentTarget: target } = event;
+        target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+      });
+    }
+  }, [])
   const renderHistory = histoy.map((item, index) => {
     if (index !== 0)
       return (
@@ -21,7 +31,7 @@ const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
       return <div key={index}> </div>;
   })
   return (
-    <div className={classes.container}>
+    <div ref={divRef} className={classes.container}>
       <Typography align='center' className={classes.text}>History</Typography>
       {renderHistory}
     </div>
