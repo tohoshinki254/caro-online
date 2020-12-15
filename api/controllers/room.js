@@ -102,7 +102,14 @@ module.exports = {
                 return;
             }
 
-            let creator = null, player = null;
+            let creator = {
+                name: 'N/A',
+                mark: 0
+            }
+            let player = {
+                name: 'N/A',
+                mark: 0
+            }
             if (room.creator !== null) {
                 const _creator = await accountDAO.findById(room.creator);
                 creator = {name: _creator.name, mark: room.creatorWinner}
