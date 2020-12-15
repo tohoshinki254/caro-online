@@ -11,7 +11,7 @@ import decode from 'jwt-decode';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 import socketIOClient from "socket.io-client";
 import { fetchWithAuthentication } from '../../api/fetch-data';
-import { calculateWinner, initBoard } from './Services';
+import { calculateWinner, cloneBoard, initBoard } from './Services';
 
 
 const RoomPage = ({ match }) => {
@@ -19,11 +19,11 @@ const RoomPage = ({ match }) => {
   const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }))
   const { isLogined } = useContext(AppContext);
   const [infoBoard, setInfoBoard] = useState({
-    creator:{
+    creator: {
       name: 'N/A',
       mark: 0
     },
-    player:{
+    player: {
       name: 'N/A',
       mark: 0
     }
@@ -42,8 +42,9 @@ const RoomPage = ({ match }) => {
   const handleClick = (i, j) => {
     if (start && yourTurn && history[stepNumber].board[i][j] === null) {
       const _history = history.slice();
+
       const curr = _history[_history.length - 1];
-      const board = curr.board.slice();
+      const board = cloneBoard(curr.board);
 
       board[i][j] = isCreator;
       setHistory(_history.concat([{
@@ -56,18 +57,7 @@ const RoomPage = ({ match }) => {
       }]));
       setStepNumber(_history.length);
       setYourTurn(false);
-      //check win
-      const result = calculateWinner(board, i, j, isCreator);
-      if (result === 1) {
-        socket.emit('result', { isWin: true, roomId: match.params.roomId });
-        alert('you win');
-      }
 
-      if (result === 0) {
-        socket.emit('result', { isWin: false, roomId: match.params.roomId });
-        alert('draw');
-      }
-      //------------------------------------
       const event = isCreator ? 'creator-do' : 'player-do';
       socket.emit(event, {
         board: board,
@@ -77,12 +67,61 @@ const RoomPage = ({ match }) => {
         isCreator: isCreator,
         roomId: match.params.roomId
       });
+
+      //check win
+      const result = calculateWinner(board, i, j, isCreator);
+      if (result === 1) {
+        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator });
+        alert('You win');
+        resetState();
+        updateMark(isCreator);
+      }
+
+      if (result === 0) {
+        socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator });
+        resetState();
+        alert('draw');
+      }
+      //------------------------------------
     }
   }
 
+  const resetState = () => {
+    setYourTurn(isCreator => isCreator ? true : false);
+    setStepNumber(stepNumber => 0);
+    setHistory(history => [{
+      board: initBoard(),
+      lastMove: null,
+      isCreator: null
+    }])
+  }
+
+  const updateMark = (isCreatorWin) => {
+    if (isCreatorWin) {
+      setInfoBoard(infoBoard => {
+        return {
+          player: infoBoard.player,
+          creator: {
+            name: infoBoard.creator.name,
+            mark: infoBoard.creator.mark + 1
+          }
+        };
+      })
+    } else {
+      setInfoBoard(infoBoard => {
+        return {
+          player: {
+            name: infoBoard.player.name,
+            mark: infoBoard.player.mark + 1
+          },
+          creator: infoBoard.creator
+        }
+      })
+    }
+  }
   const addBoard = ({ newBoard, location, isCreator }) => {
     setHistory(history => history.concat([{
-      board: newBoard.slice(),
+      board: cloneBoard(newBoard),
       lastMove: {
         i: location.i,
         j: location.j
@@ -123,11 +162,15 @@ const RoomPage = ({ match }) => {
             //event result
             socket.on('game-done', ({ result }) => {
               if (result === -1) {
-                alert('you loose');
+                resetState()
+                updateMark(!isCreator);
+                alert('You lose');
               } else {
+                resetState();
                 alert('you draw')
               }
             })
+
             setIsCreator(isCreator);
             setInfoBoard({ creator: creator, player: player });
           },
@@ -163,7 +206,7 @@ const RoomPage = ({ match }) => {
         </Grid>
         <Grid container item xs={6} direction='row'>
           <Grid container style={{ paddingLeft: '3%', paddingRight: '3%' }}>
-            <Board board={history[stepNumber].board.slice()} onClick={handleClick} />
+            <Board board={cloneBoard(history[stepNumber].board)} onClick={handleClick} />
           </Grid>
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>

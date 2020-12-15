@@ -6,6 +6,13 @@ export const initBoard = () => {
   return board.slice();
 }
 
+export const cloneBoard = (board) => {
+  let newBoard = board.map((row) => {
+    return row.slice();
+  });
+
+  return newBoard;
+}
 //isCreator is X if equal true
 //return -1: dont win, 0: draw, 1: win
 export const calculateWinner = (board, i, j, isCreator) => {

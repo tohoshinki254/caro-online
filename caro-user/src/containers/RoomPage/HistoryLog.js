@@ -18,7 +18,7 @@ const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
         />
       )
     else
-      return <> </>;
+      return <div key={index}> </div>;
   })
   return (
     <div className={classes.container}>
