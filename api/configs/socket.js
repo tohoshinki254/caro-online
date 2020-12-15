@@ -1,4 +1,5 @@
 const accountDAO = require('../models/account');
+const roomDAO = require('../models/room');
 const moment = require('moment');
 
 const getOnlineList = async () => {
@@ -55,9 +56,26 @@ module.exports = {
     })
 
     //isWin true: win, false: draw
-    socket.on('result', ({isWin, roomId}) => {
+    socket.on('result', async ({isWin, roomId, isCreator}) => {
+      //update db
+      const room = await roomDAO.findOne({roomId: roomId});
+      if (room){
+        if (isCreator && isWin){
+          room.creatorWinner++;
+        }else{
+          if (!isCreator && isWin){
+            room.playerWinner++;
+          }
+        }
+        await room.save();
+      }
       const result = isWin ? -1 : 0;
       socket.to(`${roomId}`).emit('game-done', {result: result});
+    })
+
+    //update list room realtime 
+    socket.on('new-room-created', () => {
+      socket.broadcast.emit('reload-list-room');
     })
   }
 }
