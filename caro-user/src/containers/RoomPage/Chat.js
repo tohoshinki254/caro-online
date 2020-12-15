@@ -44,7 +44,7 @@ const Chat = ({ roomId }) => {
             value={content}
             onChange={event => setContent(event.target.value)}
           />
-          <MyButton style={{marginLeft: '15%'}} onClick={() => sendMessage(content)}>
+          <MyButton style={{width: '10%'}} onClick={() => sendMessage(content)}>
             Send
           </MyButton>
         </div>
@@ -76,7 +76,8 @@ const useStyle = makeStyles({
     width: '100%',
     display: 'flex',
     marginTop: '4.5%',
-    paddingLeft: '4%',
+    paddingLeft: '0%',
+    justifyContent: 'space-around'
   }
 });
 
