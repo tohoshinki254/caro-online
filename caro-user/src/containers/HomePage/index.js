@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import ListRoom from './ListRoom';
@@ -9,11 +9,18 @@ import SearchIcon from '@material-ui/icons/Search';
 import OnlineUsers from './OnlineUsers';
 import { AppContext } from '../../contexts/AppContext';
 import { Redirect } from 'react-router-dom';
+import CreateRoomDialog from './CreateRoomDialog';
+import JoinRoomDialog from './JoinRoomDialog';
+import Loading from '../../components/Loading';
 
 const HomePage = () => {
     const classes = useStyle();
     const {isLogined} = useContext(AppContext);
-
+    const [openCreate, setOpenCreate] = useState(false);
+    const [openJoin, setOpenJoin] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const handleCloseCreate = () => setOpenCreate(false);
+    const handleCloseJoin = () => setOpenJoin(false);
     if (!isLogined){
         return <Redirect to='/login' />
     }
@@ -33,33 +40,24 @@ const HomePage = () => {
             </Grid>
             <Grid className={classes.mainSection} container>
                 <Grid className={classes.leftSection} item xs={8}>
-                    <Grid style={{marginTop: '1%'}} container>
-                        <Grid item xs={6}>
-                            <MyTextField
-                                className={classes.searchBar} 
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                      <InputAdornment position="start">
-                                        <SearchIcon style={{fontSize: '1.3rem'}} />
-                                      </InputAdornment>
-                                    ),
-                                }}
-                                placeholder={'Search room by ID'}
-                            />
+                    <Grid style={{marginTop: '1%'}} container >
+                        <Grid container justify='center' item xs={4} >
+                            <MyButton className={classes.button} onClick={() => setOpenJoin(true)} >
+                                Join Room
+                            </MyButton>
                         </Grid>
-                        <Grid item xs={3} >
-                            <MyButton className={classes.button}>
+                        <Grid  container justify='center' item xs={4} >
+                            <MyButton className={classes.button} onClick={() => setOpenCreate(true)} >
                                 Create Room
                             </MyButton>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid container justify='center' item xs={4}>
                             <MyButton className={classes.button}>
                                 Play now
                             </MyButton>
                         </Grid>
                     </Grid>
-                    <Grid container>
+                    <Grid container style={{height: '450px', overflowX: 'hidden'}}>
                         <ListRoom />
                     </Grid>
                 </Grid>
@@ -81,6 +79,9 @@ const HomePage = () => {
                     </div>
                 </Grid>
             </Grid>
+            <CreateRoomDialog setLoading={setLoading} open={openCreate} onClose={handleCloseCreate} />
+            <JoinRoomDialog setLoading={setLoading} open={openJoin} onClose={handleCloseJoin}/>
+            {loading && <Loading />}
         </>
     );
 };

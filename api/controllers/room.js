@@ -1,3 +1,4 @@
+const accountDAO = require('../models/account');
 const roomDAO = require('../models/room');
 
 module.exports = {
@@ -59,8 +60,9 @@ module.exports = {
                 return;
             }
             const roomWithMaxId = await roomDAO.findOne().sort('-roomId');
+            const newRoomId = roomWithMaxId === null ? 1 : roomWithMaxId.roomId + 1;
             const newRoom = new roomDAO({
-                roomId: roomWithMaxId + 1,
+                roomId: newRoomId,
                 creator: req.user._id,
                 player: null,
                 isEnd: false,
@@ -79,6 +81,54 @@ module.exports = {
             res.status(500).json({
                 message: e.message
             })
+        }
+    },
+    getDetailRoom: async (req, res, next) => {
+        try {
+            const roomId = req.body.roomId;
+            const userId = req.body.userId;
+            if (roomId === undefined || userId === undefined){
+                res.status(401).json({
+                    message: 'Room ID or User ID not defined'
+                });
+                return;
+            }
+
+            const room = await roomDAO.findOne({roomId: roomId});
+            if (room === null){
+                res.status(404).json({
+                    message: 'Room not found'
+                });
+                return;
+            }
+
+            let creator = {
+                name: 'N/A',
+                mark: 0
+            }
+            let player = {
+                name: 'N/A',
+                mark: 0
+            }
+            if (room.creator !== null) {
+                const _creator = await accountDAO.findById(room.creator);
+                creator = {name: _creator.name, mark: room.creatorWinner}
+            }
+
+            if (room.player !== null) {
+                const _player = await accountDAO.findById(room.player);
+                player = {name: _player.name, mark: room.playerWinner}
+            }
+
+            res.status(200).json({
+                creator: creator,
+                player: player,
+                isCreator: userId === room.creator
+            })
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            }); 
         }
     }
 }
