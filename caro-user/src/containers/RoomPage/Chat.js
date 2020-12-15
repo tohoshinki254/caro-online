@@ -23,7 +23,7 @@ const Chat = ({ roomId }) => {
           console.log(messages);
         }
       });
-    }, []);
+    }, [socket, messages]);
 
     const sendMessage = (message) => {
       socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });

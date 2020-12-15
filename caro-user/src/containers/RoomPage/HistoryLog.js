@@ -3,24 +3,33 @@ import { makeStyles, Typography } from '@material-ui/core';
 import History from '../../components/History';
 
 
-const HistoryLog = () => {
+const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
   const classes = useStyle();
+  const renderHistory = histoy.map((item, index) => {
+    if (index !== 0)
+      return (
+        <History
+          isX={item.isCreator}
+          step={index}
+          name={item.isCreator ? creatorName : playerName}
+          i={item.lastMove.i}
+          j={item.lastMove.j}
+          key={index}
+        />
+      )
+    else
+      return <> </>;
+  })
   return (
     <div className={classes.container}>
       <Typography align='center' className={classes.text}>History</Typography>
-      <History />
-      <History isX />
-      <History />
-      <History isX />
-      <History />
-      <History />
-      <History isX />
-      <History />
-      <History isX />
-      <History />
+      {renderHistory}
     </div>
   );
+
 }
+
+
 
 
 const useStyle = makeStyles({

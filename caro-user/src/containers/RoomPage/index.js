@@ -11,42 +11,124 @@ import decode from 'jwt-decode';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 import socketIOClient from "socket.io-client";
 import { fetchWithAuthentication } from '../../api/fetch-data';
+import { calculateWinner, initBoard } from './Services';
 
 
 const RoomPage = ({ match }) => {
   const classes = useStyle();
+  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }))
   const { isLogined } = useContext(AppContext);
-  const [infoBoard, setInfoBoard] = useState({ creator: null, player: null });
+  const [infoBoard, setInfoBoard] = useState({
+    creator:{
+      name: 'N/A',
+      mark: 0
+    },
+    player:{
+      name: 'N/A',
+      mark: 0
+    }
+  });
+  const [isCreator, setIsCreator] = useState(null);
+  //state about board
+  const [stepNumber, setStepNumber] = useState(0);
   const [start, setStart] = useState(false);
   const [yourTurn, setYourTurn] = useState(false);
+  const [history, setHistory] = useState([{
+    board: initBoard(),
+    lastMove: null,
+    isCreator: null
+  }]);
 
-  const generateBoard = () => {
-    let board = [];
-    for (let i = 0; i < 18; i++){
-      board.push(Array(18).fill(null))
-    };
-    return board;
+  const handleClick = (i, j) => {
+    if (start && yourTurn && history[stepNumber].board[i][j] === null) {
+      const _history = history.slice();
+      const curr = _history[_history.length - 1];
+      const board = curr.board.slice();
+
+      board[i][j] = isCreator;
+      setHistory(_history.concat([{
+        board: board,
+        lastMove: {
+          i: i,
+          j: j
+        },
+        isCreator: isCreator
+      }]));
+      setStepNumber(_history.length);
+      setYourTurn(false);
+      //check win
+      const result = calculateWinner(board, i, j, isCreator);
+      if (result === 1) {
+        socket.emit('result', { isWin: true, roomId: match.params.roomId });
+        alert('you win');
+      }
+
+      if (result === 0) {
+        socket.emit('result', { isWin: false, roomId: match.params.roomId });
+        alert('draw');
+      }
+      //------------------------------------
+      const event = isCreator ? 'creator-do' : 'player-do';
+      socket.emit(event, {
+        board: board,
+        location: {
+          i: i, j: j
+        },
+        isCreator: isCreator,
+        roomId: match.params.roomId
+      });
+    }
   }
-  const board = generateBoard();
+
+  const addBoard = ({ newBoard, location, isCreator }) => {
+    setHistory(history => history.concat([{
+      board: newBoard.slice(),
+      lastMove: {
+        i: location.i,
+        j: location.j
+      },
+      isCreator: isCreator
+    }]));
+    setStepNumber(stepNumber => stepNumber + 1);
+    setYourTurn(true);
+  }
+
   useEffect(() => {
-    const socket = socketIOClient(API_URL, { transports: ['websocket'] });
     if (localStorage.getItem(TOKEN_NAME) !== null) {
       const userInfo = decode(localStorage.getItem(TOKEN_NAME));
       fetchWithAuthentication(API_URL + 'room/detail', 'POST', localStorage.getItem(TOKEN_NAME), { userId: userInfo._id, roomId: match.params.roomId })
         .then(
           (data) => {
-            let {player, creator, isCreator} = data;
-
+            let { player, creator, isCreator } = data;
             socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator });
             if (isCreator) {
               socket.on('player-joined', (name) => {
-                player = { name: name, mark: 0 }
+                player = { name: name, mark: 0 };
                 setInfoBoard({ creator: creator, player: player });
-              })
-            } else {
+                setYourTurn(true);
+                setStart(true);
+              });
 
+              socket.on('player-done', ({ newBoard, location, isCreator }) => {
+                addBoard({ newBoard, location, isCreator })
+              })
+
+            } else {
+              setStart(true);
+              socket.on('creator-done', ({ newBoard, location, isCreator }) => {
+                addBoard({ newBoard, location, isCreator });
+              })
             }
 
+            //event result
+            socket.on('game-done', ({ result }) => {
+              if (result === -1) {
+                alert('you loose');
+              } else {
+                alert('you draw')
+              }
+            })
+            setIsCreator(isCreator);
             setInfoBoard({ creator: creator, player: player });
           },
           (error) => {
@@ -54,7 +136,13 @@ const RoomPage = ({ match }) => {
           }
         )
     }
-  }, [match.params.roomId]);
+    return () => {
+      socket.off('player-joined');
+      socket.off('player-done');
+      socket.off('creator-done');
+      socket.off('game-done');
+    }
+  }, []);
 
   if (!isLogined) {
     return <Redirect to='/login' />
@@ -75,12 +163,12 @@ const RoomPage = ({ match }) => {
         </Grid>
         <Grid container item xs={6} direction='row'>
           <Grid container style={{ paddingLeft: '3%', paddingRight: '3%' }}>
-            <Board board={board} />
+            <Board board={history[stepNumber].board.slice()} onClick={handleClick} />
           </Grid>
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>
-          <HistoryLog />
-          <Chat roomId={match.params.roomId}/>
+          <HistoryLog histoy={history.slice()} creatorName={infoBoard.creator.name} playerName={infoBoard.player.name} />
+          <Chat roomId={match.params.roomId} />
         </Grid>
       </Grid>
     </>

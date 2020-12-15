@@ -31,9 +31,10 @@ const useStyle = makeStyles({
         justifyContent: 'center',
         alignItems: 'center',
         fontWeight: 'bold',
-        fontSize: '2rem',
+        fontSize: '1.5rem',
         marginLeft: '1px',
-        marginBottom: '1px'
+        marginBottom: '1px',
+        cursor: 'pointer'
     }
 });
 
