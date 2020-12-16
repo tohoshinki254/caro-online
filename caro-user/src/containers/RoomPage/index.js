@@ -92,7 +92,6 @@ const RoomPage = ({ match }) => {
       setYourTurn(isCreator);
       return isCreator;
     })
-    setYourTurn(isCreator ? true : false);
     setStepNumber(0);
     setHistory(history => [{
       board: initBoard(),
