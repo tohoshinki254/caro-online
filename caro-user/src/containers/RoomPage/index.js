@@ -39,6 +39,7 @@ const RoomPage = ({ match }) => {
     isCreator: null
   }]);
 
+
   const handleClick = (i, j) => {
     if (start && yourTurn && history[stepNumber].board[i][j] === null) {
       const _history = history.slice();
@@ -87,8 +88,12 @@ const RoomPage = ({ match }) => {
   }
 
   const resetState = () => {
-    setYourTurn(isCreator => isCreator ? true : false);
-    setStepNumber(stepNumber => 0);
+    setIsCreator(isCreator => {
+      setYourTurn(isCreator);
+      return isCreator;
+    })
+    setYourTurn(isCreator ? true : false);
+    setStepNumber(0);
     setHistory(history => [{
       board: initBoard(),
       lastMove: null,
@@ -197,8 +202,13 @@ const RoomPage = ({ match }) => {
       <Grid container>
         <MyAppBar isLogined />
       </Grid>
-      <Grid container item xs={12}>
-        <Typography align='center' className={classes.idText}>{`ID: ${match.params.roomId}`}</Typography>
+      <Grid container>
+        <Grid item container xs={3}>
+          <Typography align='center' className={classes.idText}>{`ID: ${match.params.roomId}`}</Typography>
+        </Grid>
+        <Grid item container xs={6}>
+          <Typography align='center' className={classes.turn} > {yourTurn ? 'Your Turn ...' : 'Waiting for player ...'}</Typography>
+        </Grid>
       </Grid>
       <Grid className={classes.container} container alignItems='flex-start' justify='center'>
         <Grid container item xs={3} direction='column' justify='flex-end' alignItems='flex-end'>
@@ -229,8 +239,16 @@ const useStyle = makeStyles({
     fontWeight: 'bold',
     paddingLeft: '4%',
     fontSize: '1.6rem',
-    marginTop: '0.5%',
-    width: '100%'
+    marginTop: '1%',
+    width: '100%',
+    marginLeft: '20%'
+  },
+  turn: {
+    fontWeight: 'bold',
+    fontSize: '1.6rem',
+    marginTop: '1%',
+    width: '100%',
+    marginLeft: '4%'
   }
 });
 

@@ -8,47 +8,49 @@ import socketIOClient from "socket.io-client";
 import decode from 'jwt-decode';
 
 const Chat = ({ roomId }) => {
-    const classes = useStyle();
-    const socket = socketIOClient(API_URL, { transports: ['websocket'] });
-    const [content, setContent] = useState('');
-    const [messages, setMessages] = useState([]);
-    const userInfo = decode(localStorage.getItem(TOKEN_NAME));
+  const classes = useStyle();
+  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }));
+  const [content, setContent] = useState('');
+  const [messages, setMessages] = useState([]);
+  const userInfo = decode(localStorage.getItem(TOKEN_NAME));
 
-    useEffect(() => {
-      socket.on('message', data => {
-        if (data !== undefined && data !== null && data.roomId === roomId) {
-          const temp = messages;
-          temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
-          setMessages([...temp]);
-        }
-      });
-    }, []);
+  useEffect(() => {
+    socket.on('message', data => {
+      if (data !== undefined && data !== null && data.roomId === roomId) {
+        const temp = messages;
+        temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
+        setMessages([...temp]);
+      }
+    });
 
-    const sendMessage = (message) => {
-      socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
-    };
+    return () => { socket.off('message'); }
+  }, []);
 
-    return (
-      <div className={classes.container}>
-        <Typography className={classes.text} align='center'>Chat</Typography>
-        <div className={classes.chatContent}>
-          {messages.map(message => message.id === userInfo._id ? 
-            <Message isX isSender username={message.name} content={message.mess} time={message.time}/>
-            : <Message username={message.name} content={message.mess} time={message.time}/>)}
-        </div>
-        <div className={classes.textField}>
-          <MyTextField 
-            placeholder='Enter content...'
-            style={{width: '60%'}}
-            value={content}
-            onChange={event => setContent(event.target.value)}
-          />
-          <MyButton style={{width: '10%'}} onClick={() => sendMessage(content)}>
-            Send
-          </MyButton>
-        </div>
+  const sendMessage = (message) => {
+    socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
+  };
+
+  return (
+    <div className={classes.container}>
+      <Typography className={classes.text} align='center'>Chat</Typography>
+      <div className={classes.chatContent}>
+        {messages.map(message => message.id === userInfo._id ?
+          <Message isX isSender username={message.name} content={message.mess} time={message.time} />
+          : <Message username={message.name} content={message.mess} time={message.time} />)}
       </div>
-    );
+      <div className={classes.textField}>
+        <MyTextField
+          placeholder='Enter content...'
+          style={{ width: '60%' }}
+          value={content}
+          onChange={event => setContent(event.target.value)}
+        />
+        <MyButton style={{ width: '10%' }} onClick={() => sendMessage(content)}>
+          Send
+          </MyButton>
+      </div>
+    </div>
+  );
 }
 
 
