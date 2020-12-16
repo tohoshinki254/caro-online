@@ -5,7 +5,7 @@ import decode from 'jwt-decode';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 
 const OnlineUsers = () => {
-  const socket = socketIOClient(API_URL, { transports: ['websocket'] });
+  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }));
   const [users, setUsers] = useState([]);
   const userInfo = decode(localStorage.getItem(TOKEN_NAME));
 
