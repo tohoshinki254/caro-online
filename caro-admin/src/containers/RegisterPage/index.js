@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import FormRegister from './FormRegister';
 
-const RegisterPage = () => {
+const RegisterPage = ({ history }) => {
     const classes = useStyle();
     return (
         <div className={classes.container}>
@@ -10,7 +10,7 @@ const RegisterPage = () => {
             <Grid container>
                 <Grid item xs={4}/>
                 <Grid className={classes.formSection} item xs={4}>
-                    <FormRegister />
+                    <FormRegister history={history} />
                 </Grid>
                 <Grid item xs={4}/>
             </Grid>
