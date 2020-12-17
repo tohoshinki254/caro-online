@@ -162,4 +162,26 @@ module.exports = {
             });
         }
     },
+
+    getUserInfo: async (req, res, next) => {
+        const userId = req.query.userId;
+        try {
+            const user = await accountDAO.findById(userId);
+            if (user === null) {
+                res.status(401).json({
+                    message: 'User is not exist'
+                });
+                return;
+            }
+
+            res.status(200).json({
+                message: 'Successful',
+                user: user
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            });
+        }
+    },
 }
