@@ -81,7 +81,7 @@ module.exports = {
         const password = req.body.password;
         if (username && password) {
             const account = await accountDAO.findOne({ username: username });
-            if (account === null || !isAdmin) {
+            if (account === null || !account.isAdmin) {
                 res.status(401).json({
                     message: "Username not existed."
                 });
@@ -146,6 +146,20 @@ module.exports = {
             res.status(500).json({
                 message: e.message
             })
+        }
+    },
+
+    getListUser: async (req, res, next) => {
+        try {
+            const users = await accountDAO.find({ isAdmin: false });
+            res.status(200).json({
+                message: 'Successful',
+                users: users
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            });
         }
     },
 }

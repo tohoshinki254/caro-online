@@ -15,4 +15,8 @@ router.put('/', passport.authenticate('jwt', { session: false }), async (req, re
     accountController.update(req, res, next);
 });
 
+router.get('/list-user', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    accountController.getListUser(req, res, next);
+});
+
 module.exports = router;

@@ -47,6 +47,7 @@ module.exports = {
             })
         }
     },
+    
     createRoom: async (req, res, next) => {
         try {
             let isPublic = req.body.isPublic;
