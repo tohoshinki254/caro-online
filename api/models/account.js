@@ -9,6 +9,7 @@ const accountSchema = new mongoose.Schema({
     email: String,
     isAdmin: Boolean,
     isOnline: Boolean,
+    isLocked: Boolean,
 });
 
 module.exports = mongoose.model('accounts', accountSchema);

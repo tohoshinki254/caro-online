@@ -23,4 +23,8 @@ router.get('/user-info', passport.authenticate('jwt', { session: false }), async
     accountController.getUserInfo(req, res, next);
 });
 
+router.put('/lock-user', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    accountController.lockUser(req, res, next);
+})
+
 module.exports = router;

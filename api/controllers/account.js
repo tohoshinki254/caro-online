@@ -56,6 +56,13 @@ module.exports = {
                 });
                 return;
             }
+
+            if (account.isLocked) {
+                res.status(402).json({
+                    message: 'Account is locked'
+                });
+            }
+
             const isMatch = await bcrypt.compare(password, account.password);
             if (isMatch) {
                 const payload = { _id: account.id, name: account.name, username: account.username };
@@ -87,6 +94,13 @@ module.exports = {
                 });
                 return;
             }
+
+            if (account.isLocked) {
+                res.status(402).json({
+                    message: 'Account is locked'
+                });
+            }
+            
             const isMatch = await bcrypt.compare(password, account.password);
             if (isMatch) {
                 const payload = { _id: account.id, name: account.name, username: account.username };
@@ -184,4 +198,26 @@ module.exports = {
             });
         }
     },
+
+    lockUser: async (req, res, next) => {
+        const userId = req.body.userId;
+        try {
+            const user = await accountDAO.findById(userId);
+            if (user === null) {
+                res.status(401).json({
+                    message: 'User is not exist'
+                });
+            }
+
+            user.isLocked = true;
+            await user.save();
+            res.status(200).json({
+                message: 'Successful'
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            });
+        }
+    }
 }
