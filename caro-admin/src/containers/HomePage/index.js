@@ -13,6 +13,7 @@ const HomePage = () => {
     const classes = useStyles();
     const { isLogined } = useContext(AppContext);
     const history = useHistory();
+
     const [displayUsers, setDisplayUsers] = useState(true);
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
@@ -71,7 +72,7 @@ const HomePage = () => {
                     </Grid>
 
                     <Grid className={classes.mainSection} container>
-                        <TableUsers users={users} />
+                        <TableUsers users={users}/>
                     </Grid>
                 </Grid>
                 <Grid item xs={1} />

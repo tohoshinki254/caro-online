@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import LoginPage from "./containers/LoginPage";
 import RegisterPage from './containers/RegisterPage';
 import HomePage from './containers/HomePage/index';
+import UserDetails from './containers/UserDetails/index';
 import { AppContext } from "./contexts/AppContext";
 import { API_URL, TOKEN_NAME } from "./global/constants";
 
@@ -22,6 +23,7 @@ function App() {
           <Route path='/login' component={LoginPage} />
           <Route path='/register' component={RegisterPage} /> 
           <Route path='/home' component={HomePage} />
+          <Route path='/user/:userId' component={UserDetails} />
       </Switch>
     </AppContext.Provider>
   );
