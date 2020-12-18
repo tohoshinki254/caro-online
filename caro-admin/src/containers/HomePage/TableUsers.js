@@ -4,7 +4,7 @@ import { StyledTableCell, StyledTableRow } from '../../components/StyledTable/in
 import MyButton from '../../components/MyButton';
 import { useHistory } from 'react-router-dom';
 
-const TableUsers = ({ users, click }) => {
+const TableUsers = ({ users }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     let history = useHistory();
@@ -38,7 +38,6 @@ const TableUsers = ({ users, click }) => {
                             <StyledTableCell align="right">Wins</StyledTableCell>
                             <StyledTableCell align="right">Loses</StyledTableCell>
                             <StyledTableCell align="right">Draws</StyledTableCell>
-                            <StyledTableCell></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -52,9 +51,6 @@ const TableUsers = ({ users, click }) => {
                                 <StyledTableCell align="right">0</StyledTableCell>
                                 <StyledTableCell align="right">0</StyledTableCell>
                                 <StyledTableCell align="right">0</StyledTableCell>
-                                <StyledTableCell align="center">
-                                    <MyButton>Lock</MyButton>
-                                </StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>

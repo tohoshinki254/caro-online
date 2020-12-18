@@ -209,7 +209,7 @@ module.exports = {
                 });
             }
 
-            user.isLocked = true;
+            user.isLocked = !user.isLocked;
             await user.save();
             res.status(200).json({
                 message: 'Successful'

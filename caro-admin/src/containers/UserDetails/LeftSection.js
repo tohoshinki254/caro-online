@@ -1,10 +1,29 @@
-import React from 'react';
-import { Grid, makeStyles } from '@material-ui/core';
+import React, { useState } from 'react';
+import { FormControlLabel, Grid, makeStyles } from '@material-ui/core';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
+import { fetchWithAuthentication } from '../../api/fetch-data';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
 
 const LeftSection = ({ user }) => {
     const classes = useStyles();
+    
+    const [isLocked, setIsLocked] = useState(user.isLocked);
+
+    const changeLockUser = (userId) => {
+        const data = {
+            userId: userId
+        }
+        fetchWithAuthentication(API_URL + 'admin/lock-user', 'PUT', localStorage.getItem(TOKEN_NAME), data)
+            .then(
+                (data) => {
+                    setIsLocked(!isLocked);
+                },
+                (error) => {
+                    alert('Error');
+                }
+            )
+    }
 
     return (
         <div className={classes.container}>
@@ -51,8 +70,8 @@ const LeftSection = ({ user }) => {
                 </Grid>
                 <Grid item xs={1} />
             </Grid>
-            <MyButton className={classes.button} variant="contained" color="primary">
-                Lock
+            <MyButton onClick={() => changeLockUser(user._id)} className={classes.button} variant="contained" color="primary">
+                {isLocked ? "Unlock" : "Lock"}
             </MyButton>
         </div>
     )
