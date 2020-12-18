@@ -76,6 +76,11 @@ module.exports = {
     //update list room realtime 
     socket.on('new-room-created', () => {
       socket.broadcast.emit('reload-list-room');
+    });
+
+    //player start the game
+    socket.on('player-start', (data) => {
+      socket.to(`${data.roomId}`).emit('player-started');
     })
   }
 }
