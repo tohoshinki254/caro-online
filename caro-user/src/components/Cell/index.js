@@ -2,9 +2,10 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core';
 
 
-const Cell = ({isX, onClick}) => {
+const Cell = ({isX, onClick, isBorder = false}) => {
     const classes = useStyle();
     const color = isX ? '#b71c1c' : '#2f78f7';
+    const border = isBorder ? 'solid 1px black' : 'solid 0.5px white';
     const fillValue = () => {
         if (isX !== undefined && isX !== null){
             if (isX === true){
@@ -15,7 +16,7 @@ const Cell = ({isX, onClick}) => {
         }
     }
     return (
-        <div className={classes.container} onClick={onClick} style={{color: color}}>
+        <div className={classes.container} onClick={onClick} style={{color: color, border: border}}>
             {fillValue()}
         </div>
     );
@@ -32,9 +33,8 @@ const useStyle = makeStyles({
         alignItems: 'center',
         fontWeight: 'bold',
         fontSize: '1.5rem',
-        marginLeft: '1px',
-        marginBottom: '1px',
-        cursor: 'pointer'
+        cursor: 'pointer',
+
     }
 });
 

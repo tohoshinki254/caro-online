@@ -27,6 +27,7 @@ const Chat = ({ roomId }) => {
   }, []);
 
   const sendMessage = (message) => {
+    setContent('');
     socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
   };
 
@@ -34,9 +35,9 @@ const Chat = ({ roomId }) => {
     <div className={classes.container}>
       <Typography className={classes.text} align='center'>Chat</Typography>
       <div className={classes.chatContent}>
-        {messages.map(message => message.id === userInfo._id ?
-          <Message isX isSender username={message.name} content={message.mess} time={message.time} />
-          : <Message username={message.name} content={message.mess} time={message.time} />)}
+        {messages.map((message, index) => message.id === userInfo._id ?
+          <Message key={index} isX isSender username={message.name} content={message.mess} time={message.time} />
+          : <Message key={index} username={message.name} content={message.mess} time={message.time} />)}
       </div>
       <div className={classes.textField}>
         <MyTextField

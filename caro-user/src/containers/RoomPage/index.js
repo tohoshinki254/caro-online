@@ -29,6 +29,8 @@ const RoomPage = ({ match }) => {
     }
   });
   const [isCreator, setIsCreator] = useState(null);
+  const [playerStart, setPlayerStart] = useState(false);
+  const [startStatus, setStartStatus] = useState('Start');
   //state about board
   const [stepNumber, setStepNumber] = useState(0);
   const [start, setStart] = useState(false);
@@ -41,7 +43,7 @@ const RoomPage = ({ match }) => {
 
 
   const handleClick = (i, j) => {
-    if (start && yourTurn && history[stepNumber].board[i][j] === null) {
+    if (start && playerStart && yourTurn && history[stepNumber].board[i][j] === null) {
       const _history = history.slice();
 
       const curr = _history[_history.length - 1];
@@ -87,11 +89,28 @@ const RoomPage = ({ match }) => {
     }
   }
 
+  const handleStart = () => {
+    if (infoBoard.player.name === 'N/A') {
+      alert('Game cannot start because room not enough two people');
+      return;
+    }
+    if (!start) {
+      setStart(true);
+      if (!playerStart) {
+        setStartStatus('Wating for player start');
+      } else {
+        setYourTurn(isCreator);
+        setStartStatus('Game is started');
+      }
+      socket.emit('player-start', { roomId: match.params.roomId });
+    }
+  }
+
   const resetState = () => {
-    setIsCreator(isCreator => {
-      setYourTurn(isCreator);
-      return isCreator;
-    })
+    setYourTurn(false);
+    setStart(false);
+    setStartStatus('start');
+    setPlayerStart(false);
     setStepNumber(0);
     setHistory(history => [{
       board: initBoard(),
@@ -145,24 +164,38 @@ const RoomPage = ({ match }) => {
             let { player, creator, isCreator } = data;
             socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator });
             if (isCreator) {
+              //player join the room
               socket.on('player-joined', (name) => {
                 player = { name: name, mark: 0 };
                 setInfoBoard({ creator: creator, player: player });
-                setYourTurn(true);
-                setStart(true);
               });
 
+              //player play
               socket.on('player-done', ({ newBoard, location, isCreator }) => {
                 addBoard({ newBoard, location, isCreator })
               })
 
             } else {
-              setStart(true);
               socket.on('creator-done', ({ newBoard, location, isCreator }) => {
                 addBoard({ newBoard, location, isCreator });
               })
             }
-
+            //player click start
+            socket.on('player-started', () => {
+              setPlayerStart(true);
+              setStart((start) => {
+                if (start) {
+                  setIsCreator(isCreator => {
+                    setYourTurn(isCreator);
+                    return isCreator;
+                  });
+                  setStartStatus('Game is started');
+                } else {
+                  setStartStatus('Player started, You can press this button to start right now');
+                }
+                return start;
+              })
+            })
             //event result
             socket.on('game-done', ({ result }) => {
               if (result === -1) {
@@ -188,6 +221,7 @@ const RoomPage = ({ match }) => {
       socket.off('player-done');
       socket.off('creator-done');
       socket.off('game-done');
+      socket.off('player-started');
     }
   }, []);
 
@@ -211,11 +245,11 @@ const RoomPage = ({ match }) => {
       </Grid>
       <Grid className={classes.container} container alignItems='flex-start' justify='center'>
         <Grid container item xs={3} direction='column' justify='flex-end' alignItems='flex-end'>
-          <InfoBoard creator={infoBoard.creator} player={infoBoard.player} />
+          <InfoBoard handleStart={handleStart} startStatus={startStatus} creator={infoBoard.creator} player={infoBoard.player} />
         </Grid>
         <Grid container item xs={6} direction='row'>
           <Grid container style={{ paddingLeft: '3%', paddingRight: '3%' }}>
-            <Board board={cloneBoard(history[stepNumber].board)} onClick={handleClick} />
+            <Board board={cloneBoard(history[stepNumber].board)} lastMove={history[stepNumber].lastMove} onClick={handleClick} />
           </Grid>
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>
@@ -238,7 +272,7 @@ const useStyle = makeStyles({
     fontWeight: 'bold',
     paddingLeft: '4%',
     fontSize: '1.6rem',
-    marginTop: '1%',
+    marginTop: '2%',
     width: '100%',
     marginLeft: '20%'
   },
