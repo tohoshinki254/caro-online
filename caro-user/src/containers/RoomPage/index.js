@@ -96,6 +96,12 @@ const RoomPage = ({ match }) => {
     }
     if (!start) {
       setStart(true);
+      setStepNumber(0);
+      setHistory([{
+        board: initBoard(),
+        lastMove: null,
+        isCreator: null
+      }])
       if (!playerStart) {
         setStartStatus('Wating for player start');
       } else {
@@ -111,12 +117,7 @@ const RoomPage = ({ match }) => {
     setStart(false);
     setStartStatus('start');
     setPlayerStart(false);
-    setStepNumber(0);
-    setHistory(history => [{
-      board: initBoard(),
-      lastMove: null,
-      isCreator: null
-    }])
+
   }
 
   const updateMark = (isCreatorWin) => {
