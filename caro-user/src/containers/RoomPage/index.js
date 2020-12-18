@@ -8,10 +8,11 @@ import InfoBoard from './InfoBoard';
 import HistoryLog from './HistoryLog';
 import Chat from './Chat';
 import decode from 'jwt-decode';
-import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { API_URL, DRAW_IMAGE, LOSE_IMAGE, TOKEN_NAME, WIN_IMAGE } from '../../global/constants';
 import socketIOClient from "socket.io-client";
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { calculateWinner, cloneBoard, initBoard } from './Services';
+import ResultDialog from './ResultDialog';
 
 
 const RoomPage = ({ match }) => {
@@ -31,6 +32,11 @@ const RoomPage = ({ match }) => {
   const [isCreator, setIsCreator] = useState(null);
   const [playerStart, setPlayerStart] = useState(false);
   const [startStatus, setStartStatus] = useState('Start');
+  const [resultDialog, setResultDialog] = useState({
+    open: false,
+    image: null,
+    content: null,
+  })
   //state about board
   const [stepNumber, setStepNumber] = useState(0);
   const [start, setStart] = useState(false);
@@ -75,15 +81,23 @@ const RoomPage = ({ match }) => {
       const result = calculateWinner(board, i, j, isCreator);
       if (result === 1) {
         socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator });
-        alert('You win');
+        setResultDialog({
+          open: true,
+          image: WIN_IMAGE,
+          content: 'You Win'
+        });
         resetState();
         updateMark(isCreator);
       }
 
       if (result === 0) {
         socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator });
+        setResultDialog({
+          open: true,
+          image: DRAW_IMAGE,
+          content: 'Draw Game'
+        });
         resetState();
-        alert('draw');
       }
       //------------------------------------
     }
@@ -112,6 +126,13 @@ const RoomPage = ({ match }) => {
     }
   }
 
+  const handleCloseResultDialog = () => {
+    setResultDialog({
+      open: false,
+      image: null,
+      content: null
+    })
+  }
   const resetState = () => {
     setYourTurn(false);
     setStart(false);
@@ -200,12 +221,20 @@ const RoomPage = ({ match }) => {
             //event result
             socket.on('game-done', ({ result }) => {
               if (result === -1) {
+                setResultDialog({
+                  open: true,
+                  image: LOSE_IMAGE,
+                  content: 'You Lose'
+                });
                 resetState()
                 updateMark(!isCreator);
-                alert('You lose');
               } else {
+                setResultDialog({
+                  open: true,
+                  image: DRAW_IMAGE,
+                  content: 'Draw Game'
+                });
                 resetState();
-                alert('you draw')
               }
             })
 
@@ -258,6 +287,7 @@ const RoomPage = ({ match }) => {
           <Chat roomId={match.params.roomId} />
         </Grid>
       </Grid>
+      <ResultDialog open={resultDialog.open} content={resultDialog.content} image={resultDialog.image} onClose={handleCloseResultDialog}/>
     </>
   );
 }
