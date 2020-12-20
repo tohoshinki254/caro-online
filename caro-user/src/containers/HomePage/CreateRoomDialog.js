@@ -7,13 +7,11 @@ import MyButton from '../../components/MyButton';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 import { useHistory } from 'react-router-dom';
-import socketIOClient from "socket.io-client";
 
 const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
   const classes = useStyle();
   const [name, setName] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
-  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }))
   let history = useHistory();
 
   const handleCreateRoom = () => {
@@ -25,7 +23,6 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
     fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), {isPublic: !isPrivate, name: name})
       .then(
         (data) => {
-          socket.emit('new-room-created');
           setLoading(false);
           const to = `/room/${data.roomId}`;
           history.push(to);

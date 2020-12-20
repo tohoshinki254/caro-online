@@ -186,6 +186,7 @@ const RoomPage = ({ match }) => {
             let { player, creator, isCreator } = data;
             socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator });
             if (isCreator) {
+              socket.emit('new-room-created');
               //player join the room
               socket.on('player-joined', (name) => {
                 player = { name: name, mark: 0 };
@@ -287,7 +288,7 @@ const RoomPage = ({ match }) => {
           <Chat roomId={match.params.roomId} />
         </Grid>
       </Grid>
-      <ResultDialog open={resultDialog.open} content={resultDialog.content} image={resultDialog.image} onClose={handleCloseResultDialog}/>
+      <ResultDialog open={resultDialog.open} content={resultDialog.content} image={resultDialog.image} onClose={handleCloseResultDialog} />
     </>
   );
 }
