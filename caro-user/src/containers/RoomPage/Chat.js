@@ -3,13 +3,12 @@ import { makeStyles, Typography } from '@material-ui/core';
 import Message from '../../components/Message';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
-import { API_URL, TOKEN_NAME } from '../../global/constants';
-import socketIOClient from "socket.io-client";
+import { TOKEN_NAME } from '../../global/constants';
 import decode from 'jwt-decode';
+import socket from '../../global/socket';
 
 const Chat = ({ roomId }) => {
   const classes = useStyle();
-  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }));
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState([]);
   const divRef = useRef(null);
@@ -24,7 +23,9 @@ const Chat = ({ roomId }) => {
       }
     });
 
-    return () => { socket.off('message'); }
+    return () => { 
+      socket.off('message'); 
+    }
   }, []);
 
   useEffect(() => {

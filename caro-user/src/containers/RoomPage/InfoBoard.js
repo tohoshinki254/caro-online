@@ -1,14 +1,117 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import UserCard from '../../components/UserCard';
 import MyButton from '../../components/MyButton';
+import { LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
+import { RoomContext } from './context';
+import { updateResult } from './actions';
+import socket from '../../global/socket';
 
 
-const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart }) => {
+const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId }) => {
   const classes = useStyle();
+  const [xRemain, setXRemain] = useState(120);
+  const [oRemain, setORemain] = useState(120);
+  const [counter, setCounter] = useState(null);
+  const { dispatch } = useContext(RoomContext);
   const defaultInfo = { name: 'N/A', mark: 0 };
   if (creator === null) creator = defaultInfo;
   if (player === null) player = defaultInfo;
+
+
+  useEffect(() => {
+    if (yourTurn) {
+      if (isCreator) {
+        let countDown = setInterval(() => {
+          setXRemain(xRemain => {
+            socket.emit('countdown-creator', { remain: xRemain, roomId: roomId });
+            return xRemain - 1;
+          });
+        }, 1000);
+        setCounter(countDown);
+        setORemain(120);
+      } else {
+        let countDown = setInterval(() => {
+          setORemain(oRemain => {
+            socket.emit('countdown-player', { remain: oRemain, roomId: roomId });
+            return oRemain - 1;
+          });
+        }, 1000);
+        setCounter(countDown);
+        setXRemain(120);
+      }
+    } else {
+      if (counter !== null) {
+        clearInterval(counter)
+        isCreator ? setXRemain(120) : setORemain(120);
+      }
+    }
+  }, [yourTurn]);
+
+  useEffect(() => {
+    if (xRemain === 0) {
+      if (isCreator) {
+        socket.emit('countdown-creator', { remain: xRemain, roomId: roomId });
+        dispatch(updateResult({
+          open: true,
+          image: LOSE_IMAGE,
+          content: 'You Lose'
+        }));
+        resetState();
+        updateMark(!isCreator)
+      } else {
+        dispatch(updateResult({
+          open: true,
+          image: WIN_IMAGE,
+          content: 'You Win'
+        }))
+        updateMark(isCreator)
+        resetState();
+        setXRemain(120)
+      }
+    }
+  }, [xRemain])
+
+  useEffect(() => {
+    if (oRemain === 0) {
+      if (isCreator) {
+        dispatch(updateResult({
+          open: true,
+          image: WIN_IMAGE,
+          content: 'You Win'
+        }))
+        updateMark(isCreator)
+        resetState();
+        setORemain(120);
+      } else {
+        socket.emit('countdown-player', { remain: oRemain, roomId: roomId });
+        dispatch(updateResult({
+          open: true,
+          image: LOSE_IMAGE,
+          content: 'You Lose'
+        }))
+        updateMark(!isCreator)
+        resetState();
+      }
+    }
+  }, [oRemain])
+  
+  useEffect(() => {
+    if (isCreator) {
+      socket.on('player-remain-time', (data) => {
+        setORemain(data.remain);
+      })
+    } else {
+      socket.on('creator-remain-time', (data) => {
+        setXRemain(data.remain);
+      })
+    }
+
+    return () => {
+
+      isCreator ? socket.off('player-remain-time') : socket.off('creator-remain-time');
+    }
+  }, [isCreator])
   return (
     <div className={classes.container}>
       <div className={classes.buttonContainer}>
@@ -29,8 +132,8 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart }) => {
           Loose
         </MyButton>
       </div>
-      <UserCard isBorder marginTop='10%' name={player.name} minutes='120' mark={player.mark} />
-      <UserCard isBorder marginTop='10%' name={creator.name} minutes='120' mark={creator.mark} isX />
+      <UserCard isBorder marginTop='10%' name={player.name} minutes={oRemain} mark={player.mark} />
+      <UserCard isBorder marginTop='10%' name={creator.name} minutes={xRemain} mark={creator.mark} isX />
 
     </div>
   );

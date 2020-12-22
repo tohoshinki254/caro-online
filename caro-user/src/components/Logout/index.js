@@ -1,12 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
-import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { TOKEN_NAME } from '../../global/constants';
 import decode from 'jwt-decode';
-import socketIOClient from "socket.io-client";
+import socket from '../../global/socket';
 
 const Logout = () => {
-    const socket = socketIOClient(API_URL, {transports: ['websocket']});
     const {setIsLogined} = useContext(AppContext);
     const userInfo = decode(localStorage.getItem(TOKEN_NAME));
     localStorage.removeItem(TOKEN_NAME);

@@ -6,9 +6,9 @@ import LoginPage from "./containers/LoginPage";
 import RoomPage from "./containers/RoomPage";
 import RegisterPage from "./containers/RegisterPage";
 import { AppContext } from "./contexts/AppContext";
-import { API_URL, TOKEN_NAME } from "./global/constants";
-import socketIOClient from "socket.io-client";
+import { TOKEN_NAME } from "./global/constants";
 import decode from 'jwt-decode';
+import socket from "./global/socket";
 
 function App() {
   const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);
@@ -18,7 +18,6 @@ function App() {
   }
 
   useEffect(() => {
-    const socket = socketIOClient(API_URL, {transports: ['websocket']});
 
     const handleCloseTab = () => {
       if (localStorage.getItem(TOKEN_NAME) !== null){
@@ -32,7 +31,6 @@ function App() {
       ev.preventDefault();
       handleCloseTab();
     });
-
   }, [])
   return (
     <AppContext.Provider value={{isLogined: isLogined, setIsLogined: setIsLogined}}>
