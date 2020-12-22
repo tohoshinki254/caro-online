@@ -16,12 +16,21 @@ import RoomReducer from './reducer';
 import { RoomContext } from './context';
 import { updateResult } from './actions';
 import socket from '../../global/socket';
+import ConfirmDialog from './ConfirmDialog';
+import WaitingDialog from './WaitingDialog';
 
 const initialState = {
   resultDialog: {
     open: false,
     image: null,
     content: null
+  },
+  confirmDialog: {
+    open: false,
+    image: null,
+    content: null,
+    handleYes: () => {},
+    handleNo: () => {}
   }
 }
 const RoomPage = ({ match }) => {
@@ -51,7 +60,6 @@ const RoomPage = ({ match }) => {
     lastMove: null,
     isCreator: null
   }]);
-
 
   const handleClick = (i, j) => {
     if (start && playerStart && yourTurn && history[stepNumber].board[i][j] === null) {
@@ -125,7 +133,7 @@ const RoomPage = ({ match }) => {
         setStartStatus('Wating for player start');
       } else {
         setYourTurn(isCreator);
-        setStartStatus('Game is started');
+        setStartStatus('Game started');
       }
       socket.emit('player-start', { roomId: match.params.roomId });
     }
@@ -216,7 +224,7 @@ const RoomPage = ({ match }) => {
                     setYourTurn(isCreator);
                     return isCreator;
                   });
-                  setStartStatus('Game is started');
+                  setStartStatus('Game started');
                 } else {
                   setStartStatus('Player started, You can press this button to start right now');
                 }
@@ -290,6 +298,7 @@ const RoomPage = ({ match }) => {
             creator={infoBoard.creator}
             player={infoBoard.player}
             roomId={match.params.roomId}
+            start={start}
           />
         </Grid>
         <Grid container item xs={6} direction='row'>
@@ -302,7 +311,22 @@ const RoomPage = ({ match }) => {
           <Chat roomId={match.params.roomId} />
         </Grid>
       </Grid>
-      <ResultDialog open={state.resultDialog.open} content={state.resultDialog.content} image={state.resultDialog.image} onClose={handleCloseResultDialog} />
+      <ResultDialog
+        open={state.resultDialog.open}
+        content={state.resultDialog.content}
+        image={state.resultDialog.image}
+        onClose={handleCloseResultDialog} />
+      <ConfirmDialog
+        open={state.confirmDialog.open}
+        content={state.confirmDialog.content}
+        image={state.confirmDialog.image}
+        handleNo={state.confirmDialog.handleNo}
+        handleYes={state.confirmDialog.handleYes}
+      />
+      <WaitingDialog 
+      
+      
+      />
     </RoomContext.Provider>
   );
 }

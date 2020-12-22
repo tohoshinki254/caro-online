@@ -2,23 +2,54 @@ import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import UserCard from '../../components/UserCard';
 import MyButton from '../../components/MyButton';
-import { LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
+import { DRAW_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
 import { RoomContext } from './context';
-import { updateResult } from './actions';
+import { addConfirmDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 
 
-const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId }) => {
+const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId, start }) => {
   const classes = useStyle();
   const [xRemain, setXRemain] = useState(120);
   const [oRemain, setORemain] = useState(120);
   const [counter, setCounter] = useState(null);
   const { dispatch } = useContext(RoomContext);
   const defaultInfo = { name: 'N/A', mark: 0 };
+
   if (creator === null) creator = defaultInfo;
   if (player === null) player = defaultInfo;
 
+  const handleResign = () => {
+    if (!start)
+      return;
+    const handleYes = () => {
+      //something
+      dispatch(addConfirmDialog({
+        open: false,
+        image: null,
+        content: null,
+        handleYes: () => { },
+        handleNo: () => { }
+      }))
+    }
+    const handleNo = () => {
+      dispatch(addConfirmDialog({
+        open: false,
+        image: null,
+        content: null,
+        handleYes: () => { },
+        handleNo: () => { }
+      }))
+    }
 
+    dispatch(addConfirmDialog({
+      open: true,
+      image: DRAW_IMAGE,
+      content: 'Do you want to resign?',
+      handleYes: handleYes,
+      handleNo: handleNo
+    }))
+  }
   useEffect(() => {
     if (yourTurn) {
       if (isCreator) {
@@ -95,7 +126,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
       }
     }
   }, [oRemain])
-  
+
   useEffect(() => {
     if (isCreator) {
       socket.on('player-remain-time', (data) => {
@@ -112,6 +143,8 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
       isCreator ? socket.off('player-remain-time') : socket.off('creator-remain-time');
     }
   }, [isCreator])
+
+
   return (
     <div className={classes.container}>
       <div className={classes.buttonContainer}>
@@ -123,6 +156,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         </MyButton>
         <MyButton
           style={{ width: '45%', marginTop: '3%' }}
+          onClick={handleResign}
         >
           Resign
         </MyButton>
