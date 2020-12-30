@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableHead, TableContainer, TableRow, Paper, TableBody, TablePagination } from '@material-ui/core';
 import { StyledTableCell, StyledTableRow } from '../../components/StyledTable/index';
-import MyButton from '../../components/MyButton';
 import { useHistory } from 'react-router-dom';
 
 const TableUsers = ({ users }) => {
@@ -35,9 +34,10 @@ const TableUsers = ({ users }) => {
                             <StyledTableCell style={{ width: '15%'}}>Username</StyledTableCell>
                             <StyledTableCell style={{ width: '15%'}}>Name</StyledTableCell>
                             <StyledTableCell style={{ width: '15%'}}>Email</StyledTableCell>
+                            <StyledTableCell align="right">Cups</StyledTableCell>
                             <StyledTableCell align="right">Wins</StyledTableCell>
-                            <StyledTableCell align="right">Loses</StyledTableCell>
                             <StyledTableCell align="right">Draws</StyledTableCell>
+                            <StyledTableCell align="right">Loses</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -48,9 +48,10 @@ const TableUsers = ({ users }) => {
                                 </StyledTableCell>
                                 <StyledTableCell style={{ width: '15%'}}>{user.name}</StyledTableCell>
                                 <StyledTableCell style={{ width: '15%'}}>{user.email}</StyledTableCell>
-                                <StyledTableCell align="right">0</StyledTableCell>
-                                <StyledTableCell align="right">0</StyledTableCell>
-                                <StyledTableCell align="right">0</StyledTableCell>
+                                <StyledTableCell align="right">{user.cups}</StyledTableCell>
+                                <StyledTableCell align="right">{user.wins}</StyledTableCell>
+                                <StyledTableCell align="right">{user.draws}</StyledTableCell>
+                                <StyledTableCell align="right">{user.loses}</StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>

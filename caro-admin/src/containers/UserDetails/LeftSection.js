@@ -48,24 +48,35 @@ const LeftSection = ({ user }) => {
                 disabled={true}
             />
             <Grid style={{ marginTop: '5%'}} container>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
+                    <MyTextField className={classes.textField}
+                        label='Cups'
+                        disabled={true}
+                        defaultValue={user.cups}
+                    />
+                </Grid>
+                <Grid item xs={1} />
+                <Grid item xs={2}>
                     <MyTextField className={classes.textField}
                         label='Wins'
                         disabled={true}
+                        defaultValue={user.wins}
                     />
                 </Grid>
                 <Grid item xs={1} />
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                     <MyTextField className={classes.textField}
                         label='Loses'
                         disabled={true}
+                        defaultValue={user.loses}
                     />
                 </Grid>
                 <Grid item xs={1} />
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                     <MyTextField className={classes.textField}
                         label='Draws'
                         disabled={true}
+                        defaultValue={user.draws}
                     />
                 </Grid>
                 <Grid item xs={1} />

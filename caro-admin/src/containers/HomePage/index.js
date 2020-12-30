@@ -1,9 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Grid, makeStyles, Table, TableHead, TableContainer, TableRow, Paper, TableBody } from '@material-ui/core';
+import { Grid, makeStyles } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
+import MyButton from '../../components/MyButton';
+import MyTextField from '../../components/MyTextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
 import { AppContext } from '../../contexts/AppContext';
 import { Redirect } from 'react-router-dom';
-import MyButton from '../../components/MyButton';
 import { useHistory } from 'react-router-dom';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 import { fetchWithAuthentication } from '../../api/fetch-data';
@@ -18,6 +21,7 @@ const HomePage = () => {
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
     const [output, setOutput] = useState('');
+    const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
         if (displayUsers && users.length === 0) {
@@ -34,7 +38,7 @@ const HomePage = () => {
                     }
                 )
         }
-    }, [displayUsers, setDisplayUsers, setUsers, users]);
+    }, [setDisplayUsers, setUsers]);
     
     const createAccount = () => {
         const to = '/register';
@@ -54,25 +58,41 @@ const HomePage = () => {
                 <Grid item xs={1} />
                 <Grid className={classes.mainSection} item xs={10}>
                     <Grid container>
-                        <Grid container justify='center' item xs={4}>
+                        <Grid item xs={3}>
+                            <MyTextField
+                                className={classes.searchBar} 
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        <SearchIcon style={{fontSize: '1.3rem'}} />
+                                      </InputAdornment>
+                                    ),
+                                }}
+                                placeholder={'Search user by name/email'}
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid container justify='center' item xs={3}>
                             <MyButton className={classes.button} variant="contained" color="primary">
                                 View list of users
                             </MyButton>
                         </Grid>
-                        <Grid container justify='center' item xs={4}>
+                        <Grid container justify='center' item xs={3}>
                             <MyButton className={classes.button} variant="contained" color="primary">
                                 View list of matches
                             </MyButton>
                         </Grid>
-                        <Grid container justify='center' item xs={4}>
+                        <Grid container justify='center' item xs={3}>
                             <MyButton onClick={createAccount} className={classes.button} variant="contained" color="primary">
-                                Create an admin account
+                                Add new admin
                             </MyButton>
                         </Grid>
                     </Grid>
 
                     <Grid className={classes.mainSection} container>
-                        <TableUsers users={users}/>
+                        <TableUsers users={users.filter(item => item.name.includes(searchText) || item.email.includes(searchText))}/>
                     </Grid>
                 </Grid>
                 <Grid item xs={1} />
