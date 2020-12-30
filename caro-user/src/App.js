@@ -5,6 +5,7 @@ import HomePage from "./containers/HomePage";
 import LoginPage from "./containers/LoginPage";
 import RoomPage from "./containers/RoomPage";
 import RegisterPage from "./containers/RegisterPage";
+import Profile from "./containers/Profile";
 import { AppContext } from "./contexts/AppContext";
 import { TOKEN_NAME } from "./global/constants";
 import decode from 'jwt-decode';
@@ -43,6 +44,7 @@ function App() {
           <Route path='/home' component={HomePage}/>
           <Route path='/logout' component={Logout} />
           <Route path='/room/:roomId' component={RoomPage} />
+          <Route path='/profile' component={Profile} />
       </Switch>      
     </AppContext.Provider>
 
