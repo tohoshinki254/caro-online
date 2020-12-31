@@ -1,51 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles, Typography, Avatar, List, ListItem, ListItemText } from '@material-ui/core';
+import { makeStyles, Typography, Avatar, List, ListItem, ListItemText, CircularProgress } from '@material-ui/core';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 
-const LeftSection = () => {
+const LeftSection = ({ userId }) => {
     const classes = useStyles();
-    const userId = "5fcda7e6977eac0b00da4c68";
     const [userInfo, setUserInfo] = useState();
 
     useEffect(() => {
         fetchWithAuthentication(API_URL + 'user?userId=' + userId, 'GET', localStorage.getItem(TOKEN_NAME))
             .then(
                 (data) => {
-                    console.log(data);
+                    setUserInfo(data.user);
                 },
                 (error) => {
                     alert('Error');
                 }
             )
-    }, []);
+    }, [setUserInfo]);
 
 
     return (
         <div>
-            <div className={classes.divAvatar}>
-                <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
-                <Typography className={classes.name}>Nguyễn Thanh Tiến</Typography>
-            </div>
+            {userInfo !== null && userInfo !== undefined ? 
             <div>
-                <List>
-                    <ListItem>
-                        <ListItemText primary="Join Date: " className={classes.listItem}/>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemText primary="Matches: " className={classes.listItem}/>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemText primary="Win Rate: " className={classes.listItem}/>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemText primary="Rank: " className={classes.listItem}/>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemText primary="Cups: " className={classes.listItem}/>
-                    </ListItem>
-                </List>
+                <div className={classes.divAvatar}>
+                    <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
+                    <Typography className={classes.name}>{userInfo.name}</Typography>
+                </div>
+                <div style={{ marginLeft: '10%' }}>
+                    <List>
+                        <ListItem>
+                            <ListItemText primary="Join Date: " className={classes.listItem}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText primary={`Matches: ${userInfo.wins + userInfo.draws + userInfo.loses}`} className={classes.listItem}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText primary="Win Rate: " className={classes.listItem}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText primary="Rank: " className={classes.listItem}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText primary={`Cups: ${userInfo.cups}`} className={classes.listItem}/>
+                        </ListItem>
+                    </List>
+                </div>
             </div>
+            : <CircularProgress /> }
         </div>
     )
 }
@@ -67,7 +70,8 @@ const useStyles = makeStyles((theme) => ({
         marginTop: '1%'
     },
     listItem: {
-        fontFamily: 'monospace'
+        fontFamily: 'monospace',
+        color: 'gray'
     }
 }));
 
