@@ -1,6 +1,7 @@
 const accountDAO = require('../models/account');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const transporter = require('../configs/nodemailer');
 const salt = 8;
 
 module.exports = {
@@ -14,7 +15,8 @@ module.exports = {
 
             if (username && password && name && email && isAdmin !== undefined) {
                 const checkUser = await accountDAO.findOne({ username: username });
-                if (checkUser === null) {
+                const checkUser2 = await accountDAO.findOne({ email: email });
+                if (checkUser === null && checkUser2 === null) {
                     password = await bcrypt.hash(password, salt);
                     const newAccount = new accountDAO({
                         username: username,
@@ -22,20 +24,64 @@ module.exports = {
                         name: name,
                         email: email,
                         isAdmin: isAdmin,
-                        isOnline: false
+                        isOnline: false,
+                        isLocked: false,
+                        cups: 0,
+                        wins: 0,
+                        loses: 0,
+                        draws: 0,
+                        isConfirmed: false,
                     });
                     await newAccount.save();
+
+                    await transporter.sendMail({
+                        from: '1712785 - 1712813',
+                        to: newAccount.email,
+                        subject: 'Tic-Tac-Toe Online Email Verification',
+                        html: '<p>Click <a href="' + process.env.DOMAIN_NAME +
+                            'user/mail-verification?id=' + newAccount._id + '"' +
+                            '> here </a> to verify your account </p>'
+                    })
+
                     res.status(200).json({
                         message: "Successful"
                     });
                 } else {
                     res.status(409).json({
-                        message: "This username existed"
+                        message: "This username/email is used"
                     });
                 }
             } else {
                 res.status(400).json({
                     message: "username or password or name or email is undefined."
+                })
+            }
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    },
+
+    verifyEmail: async (req, res, next) => {
+        try {
+            const id = req.query.id;
+            if (id === undefined) {
+                res.status(400).json({
+                    message: 'Id is undefined'
+                });
+            }
+
+            const user = await accountDAO.findById(id);
+            if (user === null) {
+                res.status(404).json({
+                    message: 'Id is undefined'
+                })
+            } else {
+                user.isConfirmed = true;
+                await user.save();
+                res.status(200).json({
+                    message: 'OK'
                 })
             }
         } catch (e) {

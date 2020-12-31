@@ -10,6 +10,11 @@ const accountSchema = new mongoose.Schema({
     isAdmin: Boolean,
     isOnline: Boolean,
     isLocked: Boolean,
+    isConfirmed: Boolean,
+    cups: Number,
+    wins: Number,
+    loses: Number,
+    draws: Number,
 });
 
 module.exports = mongoose.model('accounts', accountSchema);

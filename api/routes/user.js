@@ -15,4 +15,12 @@ router.put('/', passport.authenticate('jwt', { session: false }), async (req, re
     accountController.update(req, res, next);
 });
 
+router.get('/', passport.authenticate('jwt', { session: false }), async(req, res, next) => {
+    accountController.getUserInfo(req, res, next);
+});
+
+router.get('/mail-verification', async (req, res, next) => {
+    accountController.verifyEmail(req, res, next);
+})
+
 module.exports = router;
