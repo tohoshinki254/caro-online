@@ -12,7 +12,6 @@ const LeftSection = ({text, pathLink}) => {
             <Link style={{marginTop: '12%'}} to={pathLink}>
                 <Typography className={classes.text} >{text}</Typography>
             </Link>
-            
         </div>
     );
 }
