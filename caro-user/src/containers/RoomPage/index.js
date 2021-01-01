@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import { AppContext } from '../../contexts/AppContext';
@@ -9,16 +9,35 @@ import HistoryLog from './HistoryLog';
 import Chat from './Chat';
 import decode from 'jwt-decode';
 import { API_URL, DRAW_IMAGE, LOSE_IMAGE, TOKEN_NAME, WIN_IMAGE } from '../../global/constants';
-import socketIOClient from "socket.io-client";
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { calculateWinner, cloneBoard, initBoard } from './Services';
 import ResultDialog from './ResultDialog';
+import RoomReducer from './reducer';
+import { RoomContext } from './context';
+import { updateResult } from './actions';
+import socket from '../../global/socket';
+import ConfirmDialog from './ConfirmDialog';
+import WaitingDialog from './WaitingDialog';
 
-
+const initialState = {
+  resultDialog: {
+    open: false,
+    image: null,
+    content: null
+  },
+  confirmDialog: {
+    open: false,
+    image: null,
+    content: null,
+    handleYes: () => {},
+    handleNo: () => {}
+  }
+}
 const RoomPage = ({ match }) => {
   const classes = useStyle();
-  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }))
   const { isLogined } = useContext(AppContext);
+  const [state, dispatch] = useReducer(RoomReducer, initialState);
+
   const [infoBoard, setInfoBoard] = useState({
     creator: {
       name: 'N/A',
@@ -32,11 +51,6 @@ const RoomPage = ({ match }) => {
   const [isCreator, setIsCreator] = useState(null);
   const [playerStart, setPlayerStart] = useState(false);
   const [startStatus, setStartStatus] = useState('Start');
-  const [resultDialog, setResultDialog] = useState({
-    open: false,
-    image: null,
-    content: null,
-  })
   //state about board
   const [stepNumber, setStepNumber] = useState(0);
   const [start, setStart] = useState(false);
@@ -46,7 +60,6 @@ const RoomPage = ({ match }) => {
     lastMove: null,
     isCreator: null
   }]);
-
 
   const handleClick = (i, j) => {
     if (start && playerStart && yourTurn && history[stepNumber].board[i][j] === null) {
@@ -81,22 +94,22 @@ const RoomPage = ({ match }) => {
       const result = calculateWinner(board, i, j, isCreator);
       if (result === 1) {
         socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator });
-        setResultDialog({
+        dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
           content: 'You Win'
-        });
+        }))
         resetState();
         updateMark(isCreator);
       }
 
       if (result === 0) {
         socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator });
-        setResultDialog({
+        dispatch(updateResult({
           open: true,
           image: DRAW_IMAGE,
           content: 'Draw Game'
-        });
+        }))
         resetState();
       }
       //------------------------------------
@@ -120,25 +133,24 @@ const RoomPage = ({ match }) => {
         setStartStatus('Wating for player start');
       } else {
         setYourTurn(isCreator);
-        setStartStatus('Game is started');
+        setStartStatus('Game started');
       }
       socket.emit('player-start', { roomId: match.params.roomId });
     }
   }
 
   const handleCloseResultDialog = () => {
-    setResultDialog({
+    dispatch(updateResult({
       open: false,
       image: null,
       content: null
-    })
+    }))
   }
   const resetState = () => {
     setYourTurn(false);
     setStart(false);
     setStartStatus('start');
     setPlayerStart(false);
-
   }
 
   const updateMark = (isCreatorWin) => {
@@ -212,7 +224,7 @@ const RoomPage = ({ match }) => {
                     setYourTurn(isCreator);
                     return isCreator;
                   });
-                  setStartStatus('Game is started');
+                  setStartStatus('Game started');
                 } else {
                   setStartStatus('Player started, You can press this button to start right now');
                 }
@@ -222,19 +234,19 @@ const RoomPage = ({ match }) => {
             //event result
             socket.on('game-done', ({ result }) => {
               if (result === -1) {
-                setResultDialog({
+                dispatch(updateResult({
                   open: true,
                   image: LOSE_IMAGE,
                   content: 'You Lose'
-                });
+                }))
                 resetState()
                 updateMark(!isCreator);
               } else {
-                setResultDialog({
+                dispatch(updateResult({
                   open: true,
                   image: DRAW_IMAGE,
                   content: 'Draw Game'
-                });
+                }))
                 resetState();
               }
             })
@@ -262,7 +274,7 @@ const RoomPage = ({ match }) => {
 
 
   return (
-    <>
+    <RoomContext.Provider value={{ dispatch, state }}>
       <Grid container>
         <MyAppBar isLogined />
       </Grid>
@@ -276,7 +288,18 @@ const RoomPage = ({ match }) => {
       </Grid>
       <Grid className={classes.container} container alignItems='flex-start' justify='center'>
         <Grid container item xs={3} direction='column' justify='flex-end' alignItems='flex-end'>
-          <InfoBoard handleStart={handleStart} startStatus={startStatus} creator={infoBoard.creator} player={infoBoard.player} />
+          <InfoBoard
+            yourTurn={yourTurn}
+            resetState={resetState}
+            updateMark={updateMark}
+            isCreator={isCreator}
+            handleStart={handleStart}
+            startStatus={startStatus}
+            creator={infoBoard.creator}
+            player={infoBoard.player}
+            roomId={match.params.roomId}
+            start={start}
+          />
         </Grid>
         <Grid container item xs={6} direction='row'>
           <Grid container style={{ paddingLeft: '3%', paddingRight: '3%' }}>
@@ -288,8 +311,23 @@ const RoomPage = ({ match }) => {
           <Chat roomId={match.params.roomId} />
         </Grid>
       </Grid>
-      <ResultDialog open={resultDialog.open} content={resultDialog.content} image={resultDialog.image} onClose={handleCloseResultDialog} />
-    </>
+      <ResultDialog
+        open={state.resultDialog.open}
+        content={state.resultDialog.content}
+        image={state.resultDialog.image}
+        onClose={handleCloseResultDialog} />
+      <ConfirmDialog
+        open={state.confirmDialog.open}
+        content={state.confirmDialog.content}
+        image={state.confirmDialog.image}
+        handleNo={state.confirmDialog.handleNo}
+        handleYes={state.confirmDialog.handleYes}
+      />
+      <WaitingDialog 
+      
+      
+      />
+    </RoomContext.Provider>
   );
 }
 

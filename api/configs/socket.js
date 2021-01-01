@@ -1,6 +1,7 @@
 const accountDAO = require('../models/account');
 const roomDAO = require('../models/room');
 const moment = require('moment');
+const cookieParser = require('cookie-parser');
 
 const getOnlineList = async () => {
   const res = await accountDAO.find({ isOnline: true, isAdmin: false });
@@ -81,6 +82,27 @@ module.exports = {
     //player start the game
     socket.on('player-start', (data) => {
       socket.to(`${data.roomId}`).emit('player-started');
+    })
+
+    //countdown creator
+    socket.on('countdown-creator', async ({remain, roomId}) => {
+      socket.to(`${roomId}`).emit('creator-remain-time', {remain: remain})
+      if (remain === 0) {
+        const room = await roomDAO.findOne({roomId: roomId});
+        room.playerWinner++;
+        await room.save();
+      }
+
+    })
+
+    //countdown player
+    socket.on('countdown-player', async ({remain, roomId}) => {
+      socket.to(`${roomId}`).emit('player-remain-time', {remain: remain});
+      if (remain === 0){
+        const room = await roomDAO.findOne({roomId: roomId});
+        room.creatorWinner++;
+        await room.save();
+      }
     })
   }
 }

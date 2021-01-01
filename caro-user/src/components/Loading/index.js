@@ -7,26 +7,26 @@ const Loading = () => {
     return (
         <>
             <div className={classes.loadingDiv} />
-            <CircularProgress size={60} className={classes.loadingItem}/> 
+            <CircularProgress size={60} className={classes.loadingItem} />
         </>
     );
 }
 
 const useStyle = makeStyles({
-    loadingDiv:{
+    loadingDiv: {
         position: 'absolute',
         background: 'black',
         height: '100%',
         width: '100%',
         opacity: 0.4,
         zIndex: 4000
-      },
+    },
     loadingItem: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    zIndex: 4001
-    }    
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        zIndex: 4001
+    }
 });
 
 

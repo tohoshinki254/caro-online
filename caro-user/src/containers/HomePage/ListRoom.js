@@ -3,13 +3,11 @@ import { Grid } from '@material-ui/core';
 import Room from '../../components/Room';
 import { fetchWithoutAuthentication } from '../../api/fetch-data';
 import { API_URL } from '../../global/constants';
-import socketIOClient from "socket.io-client";
+import socket from '../../global/socket';
 
 const ListRoom = () => {
     const [publicRooms, setPublicRooms] = useState({ rooms: [], message: '' });
     const [reload, setReload] = useState(Math.random());
-    const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }))
-
     useEffect(() => {
         fetchWithoutAuthentication(API_URL + 'room/public', 'GET')
             .then(
@@ -25,7 +23,9 @@ const ListRoom = () => {
             setReload(Math.random());
         })
 
-        return () => { socket.off('reload-list-room') }
+        return () => { 
+            socket.off('reload-list-room')
+        }
     }, [reload]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import User from '../../components/User';
-import socketIOClient from "socket.io-client";
 import decode from 'jwt-decode';
-import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { TOKEN_NAME } from '../../global/constants';
+import socket from '../../global/socket';
 
 const OnlineUsers = () => {
-  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }));
   const [users, setUsers] = useState([]);
   const userInfo = decode(localStorage.getItem(TOKEN_NAME));
 
