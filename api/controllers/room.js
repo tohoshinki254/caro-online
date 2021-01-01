@@ -48,6 +48,7 @@ module.exports = {
             })
         }
     },
+    
     createRoom: async (req, res, next) => {
         try {
             let isPublic = req.body.isPublic;
@@ -68,7 +69,8 @@ module.exports = {
                 isEnd: false,
                 creatorWinner: 0,
                 playerWinner: 0,
-                createTime: new Date(),
+                draws: 0,
+                createdTime: new Date(),
                 isPublic: isPublic,
                 name: name
             });
@@ -83,6 +85,7 @@ module.exports = {
             })
         }
     },
+
     getDetailRoom: async (req, res, next) => {
         try {
             const roomId = req.body.roomId;
@@ -129,6 +132,57 @@ module.exports = {
             res.status(500).json({
                 message: e.message
             }); 
+        }
+    },
+
+    // Cập nhật thông số của người chơi
+    // Lưu chat, history
+    // Dùng roomId lấy các thông tin có sẵn rồi update thêm history, chat, ...
+    updateParamsAfterEnd: async (req, res, next) => {
+        try {
+            const { id, creatorWins, playerWins, draws, chat, history } = req.body;
+            
+            const room = await roomDAO.findOne({ roomId: id });
+            if (room === null || room === undefined) {
+                res.status(400).json({
+                    message: 'Room is not existed'
+                });
+                return;
+            }
+
+            const creator = await accountDAO.findById(room.creator);
+            const player = await accountDAO.findById(room.player);
+            if (creator === null || player === null) {
+                res.status(401).json({
+                    message: 'Account is not existed'
+                });
+                return;
+            }
+
+            room.creatorWinner = creatorWins;
+            room.playerWinner = playerWins;
+            room.draws = draws;
+            room.chat = chat;
+            room.history = history;
+            await room.save();
+
+            creator.wins += creatorWins;
+            creator.loses += playerWins;
+            creator.draws += draws;
+            await creator.save();
+
+            player.wins += playerWins;
+            player.loses += creatorWins;
+            player.draws += draws;
+            await player.save();
+
+            res.status(200).json({
+                message: 'OK'
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            })
         }
     }
 }

@@ -9,9 +9,12 @@ const roomSchema = new mongoose.Schema({
     isEnd: Boolean,
     creatorWinner: Number,
     playerWinner: Number,
+    draws: Number,
     createdTime: Date,
     isPublic: Boolean,
-    name: String
+    name: String,
+    chat: Array,
+    history: Array
 });
 
 module.exports = mongoose.model('rooms', roomSchema);

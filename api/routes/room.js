@@ -18,6 +18,10 @@ router.post('/', passport.authenticate('jwt', { session: false }), async(req, re
 
 router.post('/detail', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
     roomController.getDetailRoom(req, res, next);
+});
+
+router.post('/saving-result', async (req, res, next) => {
+    roomController.updateParamsAfterEnd(req, res, next);
 })
 
 module.exports = router;
