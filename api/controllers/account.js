@@ -30,7 +30,7 @@ module.exports = {
                         wins: 0,
                         loses: 0,
                         draws: 0,
-                        isConfirmed: false,
+                        isConfirmed: isAdmin ? true : false,
                     });
                     await newAccount.save();
 
@@ -39,7 +39,7 @@ module.exports = {
                         to: newAccount.email,
                         subject: 'Tic-Tac-Toe Online Email Verification',
                         html: '<p>Click <a href="' + process.env.DOMAIN_NAME +
-                            'user/mail-verification?id=' + newAccount._id + '"' +
+                            'mail-verification/' + newAccount._id + '"' +
                             '> here </a> to verify your account </p>'
                     })
 
@@ -70,6 +70,7 @@ module.exports = {
                 res.status(400).json({
                     message: 'Id is undefined'
                 });
+                return;
             }
 
             const user = await accountDAO.findById(id);
@@ -107,6 +108,14 @@ module.exports = {
                 res.status(402).json({
                     message: 'Account is locked'
                 });
+                return;
+            }
+
+            if (!account.isConfirmed) {
+                res.status(403).json({
+                    message: 'Account is not activated'
+                });
+                return;
             }
 
             const isMatch = await bcrypt.compare(password, account.password);
@@ -145,6 +154,14 @@ module.exports = {
                 res.status(402).json({
                     message: 'Account is locked'
                 });
+                return;
+            }
+
+            if (!account.isConfirmed) {
+                res.status(403).json({
+                    message: 'Account is not activated'
+                });
+                return;
             }
             
             const isMatch = await bcrypt.compare(password, account.password);
@@ -264,6 +281,62 @@ module.exports = {
             res.status(500).json({
                 message: e.message
             });
+        }
+    },
+
+    sendMailForgotPass: async (req, res, next) => {
+        try {
+            const mail = req.body.email;
+            const user = await accountDAO.findOne({ email: mail });
+
+            if (user === null || user === undefined) {
+                res.status(400).json({
+                    message: 'User is not existed'
+                });
+                return;
+            }
+
+            await transporter.sendMail({
+                from: '1712785 - 1712813',
+                to: mail,
+                subject: 'Tic-Tac-Toe Online Email To Rest Password',
+                html: '<p>Click <a href="' + process.env.DOMAIN_NAME +
+                    'reset-password/' + user._id + '"' +
+                    '> here </a> to rest password </p>'
+            })
+
+            res.status(200).json({
+                message: 'OK'
+            })
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            });
+        }
+    },
+
+    resetPassword: async (req, res, next) => {
+        try {
+            const { id, password } = req.body;
+            const user = await accountDAO.findById(id);
+            if (user === null || user === undefined) {
+                res.status(400).json({
+                    message: 'User is not existed'
+                });
+                return;
+            }
+
+            const newPass = await bcrypt.hash(password, salt);
+            user.password = newPass;
+
+            await user.save();
+            res.status(200).json({
+                message: 'OK'
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            })
         }
     }
 }
