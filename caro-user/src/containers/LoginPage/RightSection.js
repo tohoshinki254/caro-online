@@ -100,8 +100,8 @@ const RightSection = ({setLoading}) => {
             </MyButton>
             <div className={classes.otherLogin}>
                 <Typography className={classes.otherLoginText}>Or login with: </Typography>
-                <img className={classes.icon} src="/assets/icons/facebook.svg" alt='facebook-icon'/>
-                <img className={classes.icon} src="/assets/icons/google.svg" alt='google-icon'/>
+                <img onClick={() => { window.location.assign(API_URL + "auth/facebook")}} className={classes.icon} src="/assets/icons/facebook.svg" alt='facebook-icon'/>
+                <img onClick={() => { window.location.assign(API_URL + "auth/google")}} className={classes.icon} src="/assets/icons/google.svg" alt='google-icon'/>
             </div>         
         </div>
       </>

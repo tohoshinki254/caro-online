@@ -9,6 +9,7 @@ import { AppContext } from "./contexts/AppContext";
 import { API_URL, TOKEN_NAME } from "./global/constants";
 import socketIOClient from "socket.io-client";
 import decode from 'jwt-decode';
+import Auth from "./components/Auth";
 
 function App() {
   const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);
@@ -33,7 +34,9 @@ function App() {
       handleCloseTab();
     });
 
-  }, [])
+  }, []);
+
+
   return (
     <AppContext.Provider value={{isLogined: isLogined, setIsLogined: setIsLogined}}>
       <Switch>
@@ -45,6 +48,7 @@ function App() {
           <Route path='/home' component={HomePage}/>
           <Route path='/logout' component={Logout} />
           <Route path='/room/:roomId' component={RoomPage} />
+          <Route path='/oauth/:token' component={Auth} />
       </Switch>      
     </AppContext.Provider>
 
