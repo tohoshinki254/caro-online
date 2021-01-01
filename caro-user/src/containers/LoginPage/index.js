@@ -25,7 +25,7 @@ const LoginPage = () => {
                 <Grid className={classes.formSection} item xs={6}> 
                     <Grid container>
                         <Grid className={classes.rightLine} item xs={6} >
-                            <LeftSection text={'Create an account'} pathLink="/register" />
+                            <LeftSection text={'Create an account'} pathLink="/register" forget={'Forget Password'} forgetLink="/forget-password"/>
                         </Grid>
                         <Grid className={classes.paddingRightSection} item xs={6}>
                             <RightSection setLoading={setLoadingValue} />

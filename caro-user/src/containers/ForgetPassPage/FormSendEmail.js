@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
+import { fetchWithoutAuthentication } from '../../api/fetch-data';
+import { API_URL } from '../../global/constants';
 
-const FormSection = ({ id }) => {
+const FormSendEmail = ({ setLoading }) => {
     const classes = useStyles();
     const [email, setEmail] = useState({value: '', error: false});
     const [output, setOutput] = useState('');
@@ -14,6 +16,25 @@ const FormSection = ({ id }) => {
         const newEmail = {value: value, error: !pattern.test(value)}
         setEmail(newEmail);
     }
+
+    const sendMail = () => {
+        setLoading(true);
+        const data = {
+            email: email.value
+        };
+        fetchWithoutAuthentication(API_URL + 'user/mail-reset-password', 'POST', data)
+            .then(
+                (data) => {
+                    setOutput('Click link in email to reset password')
+                    setLoading(false);
+                },
+                (error) => {
+                    setOutput('Invalid email');
+                    setLoading(false);
+                }
+            )
+    }
+
     return (
         <div className={classes.container}>
             <Typography className={classes.title}>Forget Password</Typography>
@@ -25,7 +46,7 @@ const FormSection = ({ id }) => {
                 onChange={handleEmailChange}
             />
             <Typography className={classes.errorText}>{output}</Typography>
-            <MyButton onClick={() => {}} className={classes.button} variant="contained" color="primary">
+            <MyButton onClick={() => sendMail()} className={classes.button} variant="contained" color="primary">
                 Send Email
             </MyButton>    
         </div>
@@ -55,4 +76,4 @@ const useStyles = makeStyles({
     }
 });
 
-export default FormSection;
+export default FormSendEmail;

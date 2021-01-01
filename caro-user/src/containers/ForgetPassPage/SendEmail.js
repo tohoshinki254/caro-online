@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles, Grid } from '@material-ui/core';
 import LeftSection from '../LoginPage/LeftSection';
 import FormSendEmail from '../ForgetPassPage/FormSendEmail';
+import Loading from '../../components/Loading';
 
 const SendEmail = () => {
     const classes = useStyles();
+    const [loading, setLoading] = useState(false);
 
     return (
         <div className={classes.container}>
@@ -17,12 +19,13 @@ const SendEmail = () => {
                             <LeftSection text={'Login now'} pathLink="/login" />
                         </Grid>
                         <Grid className={classes.paddingRightSection} item xs={6}>
-                            <FormSendEmail />
+                            <FormSendEmail setLoading={setLoading}/>
                         </Grid>
                     </Grid>
                 </Grid>
                 <Grid item xs={3} />
             </Grid>
+            {loading && <Loading />}
         </div>
     )
 }

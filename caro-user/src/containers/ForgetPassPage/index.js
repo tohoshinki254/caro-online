@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import Loading from '../../components/Loading';
 import LeftSection from '../LoginPage/LeftSection';
 import FormSection from './FormSection';
 
 const ForgetPassPage = (props) => {
     const classes = useStyles();
-    let history = useHistory();
     const [loading, setLoading] = useState(false);
     const userId = props.match.params.id;
 
@@ -21,12 +20,13 @@ const ForgetPassPage = (props) => {
                             <LeftSection text={'Login now'} pathLink="/login" />
                         </Grid>
                         <Grid className={classes.paddingRightSection} item xs={6}>
-                            <FormSection id={userId} />
+                            <FormSection id={userId} setLoading={setLoading} />
                         </Grid>
                     </Grid>
                 </Grid>
                 <Grid item xs={3} />
             </Grid>
+            {loading && <Loading />}
         </div>
     )
 }

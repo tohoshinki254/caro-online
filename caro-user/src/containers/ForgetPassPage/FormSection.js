@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
+import { fetchWithoutAuthentication } from '../../api/fetch-data';
+import { API_URL } from '../../global/constants';
 
-const FormSection = ({ id }) => {
+const FormSection = ({ id, setLoading }) => {
     const classes = useStyles();
     const [password, setPassword] = useState({ value: '', error: false });
     const [rePassword, setRePassword] = useState({ value: '', error: false });
@@ -21,6 +23,25 @@ const FormSection = ({ id }) => {
         const value = event.target.value;
         const newRePassword = {value: value, error: !(value === password.value)}
         setRePassword(newRePassword);
+    }
+
+    const resetPassword = () => {
+        setLoading(true);
+        const data = {
+            id: id,
+            password: password.value
+        }
+        fetchWithoutAuthentication(API_URL + 'user/reset-password', 'POST', data)
+            .then(
+                (data) => {
+                    setOutput('Reset password successfully');
+                    setLoading(false);
+                },
+                (error) => {
+                    setOutput('Error');
+                    setLoading(false);
+                }
+            )
     }
 
     return (
@@ -43,7 +64,7 @@ const FormSection = ({ id }) => {
                 onChange={handleRePasswordChange}
             />
             <Typography className={classes.errorText}>{output}</Typography>
-            <MyButton onClick={() => {}} className={classes.button} variant="contained" color="primary">
+            <MyButton onClick={() => resetPassword()} className={classes.button} variant="contained" color="primary">
                 Change Password
             </MyButton>    
         </div>
