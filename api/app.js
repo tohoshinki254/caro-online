@@ -6,11 +6,13 @@ const logger = require('morgan');
 const cors = require('cors');
 const passport = require('./configs/passport');
 const cookieSession = require("cookie-session");
+const session = require('express-session')
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
 const adminRouter = require('./routes/admin');
 const roomRouter = require('./routes/room');
+const authRouter = require('./routes/auth');
 
 const app = express();
 
@@ -18,8 +20,15 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.set('trust proxy', 1) 
+app.use(session({ 
+  secret: 'cat',
+  resave: false,
+  saveUninitialized: true,
+}));
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use(cors({credentials: true, origin: true}));
 app.use(logger('dev'));
 app.use(express.json());
@@ -31,6 +40,7 @@ app.use('/', indexRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 app.use('/room', roomRouter);
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

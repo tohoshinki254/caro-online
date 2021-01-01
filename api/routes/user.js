@@ -31,4 +31,8 @@ router.post('/reset-password', async (req, res, next) => {
     accountController.resetPassword(req, res, next);
 })
 
+router.get('/token-validation', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    accountController.checkToken(req, res, next);
+})
+
 module.exports = router;
