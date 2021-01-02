@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import UserCard from '../../components/UserCard';
 import MyButton from '../../components/MyButton';
-import { DRAW_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
+import { DRAW_IMAGE, FLAG_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
 import { RoomContext } from './context';
-import { addConfirmDialog, updateResult } from './actions';
+import { addConfirmDialog, addWatingDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 
 
@@ -22,8 +22,11 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
   const handleResign = () => {
     if (!start)
       return;
+
     const handleYes = () => {
       //something
+      resetState();
+      updateMark(!isCreator);
       dispatch(addConfirmDialog({
         open: false,
         image: null,
@@ -31,6 +34,15 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         handleYes: () => { },
         handleNo: () => { }
       }))
+
+      dispatch(updateResult({
+        open: true,
+        image: LOSE_IMAGE,
+        content: 'You Lose'
+      }))
+
+      const eventResign = isCreator ? 'creator-resign' : 'player-resign';
+      socket.emit(eventResign, { roomId: roomId });
     }
     const handleNo = () => {
       dispatch(addConfirmDialog({
@@ -44,12 +56,74 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
 
     dispatch(addConfirmDialog({
       open: true,
-      image: DRAW_IMAGE,
+      image: FLAG_IMAGE,
       content: 'Do you want to resign?',
       handleYes: handleYes,
       handleNo: handleNo
     }))
   }
+
+  const handleDraw = () => {
+    if (!start)
+      return;
+
+    const handleYes = () => {
+      dispatch(addConfirmDialog({
+        open: false,
+        image: null,
+        content: null,
+        handleYes: () => { },
+        handleNo: () => { }
+      }))
+
+      dispatch(addWatingDialog({
+        open: true
+      }));
+
+      const eventDraw = isCreator ? 'creator-claim-draw' : 'player-claim-draw';
+      socket.emit(eventDraw, { roomId: roomId });
+
+      const replyDraw = isCreator ? 'player-replied-draw' : 'creator-replied-draw';
+      socket.on(replyDraw, ({ accept }) => {
+
+        dispatch(addWatingDialog({
+          open: false
+        }));
+
+        if (accept) {
+          resetState();
+          dispatch(updateResult({
+            open: true,
+            image: DRAW_IMAGE,
+            content: 'Draw'
+          }));
+        } else {
+
+        }
+
+        socket.off(replyDraw);
+      })
+    }
+
+    const handleNo = () => {
+      dispatch(addConfirmDialog({
+        open: false,
+        image: null,
+        content: null,
+        handleYes: () => { },
+        handleNo: () => { }
+      }))
+    }
+
+    dispatch(addConfirmDialog({
+      open: true,
+      image: DRAW_IMAGE,
+      content: 'Do you want to claim a draw?',
+      handleYes: handleYes,
+      handleNo: handleNo
+    }))
+  }
+
   useEffect(() => {
     if (yourTurn) {
       if (isCreator) {
@@ -78,6 +152,14 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
       }
     }
   }, [yourTurn]);
+
+  useEffect(() => {
+    if (!start) {
+      setXRemain(120);
+      setORemain(120);
+      if (counter !== null) clearInterval(counter)
+    }
+  }, [start])
 
   useEffect(() => {
     if (xRemain === 0) {
@@ -162,8 +244,9 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         </MyButton>
         <MyButton
           style={{ width: '45%', marginLeft: '10%', marginTop: '3%' }}
+          onClick={handleDraw}
         >
-          Loose
+          Draw
         </MyButton>
       </div>
       <UserCard isBorder marginTop='10%' name={player.name} minutes={oRemain} mark={player.mark} />

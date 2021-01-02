@@ -14,7 +14,7 @@ import { calculateWinner, cloneBoard, initBoard } from './Services';
 import ResultDialog from './ResultDialog';
 import RoomReducer from './reducer';
 import { RoomContext } from './context';
-import { updateResult } from './actions';
+import { addConfirmDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 import ConfirmDialog from './ConfirmDialog';
 import WaitingDialog from './WaitingDialog';
@@ -29,15 +29,17 @@ const initialState = {
     open: false,
     image: null,
     content: null,
-    handleYes: () => {},
-    handleNo: () => {}
+    handleYes: () => { },
+    handleNo: () => { }
+  },
+  waitingDialog: {
+    open: false
   }
 }
 const RoomPage = ({ match }) => {
   const classes = useStyle();
   const { isLogined } = useContext(AppContext);
   const [state, dispatch] = useReducer(RoomReducer, initialState);
-
   const [infoBoard, setInfoBoard] = useState({
     creator: {
       name: 'N/A',
@@ -210,9 +212,115 @@ const RoomPage = ({ match }) => {
                 addBoard({ newBoard, location, isCreator })
               })
 
+              //listen player resign
+              socket.on('player-resigned', () => {
+                updateMark(true);
+                resetState();
+                dispatch(updateResult({
+                  open: true,
+                  image: WIN_IMAGE,
+                  content: 'You Win'
+                }));
+              })
+
+              //listen player claim draw
+              socket.on('player-claimed-draw', () => {
+                const handleYes = () => {
+                  dispatch(addConfirmDialog({
+                    open: false,
+                    image: null,
+                    content: null,
+                    handleYes: () => { },
+                    handleNo: () => { }
+                  }));
+
+                  socket.emit('creator-reply-draw', {roomId: match.params.roomId, accept: true});
+
+                  dispatch(updateResult({
+                    open: true,
+                    image: DRAW_IMAGE,
+                    content: 'Draw'
+                  }));
+                  resetState();
+                }
+
+                const handleNo = () => {
+                  dispatch(addConfirmDialog({
+                    open: false,
+                    image: null,
+                    content: null,
+                    handleYes: () => { },
+                    handleNo: () => { }
+                  }));
+
+                  socket.emit('creator-reply-draw', {roomId: match.params.roomId, accept: false});
+                }
+
+                dispatch(addConfirmDialog({
+                  open: true,
+                  image: DRAW_IMAGE,
+                  content: 'Player want to claim a draw?',
+                  handleYes: handleYes,
+                  handleNo: handleNo
+                }))
+              })
             } else {
               socket.on('creator-done', ({ newBoard, location, isCreator }) => {
                 addBoard({ newBoard, location, isCreator });
+              })
+
+              //listen creator resign
+              socket.on('creator-resigned', () => {
+                updateMark(false);
+                resetState();
+                dispatch(updateResult({
+                  open: true,
+                  image: WIN_IMAGE,
+                  content: 'You Win'
+                }));
+              })
+
+              //listen creator claim draw
+              socket.on('creator-claimed-draw', () => {
+                const handleYes = () => {
+                  dispatch(addConfirmDialog({
+                    open: false,
+                    image: null,
+                    content: null,
+                    handleYes: () => { },
+                    handleNo: () => { }
+                  }));
+
+                  socket.emit('player-reply-draw', {roomId: match.params.roomId, accept: true});
+
+                  dispatch(updateResult({
+                    open: true,
+                    image: DRAW_IMAGE,
+                    content: 'Draw'
+                  }));
+
+                  resetState();
+                }
+
+                const handleNo = () => {
+                  dispatch(addConfirmDialog({
+                    open: false,
+                    image: null,
+                    content: null,
+                    handleYes: () => { },
+                    handleNo: () => { }
+                  }));
+
+                  socket.emit('player-reply-draw', {roomId: match.params.roomId, accept: false});
+                }
+
+                dispatch(addConfirmDialog({
+                  open: true,
+                  image: DRAW_IMAGE,
+                  content: 'Player want to claim a draw?',
+                  handleYes: handleYes,
+                  handleNo: handleNo
+                }))
               })
             }
             //player click start
@@ -265,6 +373,10 @@ const RoomPage = ({ match }) => {
       socket.off('creator-done');
       socket.off('game-done');
       socket.off('player-started');
+      socket.off('creator-resigned')
+      socket.off('player-resigned');
+      socket.off('creator-claimed-draw');
+      socket.off('player-claimed-draw');
     }
   }, []);
 
@@ -323,9 +435,8 @@ const RoomPage = ({ match }) => {
         handleNo={state.confirmDialog.handleNo}
         handleYes={state.confirmDialog.handleYes}
       />
-      <WaitingDialog 
-      
-      
+      <WaitingDialog
+        open={state.waitingDialog.open}
       />
     </RoomContext.Provider>
   );

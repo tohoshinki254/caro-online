@@ -46,8 +46,15 @@ const ConfirmDialog = ({open = false, image, content, handleYes, handleNo}) => {
 const useStyle = makeStyles({
   image: {
     width: '100%',
+    paddingTop: '4%',
+    paddingBottom: '4%'
   },
-
+  text: {
+    marginTop: '5%',
+    marginBottom: '2%',
+    fontFamily: 'NerkoOne',
+    fontSize: '1.5rem',
+  }
 });
 
 export default ConfirmDialog;

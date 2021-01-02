@@ -2,11 +2,11 @@ import React from 'react';
 import { CircularProgress, Dialog, Grid, makeStyles, Typography } from '@material-ui/core';
 
 
-const WaitingDialog = () => {
+const WaitingDialog = ({open}) => {
     const classes = useStyle();
     return (
       <Dialog
-        open={false}
+        open={open}
         fullWidth
         maxWidth='xs'
       >
