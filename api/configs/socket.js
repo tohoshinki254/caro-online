@@ -104,5 +104,44 @@ module.exports = {
         await room.save();
       }
     })
+
+    //creator resign
+    socket.on('creator-resign', async ({roomId}) => {
+      socket.to(`${roomId}`).emit('creator-resigned');
+      const room = await roomDAO.findOne({roomId: roomId});
+      if (room) {
+        room.playerWinner++;
+        await room.save();
+      }
+    })
+
+    //player resign
+    socket.on('player-resign', async ({roomId}) => {
+      socket.to(`${roomId}`).emit('player-resigned');
+      const room = await roomDAO.findOne({roomId: roomId});
+      if (room) {
+        room.creatorWinner++;
+        await room.save();
+      }
+    })
+
+    //creator claim draw
+    socket.on('creator-claim-draw', async ({roomId}) => {
+      socket.to(`${roomId}`).emit('creator-claimed-draw');
+    })
+
+    socket.on('player-reply-draw', async ({roomId, accept}) => {
+      socket.to(`${roomId}`).emit('player-replied-draw', {accept});
+    })
+
+    //player claim draw
+    socket.on('player-claim-draw', async ({roomId}) => {
+      socket.to(`${roomId}`).emit('player-claimed-draw');
+    })
+
+
+    socket.on('creator-reply-draw', async ({roomId, accept}) => {
+      socket.to(`${roomId}`).emit('creator-replied-draw', {accept});
+    })
   }
 }
