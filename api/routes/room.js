@@ -26,6 +26,10 @@ router.post('/saving-result', async (req, res, next) => {
 
 router.post('/rooms-by-user', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
     roomController.getRoomByUserId(req, res, next);
+});
+
+router.get('/rooms-ended', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    roomController.getRoomsEnded(req, res, next);
 })
 
 module.exports = router;

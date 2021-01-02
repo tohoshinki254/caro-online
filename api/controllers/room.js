@@ -188,6 +188,7 @@ module.exports = {
 
     getRoomByUserId: async (req, res, next) => {
         try {
+            console.log(req.body);
             const { id } = req.body;
             const user = await accountDAO.findById(id);
             if (user === null) {
@@ -198,6 +199,20 @@ module.exports = {
             }
 
             const rooms = await roomDAO.find({ $or: [{ creator: id }, { player: id }] });
+            res.status(200).json({
+                message: 'OK',
+                rooms: rooms
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    },
+
+    getRoomsEnded: async (req, res, next) => {
+        try {
+            const rooms = await roomDAO.find({ isEnd: true });
             res.status(200).json({
                 message: 'OK',
                 rooms: rooms
