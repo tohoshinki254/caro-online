@@ -3,13 +3,11 @@ import { makeStyles, Paper, Table, TableContainer, TableHead, TablePagination, T
 import { useHistory } from 'react-router-dom';
 import { StyledTableCell, StyledTableRow } from '../../components/StyledTable';
 
-const RightSection = () => {
+const RightSection = ({ rooms, userId }) => {
     const classes = useStyles();
     let history = useHistory();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(7);
-
-    const [matches, setMatches] = useState([]);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -27,44 +25,31 @@ const RightSection = () => {
                     <TableHead>
                         <TableRow>
                             <StyledTableCell style={{ width: '40%' }}>Competitor</StyledTableCell>
-                            <StyledTableCell align="right">Cups won</StyledTableCell>
-                            <StyledTableCell align="right">Wins</StyledTableCell>
-                            <StyledTableCell align="right">Draws</StyledTableCell>
-                            <StyledTableCell align="right">Loses</StyledTableCell>
+                            <StyledTableCell align="center">Cups won</StyledTableCell>
+                            <StyledTableCell align="center">Wins</StyledTableCell>
+                            <StyledTableCell align="center">Draws</StyledTableCell>
+                            <StyledTableCell align="center">Loses</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {/* {matches.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((match) => (
-                            <></>
-                        ))} */}
-                        <StyledTableRow>
-                            <StyledTableCell style={{ width: '40%' }}>Competitor</StyledTableCell>
-                            <StyledTableCell align="right">Cups won</StyledTableCell>
-                            <StyledTableCell align="right">Wins</StyledTableCell>
-                            <StyledTableCell align="right">Draws</StyledTableCell>
-                            <StyledTableCell align="right">Loses</StyledTableCell>
-                        </StyledTableRow>
-                        <StyledTableRow>
-                            <StyledTableCell style={{ width: '40%' }}>Competitor</StyledTableCell>
-                            <StyledTableCell align="right">Cups won</StyledTableCell>
-                            <StyledTableCell align="right">Wins</StyledTableCell>
-                            <StyledTableCell align="right">Draws</StyledTableCell>
-                            <StyledTableCell align="right">Loses</StyledTableCell>
-                        </StyledTableRow>
-                        <StyledTableRow>
-                            <StyledTableCell style={{ width: '40%' }}>Competitor</StyledTableCell>
-                            <StyledTableCell align="right">Cups won</StyledTableCell>
-                            <StyledTableCell align="right">Wins</StyledTableCell>
-                            <StyledTableCell align="right">Draws</StyledTableCell>
-                            <StyledTableCell align="right">Loses</StyledTableCell>
-                        </StyledTableRow>
+                        {rooms.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((room) => (
+                            <StyledTableRow key={room.creator !== userId ? room.creator : room.player} onClick={() => {}}>
+                                <StyledTableCell component="th" scope="row" style={{ width: '15%'}}>
+                                    {room.creator !== userId ? room.creator : room.player}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">{room.cups}</StyledTableCell>
+                                <StyledTableCell align="center">{room.creator !== userId ? room.playerWinner : room.creatorWinner}</StyledTableCell>
+                                <StyledTableCell align="center">{room.draws}</StyledTableCell>
+                                <StyledTableCell align="center">{room.creator !== userId ? room.creatorWinner : room.playerWinner}</StyledTableCell>
+                            </StyledTableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </TableContainer>
             <TablePagination 
                 rowsPerPageOptions={[5, 10]}
                 component="div"
-                count={matches.length}
+                count={rooms.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={handleChangePage}

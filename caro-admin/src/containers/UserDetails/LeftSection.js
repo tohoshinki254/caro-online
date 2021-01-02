@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { FormControlLabel, Grid, makeStyles } from '@material-ui/core';
-import MyTextField from '../../components/MyTextField';
-import MyButton from '../../components/MyButton';
+import { makeStyles, Typography, Avatar, List, ListItem, ListItemText } from '@material-ui/core';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
+import MyButton from '../../components/MyButton/index';
 
 const LeftSection = ({ user }) => {
     const classes = useStyles();
@@ -26,80 +25,57 @@ const LeftSection = ({ user }) => {
     }
 
     return (
-        <div className={classes.container}>
-            <MyTextField className={classes.textField}
-                label='User ID'
-                defaultValue={user._id}
-                disabled={true}
-            />
-            <MyTextField className={classes.textField}
-                label='Username'
-                defaultValue={user.username}
-                disabled={true}
-            />
-            <MyTextField className={classes.textField}
-                label='Name'
-                defaultValue={user.name}
-                disabled={true}
-            />
-            <MyTextField className={classes.textField}
-                label='Email'
-                defaultValue={user.email}
-                disabled={true}
-            />
-            <Grid style={{ marginTop: '5%'}} container>
-                <Grid item xs={2}>
-                    <MyTextField className={classes.textField}
-                        label='Cups'
-                        disabled={true}
-                        defaultValue={user.cups}
-                    />
-                </Grid>
-                <Grid item xs={1} />
-                <Grid item xs={2}>
-                    <MyTextField className={classes.textField}
-                        label='Wins'
-                        disabled={true}
-                        defaultValue={user.wins}
-                    />
-                </Grid>
-                <Grid item xs={1} />
-                <Grid item xs={2}>
-                    <MyTextField className={classes.textField}
-                        label='Loses'
-                        disabled={true}
-                        defaultValue={user.loses}
-                    />
-                </Grid>
-                <Grid item xs={1} />
-                <Grid item xs={2}>
-                    <MyTextField className={classes.textField}
-                        label='Draws'
-                        disabled={true}
-                        defaultValue={user.draws}
-                    />
-                </Grid>
-                <Grid item xs={1} />
-            </Grid>
-            <MyButton onClick={() => changeLockUser(user._id)} className={classes.button} variant="contained" color="primary">
-                {isLocked ? "Unlock" : "Lock"}
-            </MyButton>
+        <div>
+            <div className={classes.divAvatar}>
+                <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
+                <Typography className={classes.name}>{user.name}</Typography>
+            </div>
+            <div>
+                <List>
+                    <ListItem>
+                        <ListItemText primary={`Matches: ${user.wins + user.loses + user.draws}`} className={classes.listItem}/>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemText primary="Win Rate: " className={classes.listItem}/>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemText primary="Rank: " className={classes.listItem}/>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemText primary={`Cups: ${user.cups}`} className={classes.listItem}/>
+                    </ListItem>
+                </List>
+                <MyButton onClick={() => changeLockUser(user._id)} className={classes.button} variant="contained" color="primary">
+                    {isLocked ? "Unlock" : "Lock"}
+                </MyButton>
+            </div>
         </div>
     )
 }
 
-const useStyles = makeStyles({
-    container: {
+const useStyles = makeStyles((theme) => ({
+    divAvatar: {
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
-    textField: {
-        marginTop: '5%',
-        color: 'black'
+    avatar: {
+        width: '30%',
+        height: '30%'
+    },
+    name: {
+        fontFamily: 'NerkoOne',
+        fontSize: '2rem',
+        marginTop: '1%'
+    },
+    listItem: {
+        fontFamily: 'monospace',
+        color: 'gray'
     },
     button: {
-        marginTop: '10%'
+        width: '100%'
     },
-});
+}));
 
 export default LeftSection;
