@@ -184,5 +184,28 @@ module.exports = {
                 message: e.message
             })
         }
+    },
+
+    getRoomByUserId: async (req, res, next) => {
+        try {
+            const { id } = req.body;
+            const user = await accountDAO.findById(id);
+            if (user === null) {
+                res.status(400).json({
+                    message: 'User is not existed'
+                });
+                return;
+            }
+
+            const rooms = await roomDAO.find({ $or: [{ creator: id }, { player: id }] });
+            res.status(200).json({
+                message: 'OK',
+                rooms: rooms
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            })
+        }
     }
 }

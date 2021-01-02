@@ -13,8 +13,7 @@ const roomSchema = new mongoose.Schema({
     createdTime: Date,
     isPublic: Boolean,
     name: String,
-    chat: Array,
-    history: Array
+    chat: Array
 });
 
 module.exports = mongoose.model('rooms', roomSchema);
