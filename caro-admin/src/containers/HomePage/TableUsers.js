@@ -31,27 +31,25 @@ const TableUsers = ({ users }) => {
                 <Table style={{ width: '100%' }} aria-label="customized table">
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell style={{ width: '15%'}}>Username</StyledTableCell>
                             <StyledTableCell style={{ width: '15%'}}>Name</StyledTableCell>
                             <StyledTableCell style={{ width: '15%'}}>Email</StyledTableCell>
-                            <StyledTableCell align="right">Cups</StyledTableCell>
-                            <StyledTableCell align="right">Wins</StyledTableCell>
-                            <StyledTableCell align="right">Draws</StyledTableCell>
-                            <StyledTableCell align="right">Loses</StyledTableCell>
+                            <StyledTableCell align="center">Cups</StyledTableCell>
+                            <StyledTableCell align="center">Wins</StyledTableCell>
+                            <StyledTableCell align="center">Draws</StyledTableCell>
+                            <StyledTableCell align="center">Loses</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                            <StyledTableRow key={user.username} onClick={() => seeUserDetails(user)}>
+                            <StyledTableRow key={user.name} onClick={() => seeUserDetails(user)}>
                                 <StyledTableCell component="th" scope="row" style={{ width: '15%'}}>
-                                    {user.username}
+                                    {user.name}
                                 </StyledTableCell>
-                                <StyledTableCell style={{ width: '15%'}}>{user.name}</StyledTableCell>
                                 <StyledTableCell style={{ width: '15%'}}>{user.email}</StyledTableCell>
-                                <StyledTableCell align="right">{user.cups}</StyledTableCell>
-                                <StyledTableCell align="right">{user.wins}</StyledTableCell>
-                                <StyledTableCell align="right">{user.draws}</StyledTableCell>
-                                <StyledTableCell align="right">{user.loses}</StyledTableCell>
+                                <StyledTableCell align="center">{user.cups}</StyledTableCell>
+                                <StyledTableCell align="center">{user.wins}</StyledTableCell>
+                                <StyledTableCell align="center">{user.draws}</StyledTableCell>
+                                <StyledTableCell align="center">{user.loses}</StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>

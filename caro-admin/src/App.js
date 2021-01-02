@@ -4,6 +4,7 @@ import LoginPage from "./containers/LoginPage";
 import RegisterPage from './containers/RegisterPage';
 import HomePage from './containers/HomePage/index';
 import UserDetails from './containers/UserDetails/index';
+import RoomDetails from './containers/RoomDetails/index';
 import { AppContext } from "./contexts/AppContext";
 import { API_URL, TOKEN_NAME } from "./global/constants";
 
@@ -24,6 +25,7 @@ function App() {
           <Route path='/register' component={RegisterPage} /> 
           <Route path='/home' component={HomePage} />
           <Route path='/user/:userId' component={UserDetails} />
+          <Route path='/room/:roomId' component={RoomDetails} />
       </Switch>
     </AppContext.Provider>
   );

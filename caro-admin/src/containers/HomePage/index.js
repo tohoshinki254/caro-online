@@ -11,34 +11,48 @@ import { useHistory } from 'react-router-dom';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import TableUsers from './TableUsers';
+import TableRooms from './TableRooms';
 
 const HomePage = () => {
     const classes = useStyles();
     const { isLogined } = useContext(AppContext);
     const history = useHistory();
-
-    const [displayUsers, setDisplayUsers] = useState(true);
+    
     const [loading, setLoading] = useState(false);
-    const [users, setUsers] = useState([]);
     const [output, setOutput] = useState('');
     const [searchText, setSearchText] = useState('');
 
+    const [displayUsers, setDisplayUsers] = useState(true);
+    const [users, setUsers] = useState([]);
+    const [rooms, setRooms] = useState([]);
+
     useEffect(() => {
-        if (displayUsers && users.length === 0) {
-            setLoading(true);
-            fetchWithAuthentication(API_URL + 'admin/list-user', 'GET', localStorage.getItem(TOKEN_NAME))
-                .then(
-                    (data) => {
-                        setLoading(false);
-                        setUsers(data.users);
-                    },
-                    (error) => {
-                        setLoading(false);
-                        setOutput(error.message);
-                    }
-                )
-        }
-    }, [setDisplayUsers, setUsers]);
+        setLoading(true);
+        fetchWithAuthentication(API_URL + 'admin/list-user', 'GET', localStorage.getItem(TOKEN_NAME))
+            .then(
+                (data) => {
+                    setLoading(false);
+                    setUsers(data.users);
+                },
+                (error) => {
+                    setLoading(false);
+                    setOutput(error.message);
+                }
+            )
+
+        setLoading(true);
+        fetchWithAuthentication(API_URL + 'room/rooms-ended', 'GET', localStorage.getItem(TOKEN_NAME))
+            .then(
+                (data) => {
+                    setLoading(false);
+                    setRooms(data.rooms);
+                },
+                (error) => {
+                    setLoading(false);
+                    setOutput(error.message);
+                }
+            )
+    }, [setUsers, setRooms]);
     
     const createAccount = () => {
         const to = '/register';
@@ -75,12 +89,20 @@ const HomePage = () => {
                             />
                         </Grid>
                         <Grid container justify='center' item xs={3}>
-                            <MyButton className={classes.button} variant="contained" color="primary">
+                            <MyButton className={classes.button} 
+                                variant="contained" 
+                                color="primary"
+                                onClick={() => setDisplayUsers(true)}
+                            >
                                 View list of users
                             </MyButton>
                         </Grid>
                         <Grid container justify='center' item xs={3}>
-                            <MyButton className={classes.button} variant="contained" color="primary">
+                            <MyButton className={classes.button} 
+                                variant="contained" 
+                                color="primary"
+                                onClick={() => setDisplayUsers(false)}
+                            >
                                 View list of matches
                             </MyButton>
                         </Grid>
@@ -92,7 +114,9 @@ const HomePage = () => {
                     </Grid>
 
                     <Grid className={classes.mainSection} container>
-                        <TableUsers users={users.filter(item => item.name.includes(searchText) || item.email.includes(searchText))}/>
+                        {displayUsers ? 
+                            <TableUsers users={users.filter(item => item.name.toLowerCase().includes(searchText) || (item.email !== null && item.email.toLowerCase().includes(searchText)))}/>
+                        : <TableRooms rooms={rooms} />}
                     </Grid>
                 </Grid>
                 <Grid item xs={1} />
