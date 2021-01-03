@@ -43,11 +43,19 @@ const RoomPage = ({ match }) => {
   const [infoBoard, setInfoBoard] = useState({
     creator: {
       name: 'N/A',
-      mark: 0
+      mark: 0,
+      cups: 0,
+      wins: 0,
+      draws: 0,
+      loses: 0
     },
     player: {
       name: 'N/A',
-      mark: 0
+      mark: 0,
+      cups: 0,
+      wins: 0,
+      draws: 0,
+      loses: 0
     }
   });
   const [isCreator, setIsCreator] = useState(null);
@@ -112,6 +120,7 @@ const RoomPage = ({ match }) => {
           image: DRAW_IMAGE,
           content: 'Draw Game'
         }))
+        updateMark();
         resetState();
       }
       //------------------------------------
@@ -132,7 +141,7 @@ const RoomPage = ({ match }) => {
         isCreator: null
       }])
       if (!playerStart) {
-        setStartStatus('Wating for player start');
+        setStartStatus('Waiting for player start');
       } else {
         setYourTurn(isCreator);
         setStartStatus('Game started');
@@ -156,26 +165,57 @@ const RoomPage = ({ match }) => {
   }
 
   const updateMark = (isCreatorWin) => {
-    if (isCreatorWin) {
+    if (isCreatorWin === true) {
       setInfoBoard(infoBoard => {
+        const winCups = infoBoard.creator.cups >= infoBoard.player.cups ? 1 : 3;
+        const loseCups = infoBoard.player.cups > infoBoard.creator.cups ? 3 : 1;
         return {
-          player: infoBoard.player,
+          player: {
+            ...infoBoard.player,
+            cups: infoBoard.player.cups - loseCups,
+            loses: infoBoard.player.loses + 1,
+          },
           creator: {
-            name: infoBoard.creator.name,
-            mark: infoBoard.creator.mark + 1
+            ...infoBoard.creator,
+            mark: infoBoard.creator.mark + 1,
+            cups: infoBoard.creator.cups + winCups,
+            wins: infoBoard.creator.wins + 1,
           }
         };
       })
     } else {
-      setInfoBoard(infoBoard => {
-        return {
-          player: {
-            name: infoBoard.player.name,
-            mark: infoBoard.player.mark + 1
-          },
-          creator: infoBoard.creator
-        }
-      })
+      if (isCreatorWin === false) {
+        setInfoBoard(infoBoard => {
+          const winCups = infoBoard.player.cups >= infoBoard.creator.cups ? 1 : 3;
+          const loseCups = infoBoard.creator.cups > infoBoard.player.cups ? 3 : 1;
+          return {
+            player: {
+              ...infoBoard.player,
+              cups: infoBoard.player.cups + winCups,
+              mark: infoBoard.player.mark + 1,
+              wins: infoBoard.player.wins + 1
+            },
+            creator: {
+              ...infoBoard.creator,
+              loses: infoBoard.creator.loses + 1,
+              cups: infoBoard.creator.cups - loseCups
+            }
+          }
+        })
+      } else {
+        setInfoBoard(infoBoard => {
+          return {
+            player: {
+              ...infoBoard.player,
+              draws: infoBoard.player.draws + 1,
+            },
+            creator: {
+              ...infoBoard.creator,
+              draws: infoBoard.player.draws + 1
+            }
+          }
+        })
+      }
     }
   }
   const addBoard = ({ newBoard, location, isCreator }) => {
@@ -198,12 +238,19 @@ const RoomPage = ({ match }) => {
         .then(
           (data) => {
             let { player, creator, isCreator } = data;
-            socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator });
+            socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator, userId: userInfo._id });
             if (isCreator) {
               socket.emit('new-room-created');
               //player join the room
-              socket.on('player-joined', (name) => {
-                player = { name: name, mark: 0 };
+              socket.on('player-joined', (playerJoined) => {
+                player = {
+                  name: playerJoined.name,
+                  mark: 0,
+                  cups: playerJoined.cups,
+                  wins: playerJoined.wins,
+                  draws: playerJoined.draws,
+                  loses: playerJoined.loses
+                };
                 setInfoBoard({ creator: creator, player: player });
               });
 
@@ -234,13 +281,14 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('creator-reply-draw', {roomId: match.params.roomId, accept: true});
+                  socket.emit('creator-reply-draw', { roomId: match.params.roomId, accept: true });
 
                   dispatch(updateResult({
                     open: true,
                     image: DRAW_IMAGE,
                     content: 'Draw'
                   }));
+                  updateMark();
                   resetState();
                 }
 
@@ -253,7 +301,7 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('creator-reply-draw', {roomId: match.params.roomId, accept: false});
+                  socket.emit('creator-reply-draw', { roomId: match.params.roomId, accept: false });
                 }
 
                 dispatch(addConfirmDialog({
@@ -291,14 +339,14 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('player-reply-draw', {roomId: match.params.roomId, accept: true});
+                  socket.emit('player-reply-draw', { roomId: match.params.roomId, accept: true });
 
                   dispatch(updateResult({
                     open: true,
                     image: DRAW_IMAGE,
                     content: 'Draw'
                   }));
-
+                  updateMark();
                   resetState();
                 }
 
@@ -311,7 +359,7 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('player-reply-draw', {roomId: match.params.roomId, accept: false});
+                  socket.emit('player-reply-draw', { roomId: match.params.roomId, accept: false });
                 }
 
                 dispatch(addConfirmDialog({
@@ -355,6 +403,7 @@ const RoomPage = ({ match }) => {
                   image: DRAW_IMAGE,
                   content: 'Draw Game'
                 }))
+                updateMark();
                 resetState();
               }
             })
@@ -455,14 +504,16 @@ const useStyle = makeStyles({
     fontSize: '1.6rem',
     marginTop: '2%',
     width: '100%',
-    marginLeft: '20%'
+    marginLeft: '20%',
+    fontFamily: 'NerkoOne',
   },
   turn: {
     fontWeight: 'bold',
     fontSize: '1.6rem',
     marginTop: '1%',
     width: '100%',
-    marginLeft: '4%'
+    marginLeft: '4%',
+    fontFamily: 'NerkoOne',
   }
 });
 

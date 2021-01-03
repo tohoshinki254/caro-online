@@ -69,16 +69,18 @@ const Chat = ({ roomId }) => {
 const useStyle = makeStyles({
   container: {
     width: '100%',
-    height: '350px',
-    backgroundColor: '#bdbdbd',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-    marginTop: '5%'
+    height: '370px',
+    marginTop: '5%',
+    borderRadius: '5px',
+    border: 'solid #bdbdbd 2px'
   },
   text: {
     marginTop: '2%',
+    paddingTop: '2%',
     fontWeight: 'bold',
-    fontSize: '1.2rem',
+    fontSize: '1.5rem',
     marginBottom: '1%',
+    fontFamily: 'NerkoOne',
   },
   chatContent: {
     width: '100%',

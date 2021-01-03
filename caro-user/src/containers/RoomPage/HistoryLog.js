@@ -45,19 +45,19 @@ const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
 const useStyle = makeStyles({
   container: {
     width: '100%',
-    height: '200px',
-    backgroundColor: '#bdbdbd',
+    height: '210px',
     borderRadius: '5px',
     display: 'flex',
     flexDirection: 'column',
     overflowX: 'hidden',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
+    border: 'solid #bdbdbd 2px'
   },
   text: {
     marginTop: '2%',
     fontWeight: 'bold',
-    fontSize: '1.2rem',
+    fontSize: '1.5rem',
     marginBottom: '2%',
+    fontFamily: 'NerkoOne',
   }
 });
 

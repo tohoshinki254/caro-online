@@ -92,6 +92,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
 
         if (accept) {
           resetState();
+          updateMark();
           dispatch(updateResult({
             open: true,
             image: DRAW_IMAGE,
@@ -249,8 +250,8 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           Draw
         </MyButton>
       </div>
-      <UserCard isBorder marginTop='10%' name={player.name} minutes={oRemain} mark={player.mark} />
-      <UserCard isBorder marginTop='10%' name={creator.name} minutes={xRemain} mark={creator.mark} isX />
+      <UserCard isBorder userStat={player} marginTop='10%'  minutes={oRemain} />
+      <UserCard isBorder userStat={creator} marginTop='10%' minutes={xRemain} isX />
 
     </div>
   );
