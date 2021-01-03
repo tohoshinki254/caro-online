@@ -2,8 +2,9 @@ import React from 'react';
 import { makeStyles, Typography, Grid } from '@material-ui/core';
 import Cell from '../../components/Cell/index';
 
-const CenterSection = () => {
+const CenterSection = ({ room, match }) => {
     const classes = useStyles();
+
     let board = [];
     for (let i = 0; i < 18; i++) {
         board.push(Array(18).fill(null))
@@ -28,7 +29,7 @@ const CenterSection = () => {
 
     return (
         <div className={classes.root}>
-            <Typography className={classes.title}>Room 100 - Game 1</Typography>
+            <Typography className={classes.title}>Room {room.roomId} {match !== undefined ? ` - Game ${match.match}` : null} </Typography>
             <Grid container>
                 {generateBoard()}
             </Grid>

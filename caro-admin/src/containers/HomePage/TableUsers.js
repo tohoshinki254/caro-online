@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableHead, TableContainer, TableRow, Paper, TableBody, TablePagination } from '@material-ui/core';
 import { StyledTableCell, StyledTableRow } from '../../components/StyledTable/index';
 import { useHistory } from 'react-router-dom';

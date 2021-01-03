@@ -1,31 +1,54 @@
-import React from 'react';
-import { makeStyles, Grid } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
+import { Grid } from '@material-ui/core';
+import { useLocation } from 'react-router-dom';
 import LeftSection from './LeftSection';
 import CenterSection from './CenterSection';
 import RightSection from './RightSection';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { fetchWithAuthentication } from '../../api/fetch-data';
 
 const RoomDetails = () => {
-    const classes = useStyles();
+    const { room } = useLocation().state;
+    const [matches, setMatches] = useState([]);
+    const [match, setMatch] = useState();
+
+    useEffect(() => {
+        const data = {
+            roomId: room.roomId
+        };
+        fetchWithAuthentication(API_URL + 'match/matches-of-room', 'POST', localStorage.getItem(TOKEN_NAME), data)
+            .then(
+                (data) => {
+                    setMatches(data.matches);
+                    if (data.matches.length !== 0) {
+                        setMatch(matches[0]);
+                    }
+                },
+                (error) => {
+
+                }
+            )
+    }, [])
+
+    const changeMatch = (match) => {
+        setMatch(match);
+    }
 
     return (
         <>
             <Grid container>
                 <Grid item xs={3}>
-                    <LeftSection />
+                    <LeftSection room={room} matches={matches} changeMatch={changeMatch} />
                 </Grid>
                 <Grid item xs={6}>
-                    <CenterSection />
+                    <CenterSection room={room} match={match}/>
                 </Grid>
                 <Grid item xs={3}>
-                    <RightSection />
+                    <RightSection room={room} match={match}/>
                 </Grid>
             </Grid>
         </>
     )
 }
-
-const useStyles = makeStyles({
-
-});
 
 export default RoomDetails;

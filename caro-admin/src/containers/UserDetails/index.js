@@ -27,7 +27,7 @@ const UserDetails = () => {
 
                 }
             )
-    }, [setRooms])
+    }, [setRooms, location])
 
     return (
         <>

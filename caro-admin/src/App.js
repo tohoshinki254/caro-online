@@ -6,7 +6,7 @@ import HomePage from './containers/HomePage/index';
 import UserDetails from './containers/UserDetails/index';
 import RoomDetails from './containers/RoomDetails/index';
 import { AppContext } from "./contexts/AppContext";
-import { API_URL, TOKEN_NAME } from "./global/constants";
+import { TOKEN_NAME } from "./global/constants";
 
 function App() {
   const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);

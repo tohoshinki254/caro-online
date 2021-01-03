@@ -1,103 +1,86 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles, Avatar, Typography, Button } from '@material-ui/core';
 import { CheckCircle } from '@material-ui/icons';
-import MyButton from '../../components/MyButton/index';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { fetchWithAuthentication } from '../../api/fetch-data';
 
-const LeftSection = () => {
+const LeftSection = ({ room, matches, changeMatch }) => {
     const classes = useStyles();
+    const [creator, setCreator] = useState();
+    const [player, setPlayer] = useState();
+
+    useEffect(() => {
+        fetchWithAuthentication(API_URL + 'user?userId=' + room.creator, 'GET', localStorage.getItem(TOKEN_NAME))
+            .then(
+                (data) => {
+                    setCreator(data.user);
+                },
+                (error) => {
+
+                }
+            )
+    }, [setCreator])
+
+    useEffect(() => {
+        fetchWithAuthentication(API_URL + 'user?userId=' + room.player, 'GET', localStorage.getItem(TOKEN_NAME))
+            .then(
+                (data) => {
+                    setPlayer(data.user);
+                },
+                (error) => {
+
+                }
+            )
+    }, [setPlayer])
 
     return (
         <div style={{ margin: '5%', alignItems: 'center' }}>
             <div style={{borderColor: 'dodgerblue' ,borderWidth: '2px', borderStyle: 'solid', borderRadius: '5px', padding: '2%', marginBottom: '2%'}}>
+                {creator !== undefined && 
                 <div className={classes.player}>
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
                     <div style={{ justifyContent: 'center', margin: '2%' }}>
-                        <Typography className={classes.title}>thanhtien813</Typography>
+                        <Typography className={classes.title}>{creator.name}</Typography>
                         <Typography style={{ fontSize: '0.9rem', color: 'gray' }}>5feeedb2f3c3040c1848b3ba</Typography>
                     </div>
-                </div>
+                </div>}
             </div>
             <div style={{borderColor: 'red' ,borderWidth: '2px', borderStyle: 'solid', borderRadius: '5px', padding: '2%', marginTop: '2%', marginBottom: '10%'}}>
+                {player !== undefined && 
                 <div className={classes.player}>
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
                     <div style={{ justifyContent: 'center', margin: '2%' }}>
-                        <Typography className={classes.title}>thanhtien813</Typography>
+                        <Typography className={classes.title}>{player.name}</Typography>
                         <Typography style={{ fontSize: '0.9rem', color: 'gray' }}>5feeedb2f3c3040c1848b3ba</Typography>
                     </div>
-                </div>
+                </div>}
             </div>
 
             <Typography className={classes.title}>Matches</Typography>
             <div className={classes.matches}>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 1
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 2
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 3
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 4
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 5
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 6
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 7
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    className={classes.game}
-                    startIcon={<CheckCircle />}
-                >
-                    Game 8
-                </Button>
+                {matches.map((match) => (
+                    match.isCreatorWinner ? 
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className={classes.game}
+                            startIcon={<CheckCircle />}
+                            onClick={() => changeMatch(match)}
+                        >
+                            Game {match.match}
+                        </Button>
+                    :
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            className={classes.game}
+                            startIcon={<CheckCircle />}
+                            onClick={() => changeMatch(match)}
+                        >
+                            Game {match.match}
+                        </Button>
+                ))}
             </div>
-
-            <MyButton onClick={() => {}} style={{ width: '100%', marginTop: '5%' }} variant="contained" color="primary">
-                Back
-            </MyButton>
         </div>
     )
 }
@@ -119,7 +102,7 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        height: '300px',
+        height: '400px',
         overflowX: 'hidden',
         overflowY: 'auto'
     },
