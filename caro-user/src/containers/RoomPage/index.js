@@ -18,12 +18,16 @@ import { addConfirmDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 import ConfirmDialog from './ConfirmDialog';
 import WaitingDialog from './WaitingDialog';
+import { convertBoardArray } from './util';
 
 const initialState = {
   resultDialog: {
     open: false,
     image: null,
-    content: null
+    content: null,
+    onClose: () => { },
+    buttonText: null,
+    textSize: '3rem'
   },
   confirmDialog: {
     open: false,
@@ -40,6 +44,7 @@ const RoomPage = ({ match }) => {
   const classes = useStyle();
   const { isLogined } = useContext(AppContext);
   const [state, dispatch] = useReducer(RoomReducer, initialState);
+  const [playerExited, setPlayerExited] = useState(false);
   const [infoBoard, setInfoBoard] = useState({
     creator: {
       name: 'N/A',
@@ -103,11 +108,13 @@ const RoomPage = ({ match }) => {
       //check win
       const result = calculateWinner(board, i, j, isCreator);
       if (result === 1) {
-        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator });
+        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator, history: convertBoardArray(history) });
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
-          content: 'You Win'
+          content: 'You Win',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         resetState();
         updateMark(isCreator);
@@ -118,7 +125,9 @@ const RoomPage = ({ match }) => {
         dispatch(updateResult({
           open: true,
           image: DRAW_IMAGE,
-          content: 'Draw Game'
+          content: 'Draw Game',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark();
         resetState();
@@ -266,7 +275,9 @@ const RoomPage = ({ match }) => {
                 dispatch(updateResult({
                   open: true,
                   image: WIN_IMAGE,
-                  content: 'You Win'
+                  content: 'You Win',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }));
               })
 
@@ -281,12 +292,18 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('creator-reply-draw', { roomId: match.params.roomId, accept: true });
+                  setHistory(history => {
+                    socket.emit('creator-reply-draw', { roomId: match.params.roomId, accept: true, history: convertBoardArray(history) });
+                    return history
+                  })
+
 
                   dispatch(updateResult({
                     open: true,
                     image: DRAW_IMAGE,
-                    content: 'Draw'
+                    content: 'Draw',
+                    buttonText: 'Play Again',
+                    onClose: handleCloseResultDialog
                   }));
                   updateMark();
                   resetState();
@@ -324,7 +341,9 @@ const RoomPage = ({ match }) => {
                 dispatch(updateResult({
                   open: true,
                   image: WIN_IMAGE,
-                  content: 'You Win'
+                  content: 'You Win',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }));
               })
 
@@ -339,12 +358,18 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('player-reply-draw', { roomId: match.params.roomId, accept: true });
+                  setHistory(history => {
+                    socket.emit('player-reply-draw', { roomId: match.params.roomId, accept: true, history: convertBoardArray(history) });
+                    return history;
+                  })
+
 
                   dispatch(updateResult({
                     open: true,
                     image: DRAW_IMAGE,
-                    content: 'Draw'
+                    content: 'Draw',
+                    buttonText: 'Play Again',
+                    onClose: handleCloseResultDialog
                   }));
                   updateMark();
                   resetState();
@@ -387,13 +412,32 @@ const RoomPage = ({ match }) => {
                 return start;
               })
             })
+
+            //player out room
+            socket.on('player-exited', () => {
+              const handleOK = () => {
+                handleCloseResultDialog();
+                setPlayerExited(true);
+              }
+
+              dispatch(updateResult({
+                open: true,
+                image: WIN_IMAGE,
+                content: `Player exited, You win and will be redirect home.`,
+                buttonText: 'OK',
+                onClose: handleOK,
+                textSize: '1.5rem'
+              }))
+            })
             //event result
             socket.on('game-done', ({ result }) => {
               if (result === -1) {
                 dispatch(updateResult({
                   open: true,
                   image: LOSE_IMAGE,
-                  content: 'You Lose'
+                  content: 'You Lose',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }))
                 resetState()
                 updateMark(!isCreator);
@@ -401,7 +445,9 @@ const RoomPage = ({ match }) => {
                 dispatch(updateResult({
                   open: true,
                   image: DRAW_IMAGE,
-                  content: 'Draw Game'
+                  content: 'Draw Game',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }))
                 updateMark();
                 resetState();
@@ -433,6 +479,9 @@ const RoomPage = ({ match }) => {
     return <Redirect to='/login' />
   }
 
+  if (playerExited) {
+    return <Redirect to='/home' />
+  }
 
   return (
     <RoomContext.Provider value={{ dispatch, state }}>
@@ -460,6 +509,7 @@ const RoomPage = ({ match }) => {
             player={infoBoard.player}
             roomId={match.params.roomId}
             start={start}
+            history={history.slice()}
           />
         </Grid>
         <Grid container item xs={6} direction='row'>
@@ -469,14 +519,17 @@ const RoomPage = ({ match }) => {
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>
           <HistoryLog histoy={history.slice()} creatorName={infoBoard.creator.name} playerName={infoBoard.player.name} />
-          <Chat roomId={match.params.roomId} />
+          <Chat roomId={match.params.roomId} isCreator={isCreator} history={history.slice()} />
         </Grid>
       </Grid>
       <ResultDialog
         open={state.resultDialog.open}
         content={state.resultDialog.content}
         image={state.resultDialog.image}
-        onClose={handleCloseResultDialog} />
+        onClose={state.resultDialog.onClose}
+        buttonText={state.resultDialog.buttonText}
+        textSize={state.resultDialog.textSize}
+      />
       <ConfirmDialog
         open={state.confirmDialog.open}
         content={state.confirmDialog.content}

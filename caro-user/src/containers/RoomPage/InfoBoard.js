@@ -6,9 +6,10 @@ import { DRAW_IMAGE, FLAG_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/cons
 import { RoomContext } from './context';
 import { addConfirmDialog, addWatingDialog, updateResult } from './actions';
 import socket from '../../global/socket';
+import { convertBoardArray } from './util';
 
 
-const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId, start }) => {
+const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId, start, history }) => {
   const classes = useStyle();
   const [xRemain, setXRemain] = useState(120);
   const [oRemain, setORemain] = useState(120);
@@ -19,6 +20,14 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
   if (creator === null) creator = defaultInfo;
   if (player === null) player = defaultInfo;
 
+  const handleCloseResultDialog = () => {
+    dispatch(updateResult({
+      open: false,
+      image: null,
+      content: null
+    }))
+  }
+  
   const handleResign = () => {
     if (!start)
       return;
@@ -38,11 +47,13 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
       dispatch(updateResult({
         open: true,
         image: LOSE_IMAGE,
-        content: 'You Lose'
+        content: 'You Lose',
+        buttonText: 'Play Again',
+        onClose: handleCloseResultDialog
       }))
 
       const eventResign = isCreator ? 'creator-resign' : 'player-resign';
-      socket.emit(eventResign, { roomId: roomId });
+      socket.emit(eventResign, { roomId: roomId, history: convertBoardArray(history) });
     }
     const handleNo = () => {
       dispatch(addConfirmDialog({
@@ -96,7 +107,9 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           dispatch(updateResult({
             open: true,
             image: DRAW_IMAGE,
-            content: 'Draw'
+            content: 'Draw',
+            buttonText: 'Play Again',
+            onClose: handleCloseResultDialog
           }));
         } else {
 
@@ -165,11 +178,13 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
   useEffect(() => {
     if (xRemain === 0) {
       if (isCreator) {
-        socket.emit('countdown-creator', { remain: xRemain, roomId: roomId });
+        socket.emit('countdown-creator', { remain: xRemain, roomId: roomId, history: convertBoardArray(history) });
         dispatch(updateResult({
           open: true,
           image: LOSE_IMAGE,
-          content: 'You Lose'
+          content: 'You Lose',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }));
         resetState();
         updateMark(!isCreator)
@@ -177,7 +192,9 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
-          content: 'You Win'
+          content: 'You Win',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark(isCreator)
         resetState();
@@ -192,17 +209,21 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
-          content: 'You Win'
+          content: 'You Win',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark(isCreator)
         resetState();
         setORemain(120);
       } else {
-        socket.emit('countdown-player', { remain: oRemain, roomId: roomId });
+        socket.emit('countdown-player', { remain: oRemain, roomId: roomId, history: convertBoardArray(history) });
         dispatch(updateResult({
           open: true,
           image: LOSE_IMAGE,
-          content: 'You Lose'
+          content: 'You Lose',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark(!isCreator)
         resetState();

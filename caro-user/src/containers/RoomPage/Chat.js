@@ -3,16 +3,34 @@ import { makeStyles, Typography } from '@material-ui/core';
 import Message from '../../components/Message';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
-import { TOKEN_NAME } from '../../global/constants';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
 import decode from 'jwt-decode';
 import socket from '../../global/socket';
+import { fetchWithAuthentication } from '../../api/fetch-data';
+import { convertBoardArray, convertChatList } from './util';
 
-const Chat = ({ roomId }) => {
+const Chat = ({ roomId, isCreator, history }) => {
   const classes = useStyle();
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState([]);
   const divRef = useRef(null);
   const userInfo = decode(localStorage.getItem(TOKEN_NAME));
+
+
+  const outRoom = () => {
+    console.log(history.slice());
+    const data = {
+      roomId: roomId,
+      chatList: convertChatList(userInfo._id, messages.slice())
+    }
+    socket.emit('player-exit', {roomId: roomId, isCreator: isCreator, history: convertBoardArray(history) });
+    fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data);
+
+  }
+
+  useEffect(() => {
+    console.log(history);
+  }, [history])
 
   useEffect(() => {
     socket.on('message', data => {
@@ -23,8 +41,9 @@ const Chat = ({ roomId }) => {
       }
     });
 
-    return () => { 
-      socket.off('message'); 
+    return () => {
+      socket.off('message');
+      outRoom();
     }
   }, []);
 
@@ -50,7 +69,7 @@ const Chat = ({ roomId }) => {
           <Message key={index} isX isSender username={message.name} content={message.mess} time={message.time} />
           : <Message key={index} username={message.name} content={message.mess} time={message.time} />)}
       </div>
-      <form className={classes.textField} onSubmit={(e) => {e.preventDefault(); sendMessage(content)}}>
+      <form className={classes.textField} onSubmit={(e) => { e.preventDefault(); sendMessage(content) }}>
         <MyTextField
           placeholder='Enter content...'
           style={{ width: '60%' }}
