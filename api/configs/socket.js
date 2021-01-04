@@ -60,19 +60,19 @@ module.exports = {
     })
 
     //isWin true: win, false: draw
-    socket.on('result', async ({ isWin, roomId, isCreator }) => {
+    socket.on('result', async ({ isWin, roomId, isCreator, history }) => {
       //update db
       const room = await roomDAO.findOne({ roomId: roomId });
       if (room) {
         if (isCreator && isWin) {
           room.creatorWinner++;
-          await updateResult(roomId, 1);
+          await updateResult(roomId, 1, history);
         } else {
           if (!isCreator && isWin) {
             room.playerWinner++;
-            await updateResult(roomId, -1);
+            await updateResult(roomId, -1, history);
           } else {
-            await updateResult(roomId, 0);
+            await updateResult(roomId, 0, history);
           }
         }
         await room.save();
@@ -92,46 +92,46 @@ module.exports = {
     })
 
     //countdown creator
-    socket.on('countdown-creator', async ({ remain, roomId }) => {
+    socket.on('countdown-creator', async ({ remain, roomId, history }) => {
       socket.to(`${roomId}`).emit('creator-remain-time', { remain: remain })
       if (remain === 0) {
         const room = await roomDAO.findOne({ roomId: roomId });
         room.playerWinner++;
-        await updateResult(roomId, -1);
+        await updateResult(roomId, -1, history);
         await room.save();
       }
 
     })
 
     //countdown player
-    socket.on('countdown-player', async ({ remain, roomId }) => {
+    socket.on('countdown-player', async ({ remain, roomId, history }) => {
       socket.to(`${roomId}`).emit('player-remain-time', { remain: remain });
       if (remain === 0) {
         const room = await roomDAO.findOne({ roomId: roomId });
         room.creatorWinner++;
-        await updateResult(roomId, 1);
+        await updateResult(roomId, 1, history);
         await room.save();
       }
     })
 
     //creator resign
-    socket.on('creator-resign', async ({ roomId }) => {
+    socket.on('creator-resign', async ({ roomId, history }) => {
       socket.to(`${roomId}`).emit('creator-resigned');
       const room = await roomDAO.findOne({ roomId: roomId });
       if (room) {
         room.playerWinner++;
-        await updateResult(roomId, -1);
+        await updateResult(roomId, -1, history);
         await room.save();
       }
     })
 
     //player resign
-    socket.on('player-resign', async ({ roomId }) => {
+    socket.on('player-resign', async ({ roomId, history }) => {
       socket.to(`${roomId}`).emit('player-resigned');
       const room = await roomDAO.findOne({ roomId: roomId });
       if (room) {
         room.creatorWinner++;
-        await updateResult(roomId, 1);
+        await updateResult(roomId, 1, history);
         await room.save();
       }
     })
@@ -141,14 +141,14 @@ module.exports = {
       socket.to(`${roomId}`).emit('creator-claimed-draw');
     })
 
-    socket.on('player-reply-draw', async ({ roomId, accept }) => {
+    socket.on('player-reply-draw', async ({ roomId, accept, history }) => {
       socket.to(`${roomId}`).emit('player-replied-draw', { accept });
       if (accept) {
         const room = await roomDAO.findOne({ roomId: roomId });
         if (room) {
           room.draws++;
           await room.save();
-          await updateResult(roomId, 0);
+          await updateResult(roomId, 0, history);
         }
       }
     })
@@ -159,16 +159,29 @@ module.exports = {
     })
 
 
-    socket.on('creator-reply-draw', async ({ roomId, accept }) => {
+    socket.on('creator-reply-draw', async ({ roomId, accept, history }) => {
       socket.to(`${roomId}`).emit('creator-replied-draw', { accept });
       if (accept) {
         const room = await roomDAO.findOne({ roomId: roomId });
         if (room) {
           room.draws++;
           await room.save();
-          await updateResult(roomId, 0);
+          await updateResult(roomId, 0, history);
         }
       }
+    })
+
+    //player exit
+    socket.on('player-exit', async ({ roomId, isCreator, history }) => {
+      socket.to(`${roomId}`).emit('player-exited');
+      const room = await roomDAO.findOne({ roomId: roomId });
+      if (!room.isEnd) {
+        if (isCreator)
+          await updateResult(roomId, -1, history);
+        else
+          await updateResult(roomId, 1, history);
+      }
+
     })
   }
 }

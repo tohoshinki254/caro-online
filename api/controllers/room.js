@@ -1,5 +1,6 @@
 const accountDAO = require('../models/account');
 const roomDAO = require('../models/room');
+const matchDAO = require('../models/match');
 
 module.exports = {
   getPublicRooms: async (req, res, next) => {
@@ -245,10 +246,10 @@ module.exports = {
     }
   },
 
-  updateResult: async (roomId, result) => {
+  updateResult: async (roomId, result, history) => {
     try {
       //result: 0: draw, 1: creator win, -1: creator lose
-      if (roomId === undefined || result === undefined) {
+      if (roomId === undefined || result === undefined || history === undefined) {
         return;
       }
 
@@ -285,10 +286,62 @@ module.exports = {
           await creator.save();
           await player.save();
 
+          //create match
+          const curMatch = await matchDAO.findOne({roomId: roomId}).sort('-match');
+          const matchNum = curMatch ? curMatch.match + 1 : 1;
+          const newMatch = new matchDAO({
+            roomId: roomId,
+            match: matchNum,
+            history: history,
+            result: result
+          })
+
+          await newMatch.save();
         }
       }
     } catch (e) {
       console.log(e.message);
+    }
+  },
+
+  setEndRoom: async (req, res, next) => {
+    try {
+      const {roomId, chatList} = req.body;
+
+      if (roomId === undefined) {
+        res.status(404).json({
+          message: 'Room is not defined'
+        });
+        return;
+      }
+
+      if (chatList === undefined) {
+        res.status(404).json({
+          message: 'Room is not defined'
+        })
+        return;
+      }
+
+      const room = await roomDAO.findOne({roomId: roomId}); 
+
+      if (room) {
+        room.isEnd = true;
+        room.chat = chatList;
+        await room.save();
+
+        res.status(200).json({
+          message: 'OK'
+        });
+      } else {
+        res.status(404).json({
+          message: 'Room is not found'
+        });
+        return;
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: error.message
+      })
     }
   }
 }

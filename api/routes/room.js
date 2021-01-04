@@ -32,4 +32,8 @@ router.get('/rooms-ended', passport.authenticate('jwt', { session: false }), asy
     roomController.getRoomsEnded(req, res, next);
 })
 
+router.post('/end', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
+    roomController.setEndRoom(req, res, next);
+})
+
 module.exports = router;

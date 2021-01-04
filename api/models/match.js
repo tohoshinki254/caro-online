@@ -6,7 +6,7 @@ const matchSchema = new mongoose.Schema({
     roomId: Number,
     match: Number,
     history: Array,
-    isCreatorWinner: Boolean
+    result: Number, //-1: creator lose, 0: draw, 1: creator win
 });
 
 module.exports = mongoose.model('matches', matchSchema);
