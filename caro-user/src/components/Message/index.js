@@ -8,7 +8,7 @@ const Message = ({isX = false, isSender = false, content, username, time}) => {
     return (
       <div className={classes.container} style={{justifyContent: justify}}>
         <div className={classes.message}>
-          <Typography className={classes.user}>{username} - {time}</Typography>
+          <Typography className={classes.user}>{username} {time !== undefined ? ` - ${time}` : null}</Typography>
           <Typography className={classes.content} style={{backgroundColor: color}} >{content}</Typography>
         </div>
       </div>

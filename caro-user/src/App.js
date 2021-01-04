@@ -9,6 +9,7 @@ import Profile from "./containers/Profile";
 import VerifyEmailPage from './containers/VerifyEmailPage';
 import ForgetPassPage from './containers/ForgetPassPage';
 import SendEmail from './containers/ForgetPassPage/SendEmail';
+import RoomDetails from './containers/RoomDetails';
 import { AppContext } from "./contexts/AppContext";
 import { TOKEN_NAME } from "./global/constants";
 import decode from 'jwt-decode';
@@ -55,7 +56,7 @@ function App() {
           <Route path='/mail-verification/:id' component={VerifyEmailPage} />
           <Route path='/reset-password/:id' component={ForgetPassPage} />
           <Route path='/forget-password' component={SendEmail} />
-          
+          <Route path='/review-room/:roomId' component={RoomDetails} />
       </Switch>      
     </AppContext.Provider>
 
