@@ -2,13 +2,18 @@ import React from 'react';
 import { makeStyles, Typography, Grid } from '@material-ui/core';
 import Cell from '../../components/Cell/index';
 
-const CenterSection = ({ room, match }) => {
+const CenterSection = ({ room, history, match }) => {
     const classes = useStyles();
 
     let board = [];
     for (let i = 0; i < 18; i++) {
         board.push(Array(18).fill(null))
     };
+
+    for (let i = 0; i < history.length; i++) {
+        const item = history[i];
+        board[item.i][item.j] = item.isCreator;
+    }
 
     const generateBoard = () => {
         const SIZE = 18;

@@ -2,22 +2,20 @@ import React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import Message from '../../components/Message';
 
-const Chat = () => {
+const Chat = ({ chat, creatorName, playerName }) => {
   const classes = useStyle();
+
+  console.log(chat);
 
   return (
     <div className={classes.container}>
       <Typography className={classes.text} align='center'>Chat</Typography>
       <div className={classes.chatContent}>
-          <Message  isX isSender username="thanhtien813" content="abc" time="123" />
-          <Message  username="thanhtien813" content="abc" time="123" />
-          <Message  username="thanhtien813" content="abc" time="123" />
-          <Message  isX isSender username="thanhtien813" content="abc" time="123" />
-          <Message  username="thanhtien813" content="abc" time="123" />
-          <Message  username="thanhtien813" content="abc" time="123" />
-          <Message  isX isSender username="thanhtien813" content="abc" time="123" />
-          <Message  username="thanhtien813" content="abc" time="123" />
-          <Message  username="thanhtien813" content="abc" time="123" />
+          {chat.map((item) => (
+            item.isCreator ?
+            <Message username={creatorName} content={item.content} />
+            : <Message isX isSender username={playerName} content={item.content} />
+          ))}
       </div>
     </div>
   );

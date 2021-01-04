@@ -2,23 +2,21 @@ import React, { useEffect, useRef } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import History from '../../components/History';
 
-const HistoryLog = ({ history = [], creatorName, playerName }) => {
+const HistoryLog = ({ history = [], creatorName, playerName, setHistory }) => {
   const classes = useStyle();
 
   const renderHistory = history.map((item, index) => {
-    if (index !== 0)
       return (
         <History
           isX={item.isCreator}
           step={index}
           name={item.isCreator ? creatorName : playerName}
-          i={item.lastMove.i}
-          j={item.lastMove.j}
+          i={item.i}
+          j={item.j}
           key={index}
+          setHistory={setHistory}
         />
       )
-    else
-      return <div key={index}> </div>;
   })
   return (
     <div className={classes.container}>

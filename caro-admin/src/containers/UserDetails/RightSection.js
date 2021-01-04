@@ -16,7 +16,15 @@ const RightSection = ({ rooms, userId }) => {
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
         setPage(0);
-    };    
+    };
+    
+    const seeRoomDetails = (room) => {
+        const to = '/room/' + room.roomId;
+        history.push({
+            pathname: to,
+            state: { room: room }
+        });
+    }
 
     return (
         <Paper style={{ width: '100%' }}>
@@ -33,7 +41,7 @@ const RightSection = ({ rooms, userId }) => {
                     </TableHead>
                     <TableBody>
                         {rooms.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((room) => (
-                            <StyledTableRow key={room.creator !== userId ? room.creator : room.player} onClick={() => {}}>
+                            <StyledTableRow key={room.creator !== userId ? room.creator : room.player} onClick={() => seeRoomDetails(room)}>
                                 <StyledTableCell component="th" scope="row" style={{ width: '15%'}}>
                                     {room.creator !== userId ? room.creator : room.player}
                                 </StyledTableCell>

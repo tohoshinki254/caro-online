@@ -1,37 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { makeStyles, Avatar, Typography, Button } from '@material-ui/core';
 import { CheckCircle } from '@material-ui/icons';
-import { API_URL, TOKEN_NAME } from '../../global/constants';
-import { fetchWithAuthentication } from '../../api/fetch-data';
 
-const LeftSection = ({ room, matches, changeMatch }) => {
+const LeftSection = ({ matches, changeMatch, creator, player }) => {
     const classes = useStyles();
-    const [creator, setCreator] = useState();
-    const [player, setPlayer] = useState();
-
-    useEffect(() => {
-        fetchWithAuthentication(API_URL + 'user?userId=' + room.creator, 'GET', localStorage.getItem(TOKEN_NAME))
-            .then(
-                (data) => {
-                    setCreator(data.user);
-                },
-                (error) => {
-
-                }
-            )
-    }, [setCreator])
-
-    useEffect(() => {
-        fetchWithAuthentication(API_URL + 'user?userId=' + room.player, 'GET', localStorage.getItem(TOKEN_NAME))
-            .then(
-                (data) => {
-                    setPlayer(data.user);
-                },
-                (error) => {
-
-                }
-            )
-    }, [setPlayer])
 
     return (
         <div style={{ margin: '5%', alignItems: 'center' }}>
@@ -41,7 +13,7 @@ const LeftSection = ({ room, matches, changeMatch }) => {
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
                     <div style={{ justifyContent: 'center', margin: '2%' }}>
                         <Typography className={classes.title}>{creator.name}</Typography>
-                        <Typography style={{ fontSize: '0.9rem', color: 'gray' }}>5feeedb2f3c3040c1848b3ba</Typography>
+                        <Typography style={{ fontSize: '0.9rem', color: 'gray' }}>{creator._id}</Typography>
                     </div>
                 </div>}
             </div>
@@ -51,7 +23,7 @@ const LeftSection = ({ room, matches, changeMatch }) => {
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
                     <div style={{ justifyContent: 'center', margin: '2%' }}>
                         <Typography className={classes.title}>{player.name}</Typography>
-                        <Typography style={{ fontSize: '0.9rem', color: 'gray' }}>5feeedb2f3c3040c1848b3ba</Typography>
+                        <Typography style={{ fontSize: '0.9rem', color: 'gray' }}>{player._id}</Typography>
                     </div>
                 </div>}
             </div>

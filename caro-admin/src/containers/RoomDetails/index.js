@@ -11,6 +11,9 @@ const RoomDetails = () => {
     const { room } = useLocation().state;
     const [matches, setMatches] = useState([]);
     const [match, setMatch] = useState();
+    const [creator, setCreator] = useState();
+    const [player, setPlayer] = useState();
+    const [history, setHistory] = useState([]);
 
     useEffect(() => {
         const data = {
@@ -28,23 +31,52 @@ const RoomDetails = () => {
 
                 }
             )
-    }, [])
+    }, [setMatch])
+
+    useEffect(() => {
+        fetchWithAuthentication(API_URL + 'user?userId=' + room.creator, 'GET', localStorage.getItem(TOKEN_NAME))
+            .then(
+                (data) => {
+                    setCreator(data.user);
+                },
+                (error) => {
+
+                }
+            )
+    }, [setCreator])
+
+    useEffect(() => {
+        fetchWithAuthentication(API_URL + 'user?userId=' + room.player, 'GET', localStorage.getItem(TOKEN_NAME))
+            .then(
+                (data) => {
+                    setPlayer(data.user);
+                },
+                (error) => {
+
+                }
+            )
+    }, [setPlayer])
 
     const changeMatch = (match) => {
         setMatch(match);
+        setHistory(match.history);
+    }
+
+    const changeHistory = (step) => {
+        setHistory(match.history.slice(0, step + 1));
     }
 
     return (
         <>
             <Grid container>
                 <Grid item xs={3}>
-                    <LeftSection room={room} matches={matches} changeMatch={changeMatch} />
+                    <LeftSection matches={matches} changeMatch={changeMatch} creator={creator} player={player}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <CenterSection room={room} match={match}/>
+                    <CenterSection room={room} history={history} match={match}/>
                 </Grid>
                 <Grid item xs={3}>
-                    <RightSection room={room} match={match}/>
+                    <RightSection room={room} match={match} setHistory={changeHistory} creator={creator} player={player}/>
                 </Grid>
             </Grid>
         </>
