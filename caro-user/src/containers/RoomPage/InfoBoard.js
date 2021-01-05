@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import UserCard from '../../components/UserCard';
 import MyButton from '../../components/MyButton';
-import { DRAW_IMAGE, FLAG_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
+import { DRAW_IMAGE, ERRO_IMAGE, FLAG_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
 import { RoomContext } from './context';
-import { addConfirmDialog, addWatingDialog, updateResult } from './actions';
+import { addConfirmDialog, addInvitePlayerDialog, addWatingDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 import { convertBoardArray } from './util';
 
@@ -138,6 +138,23 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
     }))
   }
 
+  const handleInvite = () => {
+    if (creator.name !== 'N/A' && player.name !== 'N/A') {
+      dispatch(updateResult({
+        open: true,
+        image: ERRO_IMAGE,
+        content: 'Room is full.',
+        onClose: handleCloseResultDialog,
+        buttonText: 'OK',
+        textSize: '2rem'
+      }))
+      return;
+    }
+
+    dispatch(addInvitePlayerDialog({
+      open: true
+    }));
+  }
   useEffect(() => {
     if (yourTurn) {
       if (isCreator) {
@@ -259,20 +276,26 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           {startStatus}
         </MyButton>
         <MyButton
-          style={{ width: '45%', marginTop: '3%' }}
+          style={{ width: '100%', marginTop: '2%' }}
+          onClick={handleInvite}
+        >
+          INVITE PLAYER
+        </MyButton>
+        <MyButton
+          style={{ width: '45%', marginTop: '2%' }}
           onClick={handleResign}
         >
           Resign
         </MyButton>
         <MyButton
-          style={{ width: '45%', marginLeft: '10%', marginTop: '3%' }}
+          style={{ width: '45%', marginLeft: '10%', marginTop: '2%' }}
           onClick={handleDraw}
         >
           Draw
         </MyButton>
       </div>
-      <UserCard isBorder userStat={player} marginTop='10%'  minutes={oRemain} />
-      <UserCard isBorder userStat={creator} marginTop='10%' minutes={xRemain} isX />
+      <UserCard isBorder userStat={player} marginTop='5%'  minutes={oRemain} />
+      <UserCard isBorder userStat={creator} marginTop='5%' minutes={xRemain} isX />
 
     </div>
   );

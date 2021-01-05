@@ -14,11 +14,12 @@ import { calculateWinner, cloneBoard, initBoard } from './Services';
 import ResultDialog from './ResultDialog';
 import RoomReducer from './reducer';
 import { RoomContext } from './context';
-import { addConfirmDialog, updateResult } from './actions';
+import { addConfirmDialog, addInvitePlayerDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 import ConfirmDialog from './ConfirmDialog';
 import WaitingDialog from './WaitingDialog';
 import { convertBoardArray } from './util';
+import InviteUserDialog from './InviteUserDialog';
 
 const initialState = {
   resultDialog: {
@@ -37,6 +38,9 @@ const initialState = {
     handleNo: () => { }
   },
   waitingDialog: {
+    open: false
+  },
+  invitePlayerDialog: {
     open: false
   }
 }
@@ -263,6 +267,9 @@ const RoomPage = ({ match }) => {
                   loses: playerJoined.loses
                 };
                 setInfoBoard({ creator: creator, player: player });
+                dispatch(addInvitePlayerDialog({
+                  open: false
+                }))
               });
 
               //player play
@@ -550,6 +557,10 @@ const RoomPage = ({ match }) => {
       />
       <WaitingDialog
         open={state.waitingDialog.open}
+      />
+      <InviteUserDialog 
+        open={state.invitePlayerDialog.open}
+        roomId={match.params.roomId}
       />
     </RoomContext.Provider>
   );
