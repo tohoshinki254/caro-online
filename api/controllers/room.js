@@ -40,6 +40,11 @@ module.exports = {
       room.player = playerId;
 
       await room.save();
+      
+      const player = await accountDAO.findById(playerId);
+      player.inRoom = true;
+      await player.save();
+
       res.status(200).json({
         message: 'Successful'
       });
@@ -76,6 +81,11 @@ module.exports = {
         name: name
       });
       await newRoom.save();
+      //set in room
+      const player = await accountDAO.findById(req.user._id);
+      player.inRoom = true;
+      await player.save();
+
       res.status(200).json({
         message: 'OK',
         roomId: newRoom.roomId
@@ -342,6 +352,34 @@ module.exports = {
       res.status(500).json({
         message: error.message
       })
+    }
+  },
+  inviteUser: async (username) => {
+    if (username) {
+      const account = await accountDAO.findOne({username: username});
+      if (account) {
+        if (!account.inRoom) {
+          return {
+            result: true,
+            message: `Invite ${username} successfully.`
+          }
+        } else {
+          return {
+            result: false,
+            message: `${username} is in other room.`
+          }
+        }
+      } else {
+        return {
+          result: false,
+          message: `${username} not found.`
+        }
+      }
+    } else {
+      return {
+        result: false,
+        message: 'username is undefine.'
+      }
     }
   }
 }

@@ -11,6 +11,7 @@ const accountSchema = new mongoose.Schema({
     isOnline: Boolean,
     isLocked: Boolean,
     isConfirmed: Boolean,
+    inRoom: Boolean,
     cups: Number,
     wins: Number,
     loses: Number,

@@ -2,7 +2,7 @@ const accountDAO = require('../models/account');
 const roomDAO = require('../models/room');
 const moment = require('moment');
 const cookieParser = require('cookie-parser');
-const { updateResult } = require('../controllers/room');
+const { updateResult, inviteUser } = require('../controllers/room');
 
 const getOnlineList = async () => {
   const res = await accountDAO.find({ isOnline: true, isAdmin: false });
@@ -175,13 +175,29 @@ module.exports = {
     socket.on('player-exit', async ({ roomId, isCreator, history }) => {
       socket.to(`${roomId}`).emit('player-exited');
       const room = await roomDAO.findOne({ roomId: roomId });
+      //set false in room value
+      const userId = isCreator ? room.creator : room.player;
+      const user = await accountDAO.findById(userId);
+      if (user) {
+        user.inRoom = false;
+        await user.save();
+      }
+      //
       if (!room.isEnd) {
         if (isCreator)
           await updateResult(roomId, -1, history);
         else
           await updateResult(roomId, 1, history);
       }
+    })
 
+    //invite player
+    socket.on('invite-player', async ({ username, inviterName, roomId }) => {
+      const res = await inviteUser(username);
+      socket.emit('result-invite-player', { result: res.result, message: res.message });
+      if (res.result) {
+        io.emit('receive-invitation', { username, inviterName, roomId });
+      }
     })
   }
 }

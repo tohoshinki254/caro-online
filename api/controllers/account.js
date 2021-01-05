@@ -31,6 +31,7 @@ module.exports = {
                         loses: 0,
                         draws: 0,
                         isConfirmed: isAdmin ? true : false,
+                        inRoom: false
                     });
                     await newAccount.save();
 
