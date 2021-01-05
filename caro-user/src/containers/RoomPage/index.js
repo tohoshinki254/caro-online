@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import { AppContext } from '../../contexts/AppContext';
@@ -64,6 +64,7 @@ const RoomPage = ({ match }) => {
     }
   });
   const [isCreator, setIsCreator] = useState(null);
+  const refIsCreator = useRef();
   const [playerStart, setPlayerStart] = useState(false);
   const [startStatus, setStartStatus] = useState('Start');
   //state about board
@@ -75,6 +76,7 @@ const RoomPage = ({ match }) => {
     lastMove: null,
     isCreator: null
   }]);
+  const refHistory = useRef();
 
   const handleClick = (i, j) => {
     if (start && playerStart && yourTurn && history[stepNumber].board[i][j] === null) {
@@ -472,8 +474,17 @@ const RoomPage = ({ match }) => {
       socket.off('player-resigned');
       socket.off('creator-claimed-draw');
       socket.off('player-claimed-draw');
+      socket.emit('player-exit', { roomId: match.params.roomId, isCreator: refIsCreator.current, history: convertBoardArray(refHistory.current) });
     }
   }, []);
+
+  useEffect(() => {
+    refHistory.current = history.slice();
+  }, [history])
+
+  useEffect(() => {
+    refIsCreator.current = isCreator;
+  }, [isCreator])
 
   if (!isLogined) {
     return <Redirect to='/login' />

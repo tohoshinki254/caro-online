@@ -9,28 +9,13 @@ import socket from '../../global/socket';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { convertBoardArray, convertChatList } from './util';
 
-const Chat = ({ roomId, isCreator, history }) => {
+const Chat = ({ roomId, isCreator }) => {
   const classes = useStyle();
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState([]);
   const divRef = useRef(null);
   const userInfo = decode(localStorage.getItem(TOKEN_NAME));
 
-
-  const outRoom = () => {
-    console.log(history.slice());
-    const data = {
-      roomId: roomId,
-      chatList: convertChatList(userInfo._id, messages.slice())
-    }
-    socket.emit('player-exit', {roomId: roomId, isCreator: isCreator, history: convertBoardArray(history) });
-    fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data);
-
-  }
-
-  useEffect(() => {
-    console.log(history);
-  }, [history])
 
   useEffect(() => {
     socket.on('message', data => {
@@ -42,8 +27,12 @@ const Chat = ({ roomId, isCreator, history }) => {
     });
 
     return () => {
+      const data = {
+        roomId: roomId,
+        chatList: convertChatList(userInfo._id, messages.slice())
+      }
       socket.off('message');
-      outRoom();
+      fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data);
     }
   }, []);
 
