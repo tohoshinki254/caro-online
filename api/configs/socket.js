@@ -172,8 +172,7 @@ module.exports = {
     })
 
     //player exit
-    socket.on('player-exit', async ({ roomId, isCreator, history }) => {
-      socket.to(`${roomId}`).emit('player-exited');
+    socket.on('player-exit', async ({ roomId, isCreator, history, start }) => {
       const room = await roomDAO.findOne({ roomId: roomId });
       //set false in room value
       const userId = isCreator ? room.creator : room.player;
@@ -183,12 +182,14 @@ module.exports = {
         await user.save();
       }
       //
-      if (!room.isEnd) {
+      if (!room.isEnd && start) {
         if (isCreator)
           await updateResult(roomId, -1, history);
         else
           await updateResult(roomId, 1, history);
       }
+
+      socket.to(`${roomId}`).emit('player-exited');
     })
 
     //invite player
