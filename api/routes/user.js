@@ -35,4 +35,8 @@ router.get('/token-validation', passport.authenticate('jwt', { session: false })
     accountController.checkToken(req, res, next);
 })
 
+router.get('/ranking', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    accountController.getRankingBoard(req, res, next);
+})
+
 module.exports = router;
