@@ -5,7 +5,7 @@ const matchDAO = require('../models/match');
 module.exports = {
   getPublicRooms: async (req, res, next) => {
     try {
-      const rooms = await roomDAO.find({ isPublic: true });
+      const rooms = await roomDAO.find({ isPublic: true, player: null, isEnd: false });
       res.status(200).json({
         message: 'Successful',
         rooms: rooms
@@ -21,6 +21,7 @@ module.exports = {
     try {
       const roomId = req.body.roomId;
       const playerId = req.user._id;
+      const password = req.body.password;
 
       const room = await roomDAO.findOne({ roomId: roomId });
       if (room === null) {
@@ -36,11 +37,16 @@ module.exports = {
         });
         return;
       }
-
+      if (!room.isPublic && password !== room.password) {
+        res.status(403).json({
+          message: 'Password is wrong.'
+        });
+        return;
+      }
       room.player = playerId;
 
       await room.save();
-      
+
       const player = await accountDAO.findById(playerId);
       player.inRoom = true;
       await player.save();
@@ -59,6 +65,7 @@ module.exports = {
     try {
       let isPublic = req.body.isPublic;
       const name = req.body.name;
+      const password = req.body.password;
       if (isPublic === undefined) isPublic = true;
       if (name === undefined) {
         res.status(401).json({
@@ -66,6 +73,7 @@ module.exports = {
         });
         return;
       }
+
       const roomWithMaxId = await roomDAO.findOne().sort('-roomId');
       const newRoomId = roomWithMaxId === null ? 1 : roomWithMaxId.roomId + 1;
       const newRoom = new roomDAO({
@@ -78,7 +86,8 @@ module.exports = {
         draws: 0,
         createdTime: new Date(),
         isPublic: isPublic,
-        name: name
+        name: name,
+        password: isPublic ? null : password
       });
       await newRoom.save();
       //set in room
@@ -263,11 +272,11 @@ module.exports = {
         return;
       }
 
-      const room = await roomDAO.findOne({roomId: roomId});
-      if (room) { 
+      const room = await roomDAO.findOne({ roomId: roomId });
+      if (room) {
         const creator = await accountDAO.findById(room.creator);
         const player = await accountDAO.findById(room.player);
-        
+
         if (creator && player) {
           let winCups = 0, loseCups = 0;
           switch (result) {
@@ -297,7 +306,7 @@ module.exports = {
           await player.save();
 
           //create match
-          const curMatch = await matchDAO.findOne({roomId: roomId}).sort('-match');
+          const curMatch = await matchDAO.findOne({ roomId: roomId }).sort('-match');
           const matchNum = curMatch ? curMatch.match + 1 : 1;
           const newMatch = new matchDAO({
             roomId: roomId,
@@ -316,7 +325,7 @@ module.exports = {
 
   setEndRoom: async (req, res, next) => {
     try {
-      const {roomId, chatList} = req.body;
+      const { roomId, chatList } = req.body;
 
       if (roomId === undefined) {
         res.status(404).json({
@@ -332,7 +341,7 @@ module.exports = {
         return;
       }
 
-      const room = await roomDAO.findOne({roomId: roomId}); 
+      const room = await roomDAO.findOne({ roomId: roomId });
 
       if (room) {
         room.isEnd = true;
@@ -354,10 +363,10 @@ module.exports = {
       })
     }
   },
-  
+
   inviteUser: async (username) => {
     if (username) {
-      const account = await accountDAO.findOne({username: username});
+      const account = await accountDAO.findOne({ username: username });
       if (account) {
         if (!account.inRoom) {
           return {
@@ -386,7 +395,7 @@ module.exports = {
 
   getRoomsNoPlayer: async (req, res, next) => {
     try {
-      const room = await roomDAO.findOne({ player: null });
+      const room = await roomDAO.findOne({ player: null, isEnd: false, isPublic: true });
       res.status(200).json({
         message: 'OK',
         room: room

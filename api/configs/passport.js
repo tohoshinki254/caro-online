@@ -35,7 +35,7 @@ passport.use(
                 return done(null, account);
             else {
                 const newAcc = new accountDAO({
-                    username: null,
+                    username: email,
                     password: null,
                     name: name,
                     email: email,
@@ -46,7 +46,8 @@ passport.use(
                     draws: 0,
                     loses: 0,
                     wins: 0,
-                    isConfirmed: true
+                    isConfirmed: true,
+                    inRoom: false
                 });
                 await newAcc.save();
                 return done(null, newAcc);
@@ -80,7 +81,8 @@ passport.use(
                     draws: 0,
                     loses: 0,
                     wins: 0,
-                    isConfirmed: true
+                    isConfirmed: true,
+                    inRoom: false
                 });
                 await newAcc.save();
                 return done(null, newAcc);

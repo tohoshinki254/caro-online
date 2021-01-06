@@ -355,12 +355,13 @@ module.exports = {
 
 	getRankingBoard: async (req, res, next) => {
 		try {
-			const SIZE = 5;
+			const SIZE = 4;
 			let page = req.query.page;
 			if (page === undefined) page = 1; else page = parseInt(page);
 
 			const totalPlayers = await accountDAO.countDocuments({isAdmin: false});
-			const totalPages = Math.floor(totalPlayers / SIZE) + totalPlayers % SIZE;
+			let totalPages = Math.floor(totalPlayers / SIZE);
+			totalPages % SIZE > 0 && totalPages++;
 			const skip = SIZE * (page - 1);
 			const result = await accountDAO.find({isAdmin: false}).sort('-cups').skip(skip).limit(SIZE).lean();
 
