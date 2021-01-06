@@ -87,6 +87,59 @@ const HomePage = () => {
     return <Redirect to='/login' />
   }
 
+  const playNow = () => {
+    let room;
+    fetchWithAuthentication(API_URL + 'room/room-no-player', 'GET', localStorage.getItem(TOKEN_NAME))
+      .then(
+        (data) => {
+          room = data.room;
+          if (room !== null) {
+            autoJoin(room);
+          } else {
+            autoCreateRoom();
+          }
+        },
+        (error) => {
+          alert(error.message);
+        }
+      )
+  }
+
+  const autoJoin = (room) => {
+    setLoading(true);
+    const data = {
+      roomId: room.roomId
+    }
+    fetchWithAuthentication(API_URL + 'room/join', 'POST', localStorage.getItem("caro-online-token"), data)
+        .then(
+          (data) => {
+            setLoading(false);
+            const to = '/room/' + room.roomId;
+            history.push(to);
+          },
+          (error) => {
+            setLoading(false);
+            alert(error.message);
+          }
+        )
+  }
+
+  const autoCreateRoom = () => {
+    setLoading(true);
+    fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), { isPublic: true, name: "" })
+      .then(
+        (data) => {
+          setLoading(false);
+          const to = `/room/${data.roomId}`;
+          history.push(to);
+        },
+        (error) => {
+          setLoading(false);
+          alert(error.message);
+        }
+      )
+  }
+
   return (
     <>
       <Grid container>
@@ -106,15 +159,15 @@ const HomePage = () => {
             <Grid container justify='center' item xs={3} >
               <MyButton className={classes.button} onClick={() => setOpenJoin(true)} >
                 Join Room
-                            </MyButton>
+              </MyButton>
             </Grid>
             <Grid container justify='center' item xs={3} >
               <MyButton className={classes.button} onClick={() => setOpenCreate(true)} >
                 Create Room
-                            </MyButton>
+              </MyButton>
             </Grid>
-            <Grid container justify='center' item xs={3}>
-              <MyButton className={classes.button}>
+            <Grid container justify='center' item xs={4}>
+              <MyButton className={classes.button} onClick={() => playNow()}>
                 Play now
               </MyButton>
             </Grid>

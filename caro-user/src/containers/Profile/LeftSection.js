@@ -31,13 +31,13 @@ const LeftSection = ({ userId }) => {
                 <div style={{ marginLeft: '10%' }}>
                     <List>
                         <ListItem>
-                            <ListItemText primary="Join Date: " className={classes.listItem}/>
+                            <ListItemText primary={`Username: ${userInfo.username}`} className={classes.listItem}/>
                         </ListItem>
                         <ListItem>
-                            <ListItemText primary={`Matches: ${userInfo.wins + userInfo.draws + userInfo.loses}`} className={classes.listItem}/>
+                            <ListItemText primary={`Matches: ${userInfo.wins + userInfo.loses + userInfo.draws}`} className={classes.listItem}/>
                         </ListItem>
                         <ListItem>
-                            <ListItemText primary="Win Rate: " className={classes.listItem}/>
+                            <ListItemText primary={`Win Rate: ${((userInfo.wins / (userInfo.wins + userInfo.loses + userInfo.draws)) * 100).toString().slice(0, 5)}%`} className={classes.listItem}/>
                         </ListItem>
                         <ListItem>
                             <ListItemText primary="Rank: " className={classes.listItem}/>
