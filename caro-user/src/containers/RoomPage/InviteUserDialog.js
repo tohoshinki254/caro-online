@@ -8,6 +8,7 @@ import { addInvitePlayerDialog } from './actions';
 import socket from '../../global/socket';
 import decode from 'jwt-decode';
 import { TOKEN_NAME } from '../../global/constants';
+import { AppContext } from '../../contexts/AppContext';
 
 const InviteUserDialog = ({ open, roomId }) => {
   const classes = useStyle();
@@ -16,7 +17,7 @@ const InviteUserDialog = ({ open, roomId }) => {
     result: false,
     message: ''
   });
-
+  const {setLoading} = useContext(AppContext);
   const { dispatch } = useContext(RoomContext);
 
   const closeDialog = () => {
@@ -39,10 +40,12 @@ const InviteUserDialog = ({ open, roomId }) => {
       return;
     }
 
+    setLoading(true);
     const userInfo = decode(localStorage.getItem(TOKEN_NAME));
     socket.emit('invite-player', {username, inviterName: userInfo.username, roomId: roomId });
     socket.on('result-invite-player', ({result, message}) => {
       setOutput({result, message});
+      setLoading(false);
       socket.off('result-invite-player');
     })
     setUsername('');

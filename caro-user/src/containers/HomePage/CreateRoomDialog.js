@@ -12,6 +12,7 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
   const classes = useStyle();
   const [name, setName] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [password, setPassword] = useState('');
   let history = useHistory();
 
   const handleCreateRoom = () => {
@@ -20,7 +21,7 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
       return;
     }
     setLoading(true);
-    fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), {isPublic: !isPrivate, name: name})
+    fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), { isPublic: !isPrivate, name: name })
       .then(
         (data) => {
           setLoading(false);
@@ -41,7 +42,7 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
       maxWidth='xs'
       fullWidth
     >
-      <Grid container style={{marginTop: '3%'}}>
+      <Grid container style={{ marginTop: '3%' }}>
         <Grid container item xs={2} />
         <Grid container item xs={8} justify='center' >
           <Typography className={classes.title}>Create Room</Typography>
@@ -60,12 +61,23 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
           onChange={(event) => setName(event.target.value)}
         />
         <FormControlLabel
-          style={{marginTop: '2.5%'}}
+          style={{ marginTop: '2.5%' }}
           control={<MyCheckBox checked={isPrivate} onChange={(event) => setIsPrivate(event.target.checked)} />}
           label='Private Room'
         />
+        {
+          isPrivate
+          &&
+          <MyTextField
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder='Password'
+            type='password'
+          />
+        }
+
         <MyButton
-          style={{marginTop: '2.5%'}}
+          style={{ marginTop: '5%' }}
           onClick={handleCreateRoom}
         >
           Create

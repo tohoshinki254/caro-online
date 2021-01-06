@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useReducer, useRef, useState } from 'reac
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import { AppContext } from '../../contexts/AppContext';
-import { Redirect } from 'react-router-dom';
+import { Prompt, Redirect, useHistory } from 'react-router-dom';
 import Board from './Board';
 import InfoBoard from './InfoBoard';
 import HistoryLog from './HistoryLog';
@@ -74,6 +74,7 @@ const RoomPage = ({ match }) => {
   //state about board
   const [stepNumber, setStepNumber] = useState(0);
   const [start, setStart] = useState(false);
+  const refStart = useRef();
   const [yourTurn, setYourTurn] = useState(false);
   const [history, setHistory] = useState([{
     board: initBoard(),
@@ -428,11 +429,10 @@ const RoomPage = ({ match }) => {
                 handleCloseResultDialog();
                 setPlayerExited(true);
               }
-
               dispatch(updateResult({
                 open: true,
                 image: WIN_IMAGE,
-                content: `Player exited, You win and will be redirect home.`,
+                content: refStart.current ? `Player exited, You win and will be redirected to home.` : `Player exited, You will be redirected to home.`,
                 buttonText: 'OK',
                 onClose: handleOK,
                 textSize: '1.5rem'
@@ -481,7 +481,8 @@ const RoomPage = ({ match }) => {
       socket.off('player-resigned');
       socket.off('creator-claimed-draw');
       socket.off('player-claimed-draw');
-      socket.emit('player-exit', { roomId: match.params.roomId, isCreator: refIsCreator.current, history: convertBoardArray(refHistory.current) });
+      socket.off('player-exited')
+      socket.emit('player-exit', { roomId: match.params.roomId, isCreator: refIsCreator.current, history: convertBoardArray(refHistory.current), start: refStart.current });
     }
   }, []);
 
@@ -493,6 +494,10 @@ const RoomPage = ({ match }) => {
     refIsCreator.current = isCreator;
   }, [isCreator])
 
+  useEffect(() => {
+    refStart.current = start;
+  }, [start])
+
   if (!isLogined) {
     return <Redirect to='/login' />
   }
@@ -503,6 +508,9 @@ const RoomPage = ({ match }) => {
 
   return (
     <RoomContext.Provider value={{ dispatch, state }}>
+      <Prompt 
+        message={"Are you sure want to leave this room.\nYou will be lose if the game is beginning"}     
+      />
       <Grid container>
         <MyAppBar isLogined />
       </Grid>
@@ -558,7 +566,7 @@ const RoomPage = ({ match }) => {
       <WaitingDialog
         open={state.waitingDialog.open}
       />
-      <InviteUserDialog 
+      <InviteUserDialog
         open={state.invitePlayerDialog.open}
         roomId={match.params.roomId}
       />
