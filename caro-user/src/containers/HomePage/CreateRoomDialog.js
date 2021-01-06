@@ -21,7 +21,7 @@ const CreateRoomDialog = ({ open = false, onClose, setLoading }) => {
       return;
     }
     setLoading(true);
-    fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), { isPublic: !isPrivate, name: name })
+    fetchWithAuthentication(API_URL + "room", 'POST', localStorage.getItem(TOKEN_NAME), { isPublic: !isPrivate, name: name, password: password })
       .then(
         (data) => {
           setLoading(false);

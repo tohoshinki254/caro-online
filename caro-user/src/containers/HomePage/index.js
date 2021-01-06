@@ -166,7 +166,7 @@ const HomePage = () => {
                 Create Room
               </MyButton>
             </Grid>
-            <Grid container justify='center' item xs={4}>
+            <Grid container justify='center' item xs={3}>
               <MyButton className={classes.button} onClick={() => playNow()}>
                 Play now
               </MyButton>

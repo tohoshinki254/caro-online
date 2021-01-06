@@ -8,7 +8,7 @@ import InfoBoard from './InfoBoard';
 import HistoryLog from './HistoryLog';
 import Chat from './Chat';
 import decode from 'jwt-decode';
-import { API_URL, DRAW_IMAGE, LOSE_IMAGE, TOKEN_NAME, WIN_IMAGE } from '../../global/constants';
+import { API_URL, DRAW_IMAGE, ERRO_IMAGE, LOSE_IMAGE, TOKEN_NAME, WIN_IMAGE } from '../../global/constants';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { calculateWinner, cloneBoard, initBoard } from './Services';
 import ResultDialog from './ResultDialog';
@@ -145,7 +145,14 @@ const RoomPage = ({ match }) => {
 
   const handleStart = () => {
     if (infoBoard.player.name === 'N/A') {
-      alert('Game cannot start because room not enough two people');
+      dispatch(updateResult({
+        open: true,
+        image: ERRO_IMAGE,
+        content: 'Game need two people to start.',
+        onClose: handleCloseResultDialog,
+        buttonText: 'OK',
+        textSize: '1.5rem'
+      }))
       return;
     }
     if (!start) {
@@ -508,8 +515,10 @@ const RoomPage = ({ match }) => {
 
   return (
     <RoomContext.Provider value={{ dispatch, state }}>
-      <Prompt 
-        message={"Are you sure want to leave this room.\nYou will be lose if the game is beginning"}     
+      <Prompt
+        message={(location, action) => {
+          return playerExited ? true : 'Are you sure to leave this room?\nYou will be lose if the game is beginning'
+        }}
       />
       <Grid container>
         <MyAppBar isLogined />
