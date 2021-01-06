@@ -33,10 +33,13 @@ const LeftSection = ({ user }) => {
             <div>
                 <List>
                     <ListItem>
+                        <ListItemText primary={`Username: ${user.username}`} className={classes.listItem}/>
+                    </ListItem>
+                    <ListItem>
                         <ListItemText primary={`Matches: ${user.wins + user.loses + user.draws}`} className={classes.listItem}/>
                     </ListItem>
                     <ListItem>
-                        <ListItemText primary="Win Rate: " className={classes.listItem}/>
+                        <ListItemText primary={`Win Rate: ${((user.wins / (user.wins + user.loses + user.draws)) * 100).toString().slice(0, 5)}%`} className={classes.listItem}/>
                     </ListItem>
                     <ListItem>
                         <ListItemText primary="Rank: " className={classes.listItem}/>

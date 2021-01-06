@@ -31,26 +31,35 @@ const LeftSection = ({ matches, changeMatch, creator, player }) => {
             <Typography className={classes.title}>Matches</Typography>
             <div className={classes.matches}>
                 {matches.map((match) => (
-                    match.isCreatorWinner ? 
-                        <Button
-                            variant="outlined"
-                            color="primary"
-                            className={classes.game}
-                            startIcon={<CheckCircle />}
-                            onClick={() => changeMatch(match)}
-                        >
-                            Game {match.match}
-                        </Button>
-                    :
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            className={classes.game}
-                            startIcon={<CheckCircle />}
-                            onClick={() => changeMatch(match)}
-                        >
-                            Game {match.match}
-                        </Button>
+                    match.result === -1 ? 
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        className={classes.game}
+                        startIcon={<CheckCircle />}
+                        onClick={() => changeMatch(match)}
+                    >
+                        Game {match.match}
+                    </Button>
+                : (match.result === 1 ?
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        className={classes.game}
+                        startIcon={<CheckCircle />}
+                        onClick={() => changeMatch(match)}
+                    >
+                        Game {match.match}
+                    </Button>
+                :   <Button
+                        variant="outlined"
+                        color="default"
+                        className={classes.game}
+                        startIcon={<CheckCircle />}
+                        onClick={() => changeMatch(match)}
+                    >
+                        Game {match.match}
+                    </Button>)
                 ))}
             </div>
         </div>
