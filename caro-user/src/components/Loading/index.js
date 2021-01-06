@@ -19,13 +19,13 @@ const useStyle = makeStyles({
         height: '100%',
         width: '100%',
         opacity: 0.4,
-        zIndex: 4000
+        zIndex: 5000
     },
     loadingItem: {
         position: 'absolute',
         top: '50%',
         left: '50%',
-        zIndex: 4001
+        zIndex: 5001,
     }
 });
 

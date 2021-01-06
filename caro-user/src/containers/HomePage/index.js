@@ -38,7 +38,7 @@ const HomePage = () => {
   useEffect(() => {
     const handleYes = (roomId) => {
 
-      fetchWithAuthentication(API_URL + 'room/join', 'POST', localStorage.getItem("caro-online-token"), {roomId})
+      fetchWithAuthentication(API_URL + 'room/join', 'POST', localStorage.getItem("caro-online-token"), { roomId })
         .then(
           (data) => {
             setConfirmDialog({
@@ -103,20 +103,25 @@ const HomePage = () => {
       <Grid className={classes.mainSection} container>
         <Grid className={classes.leftSection} item xs={8}>
           <Grid style={{ marginTop: '1%' }} container >
-            <Grid container justify='center' item xs={4} >
+            <Grid container justify='center' item xs={3} >
               <MyButton className={classes.button} onClick={() => setOpenJoin(true)} >
                 Join Room
                             </MyButton>
             </Grid>
-            <Grid container justify='center' item xs={4} >
+            <Grid container justify='center' item xs={3} >
               <MyButton className={classes.button} onClick={() => setOpenCreate(true)} >
                 Create Room
                             </MyButton>
             </Grid>
-            <Grid container justify='center' item xs={4}>
+            <Grid container justify='center' item xs={3}>
               <MyButton className={classes.button}>
                 Play now
-                            </MyButton>
+              </MyButton>
+            </Grid>
+            <Grid container justify='center' item xs={3}>
+              <MyButton className={classes.button} onClick={() => history.push('/ranking')}>
+                Ranking Board
+              </MyButton>
             </Grid>
           </Grid>
           <Grid container style={{ height: '450px', overflowX: 'hidden' }}>
