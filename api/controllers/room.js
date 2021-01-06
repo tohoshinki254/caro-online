@@ -354,6 +354,7 @@ module.exports = {
       })
     }
   },
+  
   inviteUser: async (username) => {
     if (username) {
       const account = await accountDAO.findOne({username: username});
@@ -380,6 +381,20 @@ module.exports = {
         result: false,
         message: 'username is undefine.'
       }
+    }
+  },
+
+  getRoomsNoPlayer: async (req, res, next) => {
+    try {
+      const room = await roomDAO.findOne({ player: null });
+      res.status(200).json({
+        message: 'OK',
+        room: room
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: e.message
+      })
     }
   }
 }

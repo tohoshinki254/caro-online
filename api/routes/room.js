@@ -30,10 +30,14 @@ router.post('/rooms-by-user', passport.authenticate('jwt', { session: false }), 
 
 router.get('/rooms-ended', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
     roomController.getRoomsEnded(req, res, next);
-})
+});
 
 router.post('/end', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
     roomController.setEndRoom(req, res, next);
-})
+});
+
+router.get('/room-no-player', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    roomController.getRoomsNoPlayer(req, res, next);
+});
 
 module.exports = router;
