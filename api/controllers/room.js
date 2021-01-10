@@ -248,7 +248,14 @@ module.exports = {
         return;
       }
 
-      const rooms = await roomDAO.find({ $or: [{ creator: id }, { player: id }] });
+      const rooms = await roomDAO.find({ $or: [{ creator: id }, { player: id }] }).lean();
+      for (let i = 0; i < rooms.length; i++) {
+        const creator = await accountDAO.findById(rooms[i].creator);
+        const player = await accountDAO.findById(rooms[i].player);
+
+        rooms[i].creator = creator;
+        rooms[i].player = player;
+      }
       res.status(200).json({
         message: 'OK',
         rooms: rooms
@@ -262,7 +269,16 @@ module.exports = {
 
   getRoomsEnded: async (req, res, next) => {
     try {
-      const rooms = await roomDAO.find({ isEnd: true });
+      const rooms = await roomDAO.find({ isEnd: true }).lean();
+
+      for (let i = 0; i < rooms.length; i++) {
+        const creator = await accountDAO.findById(rooms[i].creator);
+        const player = await accountDAO.findById(rooms[i].player);
+
+        rooms[i].creator = creator;
+        rooms[i].player = player;
+      }
+
       res.status(200).json({
         message: 'OK',
         rooms: rooms
