@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import { makeStyles, Paper, Table, TableContainer, TableHead, TablePagination, TableRow, TableBody } from '@material-ui/core';
+import { Grid, makeStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { StyledTableCell, StyledTableRow } from '../../components/StyledTable';
+import { Pagination } from '@material-ui/lab';
+import RoomRow from '../UserDetails/RoomRow';
 
 const RightSection = ({ rooms, userId }) => {
+    console.log(rooms);
     const classes = useStyles();
+    const [page, setPage] = useState(1);
     let history = useHistory();
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(7);
+
+    let totalPages = Math.floor(rooms.length / 4);
+    rooms.length % 4 > 0 && totalPages++;
+    console.log(totalPages);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
-    
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-    
+
     const seeRoomDetails = (room) => {
         const to = '/room/' + room.roomId;
         history.push({
@@ -27,48 +27,25 @@ const RightSection = ({ rooms, userId }) => {
     }
 
     return (
-        <Paper style={{ width: '100%' }}>
-            <TableContainer component={Paper}>
-                <Table style={{ width: '100%' }} aria-label="customized table">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell style={{ width: '40%' }}>Competitor</StyledTableCell>
-                            <StyledTableCell align="center">Cups won</StyledTableCell>
-                            <StyledTableCell align="center">Wins</StyledTableCell>
-                            <StyledTableCell align="center">Draws</StyledTableCell>
-                            <StyledTableCell align="center">Loses</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rooms.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((room) => (
-                            <StyledTableRow key={room.creator !== userId ? room.creator : room.player} onClick={() => seeRoomDetails(room)}>
-                                <StyledTableCell component="th" scope="row" style={{ width: '15%'}}>
-                                    {room.creator !== userId ? room.creator : room.player}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">{room.cups}</StyledTableCell>
-                                <StyledTableCell align="center">{room.creator !== userId ? room.playerWinner : room.creatorWinner}</StyledTableCell>
-                                <StyledTableCell align="center">{room.draws}</StyledTableCell>
-                                <StyledTableCell align="center">{room.creator !== userId ? room.creatorWinner : room.playerWinner}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination 
-                rowsPerPageOptions={[5, 10]}
-                component="div"
-                count={rooms.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
-        </Paper>
+        <>
+            <Grid className={classes.container} container >
+                {rooms.filter((room, index) => {
+                    return index >= (page - 1) * 4 && index < (page - 1) * 4 + 4;
+                }).map((room, index) => <RoomRow room={room} key={index} userId={userId} seeDetails={seeRoomDetails}/>)}
+            </Grid>
+            <Grid style={{marginTop: '2%', marginBottom: '5%'}} container justify='center'>
+                <Pagination count={totalPages} page={page} color='primary' size='large' onChange={handleChangePage} />
+            </Grid>
+        </>
     )
 }
 
 const useStyles = makeStyles({
-
-});
+    container: {
+        paddingLeft: '10%',
+        paddingRight: '10%',
+        paddingTop: '2%',
+    },
+})
 
 export default RightSection;

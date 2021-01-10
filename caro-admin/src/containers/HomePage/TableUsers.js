@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { Table, TableHead, TableContainer, TableRow, Paper, TableBody, TablePagination } from '@material-ui/core';
-import { StyledTableCell, StyledTableRow } from '../../components/StyledTable/index';
+import { Grid, makeStyles  } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import { Pagination } from '@material-ui/lab';
+import UserRow from '../../components/UserRow';
 
 const TableUsers = ({ users }) => {
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const classes = useStyles();
+    const [page, setPage] = useState(1);
     let history = useHistory();
+
+    let totalPages = Math.floor(users.length / 4);
+    users.length % 4 > 0 && totalPages++;
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
-    };
-    
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
+    };  
 
     const seeUserDetails = (user) => {
         const to = '/user/' + user._id;
@@ -26,46 +25,26 @@ const TableUsers = ({ users }) => {
     }
 
     return (
-        <Paper style={{ width: '100%', marginBottom: '2%' }}>
-            <TableContainer component={Paper}>
-                <Table style={{ width: '100%' }} aria-label="customized table">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell style={{ width: '15%'}}>Name</StyledTableCell>
-                            <StyledTableCell style={{ width: '15%'}}>Email</StyledTableCell>
-                            <StyledTableCell align="center">Cups</StyledTableCell>
-                            <StyledTableCell align="center">Wins</StyledTableCell>
-                            <StyledTableCell align="center">Draws</StyledTableCell>
-                            <StyledTableCell align="center">Loses</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                            <StyledTableRow key={user.name} onClick={() => seeUserDetails(user)}>
-                                <StyledTableCell component="th" scope="row" style={{ width: '15%'}}>
-                                    {user.name}
-                                </StyledTableCell>
-                                <StyledTableCell style={{ width: '15%'}}>{user.email}</StyledTableCell>
-                                <StyledTableCell align="center">{user.cups}</StyledTableCell>
-                                <StyledTableCell align="center">{user.wins}</StyledTableCell>
-                                <StyledTableCell align="center">{user.draws}</StyledTableCell>
-                                <StyledTableCell align="center">{user.loses}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination 
-                rowsPerPageOptions={[5, 10]}
-                component="div"
-                count={users.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
-        </Paper>
+        <>
+            <Grid className={classes.container} container >
+                {users.filter((user, index) => {
+                    return index >= (page - 1) * 4 && index < (page - 1) * 4 + 4;
+                }).map((user, index) => <UserRow user={user} key={index} seeDetails={seeUserDetails}/>)}
+            </Grid>
+            <Grid style={{marginTop: '2%', marginBottom: '5%'}} container justify='center'>
+                <Pagination count={totalPages} page={page} color='primary' size='large' onChange={handleChangePage} />
+            </Grid>
+        </>
     )
 }
+
+const useStyles = makeStyles({
+    container: {
+        paddingLeft: '10%',
+        paddingRight: '10%',
+        paddingTop: '2%',
+        height: '75%',
+    },
+})
 
 export default TableUsers;
