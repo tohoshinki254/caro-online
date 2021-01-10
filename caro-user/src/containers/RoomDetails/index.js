@@ -11,8 +11,6 @@ const RoomDetails = () => {
     const { room } = useLocation().state;
     const [matches, setMatches] = useState([]);
     const [match, setMatch] = useState();
-    const [creator, setCreator] = useState();
-    const [player, setPlayer] = useState();
     const [history, setHistory] = useState([]);
 
     useEffect(() => {
@@ -33,30 +31,6 @@ const RoomDetails = () => {
             )
     }, [setMatch])
 
-    useEffect(() => {
-        fetchWithAuthentication(API_URL + 'user?userId=' + room.creator, 'GET', localStorage.getItem(TOKEN_NAME))
-            .then(
-                (data) => {
-                    setCreator(data.user);
-                },
-                (error) => {
-
-                }
-            )
-    }, [setCreator])
-
-    useEffect(() => {
-        fetchWithAuthentication(API_URL + 'user?userId=' + room.player, 'GET', localStorage.getItem(TOKEN_NAME))
-            .then(
-                (data) => {
-                    setPlayer(data.user);
-                },
-                (error) => {
-
-                }
-            )
-    }, [setPlayer])
-
     const changeMatch = (match) => {
         setMatch(match);
         setHistory(match.history);
@@ -70,13 +44,13 @@ const RoomDetails = () => {
         <>
             <Grid container>
                 <Grid item xs={3}>
-                    <LeftSection matches={matches} changeMatch={changeMatch} creator={creator} player={player}/>
+                    <LeftSection matches={matches} changeMatch={changeMatch} creator={room.creator} player={room.player}/>
                 </Grid>
                 <Grid item xs={6}>
                     <CenterSection room={room} history={history} match={match}/>
                 </Grid>
                 <Grid item xs={3}>
-                    <RightSection room={room} match={match} setHistory={changeHistory} creator={creator} player={player}/>
+                    <RightSection room={room} match={match} setHistory={changeHistory} creator={room.creator} player={room.player}/>
                 </Grid>
             </Grid>
         </>

@@ -53,10 +53,11 @@ const useStyles = makeStyles({
         borderStyle: 'solid',
         borderRadius: '5px',
         padding: '2%',
-        margin: '2%'
+        margin: '2%',
+        height: '100%'
     },
     rightSection: {
-        marginTop: '2%'
+        marginTop: '1%'
     }
 });
 

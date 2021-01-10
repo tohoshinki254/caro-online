@@ -28,7 +28,7 @@ const LeftSection = ({ userId }) => {
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
                     <Typography className={classes.name}>{userInfo.name}</Typography>
                 </div>
-                <div style={{ marginLeft: '10%' }}>
+                <div style={{ marginLeft: '5%' }}>
                     <List>
                         <ListItem>
                             <ListItemText primary={`Username: ${userInfo.username}`} className={classes.listItem}/>
