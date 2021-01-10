@@ -11,8 +11,8 @@ import { convertBoardArray } from './util';
 
 const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId, start, history }) => {
   const classes = useStyle();
-  const [xRemain, setXRemain] = useState(120);
-  const [oRemain, setORemain] = useState(120);
+  const [xRemain, setXRemain] = useState(30);
+  const [oRemain, setORemain] = useState(30);
   const [counter, setCounter] = useState(null);
   const { dispatch } = useContext(RoomContext);
   const defaultInfo = { name: 'N/A', mark: 0 };
@@ -165,7 +165,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           });
         }, 1000);
         setCounter(countDown);
-        setORemain(120);
+        setORemain(30);
       } else {
         let countDown = setInterval(() => {
           setORemain(oRemain => {
@@ -174,20 +174,20 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           });
         }, 1000);
         setCounter(countDown);
-        setXRemain(120);
+        setXRemain(30);
       }
     } else {
       if (counter !== null) {
         clearInterval(counter)
-        isCreator ? setXRemain(120) : setORemain(120);
+        isCreator ? setXRemain(30) : setORemain(30);
       }
     }
   }, [yourTurn]);
 
   useEffect(() => {
     if (!start) {
-      setXRemain(120);
-      setORemain(120);
+      setXRemain(30);
+      setORemain(30);
       if (counter !== null) clearInterval(counter)
     }
   }, [start])
@@ -215,7 +215,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         }))
         updateMark(isCreator)
         resetState();
-        setXRemain(120)
+        setXRemain(30)
       }
     }
   }, [xRemain])
@@ -232,7 +232,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         }))
         updateMark(isCreator)
         resetState();
-        setORemain(120);
+        setORemain(30);
       } else {
         socket.emit('countdown-player', { remain: oRemain, roomId: roomId, history: convertBoardArray(history) });
         dispatch(updateResult({

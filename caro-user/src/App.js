@@ -17,6 +17,7 @@ import Auth from "./components/Auth";
 import socket from "./global/socket";
 import RankingBoard from "./containers/RankingBoard";
 import Loading from "./components/Loading";
+import RoomForViewer from "./containers/RoomForViewer";
 
 function App() {
   const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);
@@ -55,6 +56,7 @@ function App() {
           <Route path='/home' component={HomePage} />
           <Route path='/logout' component={Logout} />
           <Route path='/room/:roomId' component={RoomPage} />
+          <Route path='/viewer/room/:roomId' component={RoomForViewer} />
           <Route path='/oauth/:token' component={Auth} />
           <Route path='/profile' component={Profile} />
           <Route path='/mail-verification/:id' component={VerifyEmailPage} />

@@ -17,6 +17,7 @@ import decode from 'jwt-decode';
 import { API_URL, DRAW_IMAGE, TOKEN_NAME } from '../../global/constants';
 import socket from '../../global/socket';
 import { fetchWithAuthentication } from '../../api/fetch-data';
+import InputPasswordDialog from './InputPasswordDialog';
 
 const HomePage = () => {
   const classes = useStyle();
@@ -30,6 +31,15 @@ const HomePage = () => {
     content: null,
     handleYes: () => { },
     handleNo: () => { }
+  })
+  const handleCloseInputPassword = () => {
+    setInputPasswordDialog({...inputPasswordDialog, open: false});
+  }
+  const [inputPasswordDialog, setInputPasswordDialog] = useState({
+    open: false,
+    roomId: null,
+    onClose: handleCloseInputPassword,
+    isFull: false
   })
   const history = useHistory();
   const handleCloseCreate = () => setOpenCreate(false);
@@ -178,7 +188,7 @@ const HomePage = () => {
             </Grid>
           </Grid>
           <Grid container style={{ height: '450px', overflowX: 'hidden' }}>
-            <ListRoom />
+            <ListRoom handleCloseInputPassword={handleCloseInputPassword} setInputPasswordDialog={setInputPasswordDialog}  />
           </Grid>
         </Grid>
         <Grid className={classes.rightSection} item xs={4}>
@@ -203,6 +213,9 @@ const HomePage = () => {
       <JoinRoomDialog setLoading={setLoading} open={openJoin} onClose={handleCloseJoin} />
       <ConfirmDialog
         {...confirmDialog}
+      />
+      <InputPasswordDialog 
+        {...inputPasswordDialog}
       />
       {loading && <Loading />}
     </>

@@ -475,6 +475,7 @@ const RoomPage = ({ match }) => {
           },
           (error) => {
             alert(error.message);
+            setPlayerExited(true)
           }
         )
     }
@@ -517,7 +518,7 @@ const RoomPage = ({ match }) => {
     <RoomContext.Provider value={{ dispatch, state }}>
       <Prompt
         message={(location, action) => {
-          return playerExited ? true : 'Are you sure to leave this room?\nYou will be lose if the game is beginning'
+          return !playerExited && infoBoard.player.name !== 'N/A' ? 'Are you sure to leave this room?\nYou will be lose if the game is beginning' : true;
         }}
       />
       <Grid container>
