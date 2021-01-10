@@ -7,6 +7,10 @@ router.post('/join', passport.authenticate('jwt', { session: false }), async (re
     roomController.joinRoom(req, res, next);
 });
 
+router.post('/viewer/join', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
+    roomController.joinRoomAsViewer(req, res, next);
+})
+
 router.get('/public', async (req, res, next) => {
     roomController.getPublicRooms(req, res, next);
 });

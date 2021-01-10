@@ -39,6 +39,7 @@ module.exports = {
       socket.join(data.roomId);
       if (!data.isCreator) {
         const player = await accountDAO.findById(data.userId);
+        socket.broadcast.emit('reload-list-room');
         if (player)
           socket.to(`${data.roomId}`).emit('player-joined', player);
       }
@@ -173,6 +174,7 @@ module.exports = {
 
     //player exit
     socket.on('player-exit', async ({ roomId, isCreator, history, start }) => {
+
       const room = await roomDAO.findOne({ roomId: roomId });
       //set false in room value
       const userId = isCreator ? room.creator : room.player;
@@ -187,9 +189,18 @@ module.exports = {
           await updateResult(roomId, -1, history);
         else
           await updateResult(roomId, 1, history);
+      } else {  
+        if (!room.isEnd) {
+          room.isEnd = true;
+          await room.save();
+          if (room.player === null) {
+            setTimeout(() => room.delete(), 2000);
+          }
+        }
       }
 
       socket.to(`${roomId}`).emit('player-exited');
+      socket.broadcast.emit('reload-list-room');  
     })
 
     //invite player

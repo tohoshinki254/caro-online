@@ -14,7 +14,8 @@ const roomSchema = new mongoose.Schema({
     isPublic: Boolean,
     name: String,
     chat: Array,
-    password: String
+    password: String,
+    viewer: Array
 });
 
 module.exports = mongoose.model('rooms', roomSchema);

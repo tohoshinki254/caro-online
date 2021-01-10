@@ -5,7 +5,8 @@ const matchDAO = require('../models/match');
 module.exports = {
   getPublicRooms: async (req, res, next) => {
     try {
-      const rooms = await roomDAO.find({ isPublic: true, player: null, isEnd: false });
+      const rooms = await roomDAO.find({isEnd: false });
+      res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
       res.status(200).json({
         message: 'Successful',
         rooms: rooms
@@ -87,7 +88,9 @@ module.exports = {
         createdTime: new Date(),
         isPublic: isPublic,
         name: name,
-        password: isPublic ? null : password
+        password: isPublic ? null : password,
+        chat: [],
+        viewer: []
       });
       await newRoom.save();
       //set in room
@@ -125,6 +128,12 @@ module.exports = {
         return;
       }
 
+      if (userId !== room.player && userId !== room.creator && !room.viewer.includes(userId)) {
+        res.status(403).json({
+          message: 'You not have permission to join this room.'
+        });
+        return;
+      }
       let creator = {
         name: 'N/A',
         mark: 0,
@@ -405,5 +414,54 @@ module.exports = {
         message: e.message
       })
     }
+  },
+
+  joinRoomAsViewer: async(req, res, next) => {
+    try {
+      const {roomId, password} = req.body;
+      if (roomId === undefined) {
+        res.status(404).json({
+          message: 'roomID not found'
+        });
+        return;
+      }
+
+      const room = await roomDAO.findOne({roomId: roomId});
+
+      if (room && !room.isEnd) {
+        if (room.isPublic) {
+          room.viewer = room.viewer.concat(req.user._id);
+          await room.save();
+          res.status(200).json({
+            message: 'OK'
+          });
+        } else {
+          if (password === room.password) {
+            room.viewer = room.viewer.concat(req.user._id);
+            await room.save();
+            res.status(200).json({
+              message: 'OK'
+            });
+          } else {
+            res.status(401).json({
+              message: 'Password is wrong.'
+            });
+            return;
+          }
+        }
+      } else {
+        res.status(404).json({
+          message: 'Room not found'
+        });
+        return;
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: e.message
+      })
+    }
+
   }
+
+
 }
