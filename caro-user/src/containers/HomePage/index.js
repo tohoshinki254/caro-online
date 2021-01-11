@@ -33,7 +33,7 @@ const HomePage = () => {
     handleNo: () => { }
   })
   const handleCloseInputPassword = () => {
-    setInputPasswordDialog({...inputPasswordDialog, open: false});
+    setInputPasswordDialog({ ...inputPasswordDialog, open: false });
   }
   const [inputPasswordDialog, setInputPasswordDialog] = useState({
     open: false,
@@ -74,7 +74,7 @@ const HomePage = () => {
         handleNo: () => { }
       })
     }
-    const userInfo = decode(localStorage.getItem(TOKEN_NAME));
+    const userInfo = localStorage.getItem(TOKEN_NAME) ? decode(localStorage.getItem(TOKEN_NAME)) : null;
 
     socket.on('receive-invitation', ({ username, inviterName, roomId }) => {
       if (userInfo.username === username) {
@@ -121,17 +121,17 @@ const HomePage = () => {
       roomId: room.roomId
     }
     fetchWithAuthentication(API_URL + 'room/join', 'POST', localStorage.getItem("caro-online-token"), data)
-        .then(
-          (data) => {
-            setLoading(false);
-            const to = '/room/' + room.roomId;
-            history.push(to);
-          },
-          (error) => {
-            setLoading(false);
-            alert(error.message);
-          }
-        )
+      .then(
+        (data) => {
+          setLoading(false);
+          const to = '/room/' + room.roomId;
+          history.push(to);
+        },
+        (error) => {
+          setLoading(false);
+          alert(error.message);
+        }
+      )
   }
 
   const autoCreateRoom = () => {
@@ -188,7 +188,7 @@ const HomePage = () => {
             </Grid>
           </Grid>
           <Grid container style={{ height: '450px', overflowX: 'hidden' }}>
-            <ListRoom handleCloseInputPassword={handleCloseInputPassword} setInputPasswordDialog={setInputPasswordDialog}  />
+            <ListRoom handleCloseInputPassword={handleCloseInputPassword} setInputPasswordDialog={setInputPasswordDialog} />
           </Grid>
         </Grid>
         <Grid className={classes.rightSection} item xs={4}>
@@ -214,7 +214,7 @@ const HomePage = () => {
       <ConfirmDialog
         {...confirmDialog}
       />
-      <InputPasswordDialog 
+      <InputPasswordDialog
         {...inputPasswordDialog}
       />
       {loading && <Loading />}

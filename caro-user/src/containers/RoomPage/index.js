@@ -91,14 +91,15 @@ const RoomPage = ({ match }) => {
       const board = cloneBoard(curr.board);
 
       board[i][j] = isCreator;
-      setHistory(_history.concat([{
+      const finalHistory = _history.concat([{
         board: board,
         lastMove: {
           i: i,
           j: j
         },
         isCreator: isCreator
-      }]));
+      }])
+      setHistory(finalHistory);
       setStepNumber(_history.length);
       setYourTurn(false);
 
@@ -115,7 +116,7 @@ const RoomPage = ({ match }) => {
       //check win
       const result = calculateWinner(board, i, j, isCreator);
       if (result === 1) {
-        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator, history: convertBoardArray(history) });
+        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator, history: convertBoardArray(finalHistory) });
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
@@ -128,7 +129,7 @@ const RoomPage = ({ match }) => {
       }
 
       if (result === 0) {
-        socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator });
+        socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator, history: convertBoardArray(finalHistory) });
         dispatch(updateResult({
           open: true,
           image: DRAW_IMAGE,

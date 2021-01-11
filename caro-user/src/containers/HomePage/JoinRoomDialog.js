@@ -12,7 +12,6 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
   let history = useHistory();
   const [roomId, setRoomId] = useState('');
   const [password, setPassword] = useState('');
-  const [joinSuccessful, setJoinSuccessful] = useState({ status: false, message: '' });
   const [errorMessage, setErrorMessage] = useState('');
   const joinRoom = () => {
     if (roomId.length === 0) {
@@ -30,23 +29,19 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
         .then(
           (data) => {
             setLoading(false);
-            setJoinSuccessful({ status: true, message: data.message });
+            if (data.viewer === true) {
+              history.push(`/viewer/room/${roomId}`)
+            } else {
+              history.push(`/room/${roomId}`);
+            }
           },
           (error) => {
             setLoading(false);
-            setJoinSuccessful({ status: false, message: error.message });
             setErrorMessage(error.message);
           }
         )
     }
   }
-
-  useEffect(() => {
-    if (joinSuccessful.status) {
-      const to = '/room/' + roomId;
-      history.push(to);
-    }
-  }, [joinSuccessful, history, roomId])
 
   return (
     <Dialog

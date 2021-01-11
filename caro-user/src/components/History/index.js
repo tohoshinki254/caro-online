@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 
 
-const History = ({isX = false, name, i, j, step, setHistory}) => {
+const History = ({isX = false, name, i, j, step, setHistory = () => {}}) => {
   const classes = useStyle();
   const color = isX ? '#b71c1c' : '#2f78f7';
   return (
@@ -27,6 +27,7 @@ const useStyle = makeStyles({
     paddingBottom: '1%',
     borderRadius: '8px',
     marginBottom: '1.5%',
+    cursor: 'pointer'
   }
 });
 
