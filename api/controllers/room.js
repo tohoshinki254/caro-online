@@ -32,18 +32,24 @@ module.exports = {
         return;
       }
 
-      if (room.player !== null) {
-        res.status(403).json({
-          message: 'The room is full.'
-        });
-        return;
-      }
+
       if (!room.isPublic && password !== room.password) {
         res.status(403).json({
           message: 'Password is wrong.'
         });
         return;
       }
+
+      if (room.player !== null) {
+        room.viewer = room.viewer.concat(req.user._id);
+        await room.save();
+        res.status(200).json({
+          message: 'Successfully to join as viewer',
+          viewer: true
+        });
+        return;
+      }
+
       room.player = playerId;
 
       await room.save();
@@ -53,7 +59,8 @@ module.exports = {
       await player.save();
 
       res.status(200).json({
-        message: 'Successful'
+        message: 'Successful',
+        viewer: false
       });
     } catch (e) {
       res.status(500).json({

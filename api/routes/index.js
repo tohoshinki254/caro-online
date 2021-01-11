@@ -9,6 +9,7 @@ const { getRankingBoard } = require('../controllers/account');
 router.get('/', async function(req, res, next) {
   await matchDAO.deleteMany();
   await roomDAO.deleteMany();
+  res.send('success');
 });
 
 module.exports = router;
