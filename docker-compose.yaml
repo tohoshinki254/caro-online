@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  caro-api:
+    build: ./api
+    container_name: caro-api
+    ports:
+      - 5000:5000
+
+  caro-user:
+    build: ./caro-user
+    container_name: caro-user
+    stdin_open: true
+    ports:
+      - 3000:5000
+    links:
+      - "caro-api"
+  
+  caro-admin:
+    build: ./caro-admin
+    container_name: caro-admin
+    stdin_open: true
+    ports:
+      - 3001:5000
+    links:
+      - "caro-api"
