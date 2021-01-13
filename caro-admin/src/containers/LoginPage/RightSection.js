@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Button, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import LockIcon from '@material-ui/icons/Lock';
 import { fetchWithoutAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
+import { AppContext } from '../../contexts/AppContext';
+import { Redirect } from 'react-router-dom';
 
 const RightSection = () => {
     const classes = useStyle();
@@ -13,6 +15,7 @@ const RightSection = () => {
     const [output, setOutput] = useState('');
     const [username, setUsername] = useState({ value: '', error: false });
     const [password, setPassword] = useState({ value: '', error: false });
+    const { setIsLogined } = useContext(AppContext); 
 
     const handleUsernameChange = (event) => {
       let value = event.target.value;
@@ -50,8 +53,12 @@ const RightSection = () => {
       }
     }
 
+    useEffect(() => {
+      if (loginSuccess) setIsLogined(true);
+    }, [setIsLogined, loginSuccess])
+
     if (loginSuccess) {
-      alert('Login successfully');
+      return <Redirect to='/home' />
     }
 
     return (

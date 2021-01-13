@@ -19,6 +19,9 @@ const MyTextField = withStyles({
           borderColor: 'black',
         },
       },
+      "& .MuiInputBase-root.Mui-disabled": {
+        color: 'black'
+      }
     },
 })(TextField);
 

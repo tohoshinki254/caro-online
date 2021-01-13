@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { makeStyles, Typography } from '@material-ui/core';
+import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { API_URL, TOKEN_NAME } from '../../global/constants';
 
-const FormRegister = () => {
+const FormRegister = ({ history }) => {
     const classes = useStyle();
     const [username, setUsername] = useState({ value: '', error: false });
     const [password, setPassword] = useState({ value: '', error: false });
@@ -78,6 +78,10 @@ const FormRegister = () => {
         }
     }
 
+    const goHomePage = () => {
+        history.goBack();
+    }
+
     if (registerSuccess) {
         alert('Create new admin successfully');
     }
@@ -123,9 +127,18 @@ const FormRegister = () => {
                 onChange={handleRePasswordChange}
             />
             <Typography className={classes.errorRegisterText}>{output}</Typography>
-            <MyButton onClick={handleRegister} className={classes.registerButton} variant="contained" color="primary">
-                Create
-            </MyButton>
+            <Grid className={classes.button} container>
+                <Grid item xs={4}>
+                    <MyButton onClick={handleRegister} variant="contained" color="primary">
+                        Create
+                    </MyButton>
+                </Grid>
+                <Grid item xs={8}>
+                    <MyButton onClick={goHomePage} variant="contained" color="primary">
+                        Back to home page
+                    </MyButton>
+                </Grid>
+            </Grid>
         </div>
     )
 }
@@ -142,8 +155,7 @@ const useStyle = makeStyles({
     textField: {
         marginTop: '5%'
     },
-    registerButton: {
-        width: '40%',
+    button: {
         marginTop: '10%'
     },
     errorRegisterText: {
