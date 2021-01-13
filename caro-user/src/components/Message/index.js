@@ -30,10 +30,12 @@ const useStyle = makeStyles({
   },
   content: {
     paddingLeft: '2%',
+    paddingRight: '2%',
     paddingTop: '1%',
     paddingBottom: '1%',
     borderRadius: '5px',
-    color: 'white' 
+    color: 'white',
+    wordBreak: 'break-word'
   },
   user: {
     paddingLeft: '2%',

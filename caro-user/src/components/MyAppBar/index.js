@@ -51,7 +51,12 @@ const MyAppBar = ({isLogined}) => {
                 {`Hi, ${userInfo.name}`}
               </Typography>
             </MenuItem>
-            <Link style={{ textDecoration: 'none', color: 'inherit' }}  to="/profile">
+            <Link style={{ textDecoration: 'none', color: 'inherit' }}  
+              to={{
+                pathname: '/profile',
+                state: { userId: userInfo._id }
+              }}
+            >
               <MenuItem>
                 <ListItemIcon>
                   <AccountCircleIcon/>

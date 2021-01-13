@@ -1,34 +1,26 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
-import LeftSection from './LeftSection';
-import RightSection from './RightSection';
-import { Redirect } from 'react-router-dom';
-import { AppContext } from '../../contexts/AppContext';
 import Loading from '../../components/Loading';
+import LeftSection from '../LoginPage/LeftSection';
+import FormSection from './FormSection';
 
-
-const LoginPage = () => {
-    const classes = useStyle();
-    const {isLogined} = useContext(AppContext);
+const ForgetPassPage = (props) => {
+    const classes = useStyles();
     const [loading, setLoading] = useState(false);
-    const setLoadingValue = (value) => {
-        setLoading(value);
-    }
+    const userId = props.match.params.id;
 
-    if (isLogined) return <Redirect to ='/home'/>
-    
     return (
         <div className={classes.container}>
             <div className={classes.mark} />
             <Grid container>
                 <Grid item xs={3} />
-                <Grid className={classes.formSection} item xs={6}> 
+                <Grid className={classes.formSection} item xs={6}>
                     <Grid container>
                         <Grid className={classes.rightLine} item xs={6} >
-                            <LeftSection text={'Create an account'} pathLink="/register" forget={'Forget Password'} forgetLink="/forget-password"/>
+                            <LeftSection text={'Login now'} pathLink="/login" />
                         </Grid>
                         <Grid className={classes.paddingRightSection} item xs={6}>
-                            <RightSection setLoading={setLoadingValue} />
+                            <FormSection id={userId} setLoading={setLoading} />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -36,11 +28,10 @@ const LoginPage = () => {
             </Grid>
             {loading && <Loading />}
         </div>
-    );
+    )
 }
 
-
-const useStyle = makeStyles({
+const useStyles = makeStyles({
     container: {
         height: '100%',
         backgroundImage: "url('/assets/images/background.jpg')",
@@ -80,4 +71,4 @@ const useStyle = makeStyles({
     }
 });
 
-export default LoginPage;
+export default ForgetPassPage;

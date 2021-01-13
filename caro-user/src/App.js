@@ -5,10 +5,15 @@ import HomePage from "./containers/HomePage";
 import LoginPage from "./containers/LoginPage";
 import RoomPage from "./containers/RoomPage";
 import RegisterPage from "./containers/RegisterPage";
+import Profile from "./containers/Profile";
+import VerifyEmailPage from './containers/VerifyEmailPage';
+import ForgetPassPage from './containers/ForgetPassPage';
+import SendEmail from './containers/ForgetPassPage/SendEmail';
 import { AppContext } from "./contexts/AppContext";
-import { API_URL, TOKEN_NAME } from "./global/constants";
-import socketIOClient from "socket.io-client";
+import { TOKEN_NAME } from "./global/constants";
 import decode from 'jwt-decode';
+import Auth from "./components/Auth";
+import socket from "./global/socket";
 
 function App() {
   const [isLogined, setIsLoginedState] = useState(localStorage.getItem(TOKEN_NAME) !== null);
@@ -18,7 +23,6 @@ function App() {
   }
 
   useEffect(() => {
-    const socket = socketIOClient(API_URL, {transports: ['websocket']});
 
     const handleCloseTab = () => {
       if (localStorage.getItem(TOKEN_NAME) !== null){
@@ -33,7 +37,8 @@ function App() {
       handleCloseTab();
     });
 
-  }, [])
+  }, []);
+
   return (
     <AppContext.Provider value={{isLogined: isLogined, setIsLogined: setIsLogined}}>
       <Switch>
@@ -45,6 +50,12 @@ function App() {
           <Route path='/home' component={HomePage}/>
           <Route path='/logout' component={Logout} />
           <Route path='/room/:roomId' component={RoomPage} />
+          <Route path='/oauth/:token' component={Auth} />
+          <Route path='/profile' component={Profile} />
+          <Route path='/mail-verification/:id' component={VerifyEmailPage} />
+          <Route path='/reset-password/:id' component={ForgetPassPage} />
+          <Route path='/forget-password' component={SendEmail} />
+          
       </Switch>      
     </AppContext.Provider>
 

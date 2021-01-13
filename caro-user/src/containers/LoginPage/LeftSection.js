@@ -3,16 +3,18 @@ import { makeStyles, Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
 
-const LeftSection = ({text, pathLink}) => {
+const LeftSection = ({text, pathLink, forget, forgetLink}) => {
     const classes = useStyle();
     return (
         <div className={classes.container}>
             <img className={classes.logo} src="/assets/images/logo.jpg" alt='logo'/>
             <Typography className={classes.logoTitle} >Tic Tac Toe</Typography>
-            <Link style={{marginTop: '12%'}} to={pathLink}>
+            <Link style={{marginTop: '5%'}} to={pathLink}>
                 <Typography className={classes.text} >{text}</Typography>
             </Link>
-            
+            <Link style={{marginTop: '5%'}} to={forgetLink}>
+                <Typography className={classes.text} >{forget}</Typography>
+            </Link>
         </div>
     );
 }

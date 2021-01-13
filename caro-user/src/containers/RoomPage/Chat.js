@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import Message from '../../components/Message';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
-import { API_URL, TOKEN_NAME } from '../../global/constants';
-import socketIOClient from "socket.io-client";
+import { TOKEN_NAME } from '../../global/constants';
 import decode from 'jwt-decode';
+import socket from '../../global/socket';
 
 const Chat = ({ roomId }) => {
   const classes = useStyle();
-  const [socket] = useState(socketIOClient(API_URL, { transports: ['websocket'] }));
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState([]);
+  const divRef = useRef(null);
   const userInfo = decode(localStorage.getItem(TOKEN_NAME));
 
   useEffect(() => {
@@ -23,32 +23,44 @@ const Chat = ({ roomId }) => {
       }
     });
 
-    return () => { socket.off('message'); }
+    return () => { 
+      socket.off('message'); 
+    }
   }, []);
 
+  useEffect(() => {
+    if (divRef) {
+      divRef.current.addEventListener('DOMNodeInserted', event => {
+        const { currentTarget: target } = event;
+        target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+      });
+    }
+  }, [])
   const sendMessage = (message) => {
-    socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
+    setContent('');
+    if (message.length > 0)
+      socket.emit('chat-message', { message: message, _id: userInfo._id, roomId: roomId });
   };
 
   return (
     <div className={classes.container}>
       <Typography className={classes.text} align='center'>Chat</Typography>
-      <div className={classes.chatContent}>
-        {messages.map(message => message.id === userInfo._id ?
-          <Message isX isSender username={message.name} content={message.mess} time={message.time} />
-          : <Message username={message.name} content={message.mess} time={message.time} />)}
+      <div ref={divRef} className={classes.chatContent}>
+        {messages.map((message, index) => message.id === userInfo._id ?
+          <Message key={index} isX isSender username={message.name} content={message.mess} time={message.time} />
+          : <Message key={index} username={message.name} content={message.mess} time={message.time} />)}
       </div>
-      <div className={classes.textField}>
+      <form className={classes.textField} onSubmit={(e) => {e.preventDefault(); sendMessage(content)}}>
         <MyTextField
           placeholder='Enter content...'
           style={{ width: '60%' }}
           value={content}
           onChange={event => setContent(event.target.value)}
         />
-        <MyButton style={{ width: '10%' }} onClick={() => sendMessage(content)}>
+        <MyButton type='submit' style={{ width: '10%' }}>
           Send
-          </MyButton>
-      </div>
+        </MyButton>
+      </form>
     </div>
   );
 }
