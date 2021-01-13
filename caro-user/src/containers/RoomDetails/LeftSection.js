@@ -7,7 +7,7 @@ const LeftSection = ({ matches, changeMatch, creator, player }) => {
 
     return (
         <div style={{ margin: '5%', alignItems: 'center' }}>
-            <div style={{borderColor: 'dodgerblue' ,borderWidth: '2px', borderStyle: 'solid', borderRadius: '5px', padding: '2%', marginBottom: '2%'}}>
+            <div style={{borderColor: 'red' ,borderWidth: '2px', borderStyle: 'solid', borderRadius: '5px', padding: '2%', marginBottom: '2%'}}>
                 {creator !== undefined && 
                 <div className={classes.player}>
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
@@ -17,7 +17,7 @@ const LeftSection = ({ matches, changeMatch, creator, player }) => {
                     </div>
                 </div>}
             </div>
-            <div style={{borderColor: 'red' ,borderWidth: '2px', borderStyle: 'solid', borderRadius: '5px', padding: '2%', marginTop: '2%', marginBottom: '10%'}}>
+            <div style={{borderColor: 'dodgerblue' ,borderWidth: '2px', borderStyle: 'solid', borderRadius: '5px', padding: '2%', marginTop: '2%', marginBottom: '10%'}}>
                 {player !== undefined && 
                 <div className={classes.player}>
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
@@ -34,7 +34,7 @@ const LeftSection = ({ matches, changeMatch, creator, player }) => {
                     match.result === -1 ? 
                         <Button
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             className={classes.game}
                             startIcon={<CheckCircle />}
                             onClick={() => changeMatch(match)}
@@ -44,7 +44,7 @@ const LeftSection = ({ matches, changeMatch, creator, player }) => {
                     : (match.result === 1 ?
                         <Button
                             variant="outlined"
-                            color="primary"
+                            color="secondary"
                             className={classes.game}
                             startIcon={<CheckCircle />}
                             onClick={() => changeMatch(match)}
