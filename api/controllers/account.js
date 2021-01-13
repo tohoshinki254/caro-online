@@ -35,15 +35,17 @@ module.exports = {
 					});
 					await newAccount.save();
 
-					await transporter.sendMail({
-						from: '1712785 - 1712813',
-						to: newAccount.email,
-						subject: 'Tic-Tac-Toe Online Email Verification',
-						html: '<p>Click <a href="' + process.env.DOMAIN_NAME +
-							'mail-verification/' + newAccount._id + '"' +
-							'> here </a> to verify your account </p>'
-					})
-
+					if (!isAdmin) {
+						await transporter.sendMail({
+							from: '1712785 - 1712813',
+							to: newAccount.email,
+							subject: 'Tic-Tac-Toe Online Email Verification',
+							html: '<p>Click <a href="' + process.env.DOMAIN_NAME +
+								'mail-verification/' + newAccount._id + '"' +
+								'> here </a> to verify your account </p>'
+						})
+					}
+					
 					res.status(200).json({
 						message: "Successful"
 					});
