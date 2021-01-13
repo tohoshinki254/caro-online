@@ -1,29 +1,34 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import { AppContext } from '../../contexts/AppContext';
-import { Redirect } from 'react-router-dom';
+import { Prompt, Redirect } from 'react-router-dom';
 import Board from './Board';
 import InfoBoard from './InfoBoard';
 import HistoryLog from './HistoryLog';
 import Chat from './Chat';
 import decode from 'jwt-decode';
-import { API_URL, DRAW_IMAGE, LOSE_IMAGE, TOKEN_NAME, WIN_IMAGE } from '../../global/constants';
+import { API_URL, DRAW_IMAGE, ERRO_IMAGE, LOSE_IMAGE, TOKEN_NAME, WIN_IMAGE } from '../../global/constants';
 import { fetchWithAuthentication } from '../../api/fetch-data';
 import { calculateWinner, cloneBoard, initBoard } from './Services';
 import ResultDialog from './ResultDialog';
 import RoomReducer from './reducer';
 import { RoomContext } from './context';
-import { addConfirmDialog, updateResult } from './actions';
+import { addConfirmDialog, addInvitePlayerDialog, updateResult } from './actions';
 import socket from '../../global/socket';
 import ConfirmDialog from './ConfirmDialog';
 import WaitingDialog from './WaitingDialog';
+import { convertBoardArray } from './util';
+import InviteUserDialog from './InviteUserDialog';
 
 const initialState = {
   resultDialog: {
     open: false,
     image: null,
-    content: null
+    content: null,
+    onClose: () => { },
+    buttonText: null,
+    textSize: '3rem'
   },
   confirmDialog: {
     open: false,
@@ -34,34 +39,49 @@ const initialState = {
   },
   waitingDialog: {
     open: false
+  },
+  invitePlayerDialog: {
+    open: false
   }
 }
 const RoomPage = ({ match }) => {
   const classes = useStyle();
   const { isLogined } = useContext(AppContext);
   const [state, dispatch] = useReducer(RoomReducer, initialState);
+  const [playerExited, setPlayerExited] = useState(false);
   const [infoBoard, setInfoBoard] = useState({
     creator: {
       name: 'N/A',
-      mark: 0
+      mark: 0,
+      cups: 0,
+      wins: 0,
+      draws: 0,
+      loses: 0
     },
     player: {
       name: 'N/A',
-      mark: 0
+      mark: 0,
+      cups: 0,
+      wins: 0,
+      draws: 0,
+      loses: 0
     }
   });
   const [isCreator, setIsCreator] = useState(null);
+  const refIsCreator = useRef();
   const [playerStart, setPlayerStart] = useState(false);
   const [startStatus, setStartStatus] = useState('Start');
   //state about board
   const [stepNumber, setStepNumber] = useState(0);
   const [start, setStart] = useState(false);
+  const refStart = useRef();
   const [yourTurn, setYourTurn] = useState(false);
   const [history, setHistory] = useState([{
     board: initBoard(),
     lastMove: null,
     isCreator: null
   }]);
+  const refHistory = useRef();
 
   const handleClick = (i, j) => {
     if (start && playerStart && yourTurn && history[stepNumber].board[i][j] === null) {
@@ -71,14 +91,15 @@ const RoomPage = ({ match }) => {
       const board = cloneBoard(curr.board);
 
       board[i][j] = isCreator;
-      setHistory(_history.concat([{
+      const finalHistory = _history.concat([{
         board: board,
         lastMove: {
           i: i,
           j: j
         },
         isCreator: isCreator
-      }]));
+      }])
+      setHistory(finalHistory);
       setStepNumber(_history.length);
       setYourTurn(false);
 
@@ -95,23 +116,28 @@ const RoomPage = ({ match }) => {
       //check win
       const result = calculateWinner(board, i, j, isCreator);
       if (result === 1) {
-        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator });
+        socket.emit('result', { isWin: true, roomId: match.params.roomId, isCreator: isCreator, history: convertBoardArray(finalHistory) });
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
-          content: 'You Win'
+          content: 'You Win',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         resetState();
         updateMark(isCreator);
       }
 
       if (result === 0) {
-        socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator });
+        socket.emit('result', { isWin: false, roomId: match.params.roomId, isCreator: isCreator, history: convertBoardArray(finalHistory) });
         dispatch(updateResult({
           open: true,
           image: DRAW_IMAGE,
-          content: 'Draw Game'
+          content: 'Draw Game',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
+        updateMark();
         resetState();
       }
       //------------------------------------
@@ -120,7 +146,14 @@ const RoomPage = ({ match }) => {
 
   const handleStart = () => {
     if (infoBoard.player.name === 'N/A') {
-      alert('Game cannot start because room not enough two people');
+      dispatch(updateResult({
+        open: true,
+        image: ERRO_IMAGE,
+        content: 'Game need two people to start.',
+        onClose: handleCloseResultDialog,
+        buttonText: 'OK',
+        textSize: '1.5rem'
+      }))
       return;
     }
     if (!start) {
@@ -132,7 +165,7 @@ const RoomPage = ({ match }) => {
         isCreator: null
       }])
       if (!playerStart) {
-        setStartStatus('Wating for player start');
+        setStartStatus('Waiting for player start');
       } else {
         setYourTurn(isCreator);
         setStartStatus('Game started');
@@ -162,26 +195,57 @@ const RoomPage = ({ match }) => {
   }
 
   const updateMark = (isCreatorWin) => {
-    if (isCreatorWin) {
+    if (isCreatorWin === true) {
       setInfoBoard(infoBoard => {
+        const winCups = infoBoard.creator.cups >= infoBoard.player.cups ? 1 : 3;
+        const loseCups = infoBoard.player.cups > infoBoard.creator.cups ? 3 : 1;
         return {
-          player: infoBoard.player,
+          player: {
+            ...infoBoard.player,
+            cups: infoBoard.player.cups - loseCups,
+            loses: infoBoard.player.loses + 1,
+          },
           creator: {
-            name: infoBoard.creator.name,
-            mark: infoBoard.creator.mark + 1
+            ...infoBoard.creator,
+            mark: infoBoard.creator.mark + 1,
+            cups: infoBoard.creator.cups + winCups,
+            wins: infoBoard.creator.wins + 1,
           }
         };
       })
     } else {
-      setInfoBoard(infoBoard => {
-        return {
-          player: {
-            name: infoBoard.player.name,
-            mark: infoBoard.player.mark + 1
-          },
-          creator: infoBoard.creator
-        }
-      })
+      if (isCreatorWin === false) {
+        setInfoBoard(infoBoard => {
+          const winCups = infoBoard.player.cups >= infoBoard.creator.cups ? 1 : 3;
+          const loseCups = infoBoard.creator.cups > infoBoard.player.cups ? 3 : 1;
+          return {
+            player: {
+              ...infoBoard.player,
+              cups: infoBoard.player.cups + winCups,
+              mark: infoBoard.player.mark + 1,
+              wins: infoBoard.player.wins + 1
+            },
+            creator: {
+              ...infoBoard.creator,
+              loses: infoBoard.creator.loses + 1,
+              cups: infoBoard.creator.cups - loseCups
+            }
+          }
+        })
+      } else {
+        setInfoBoard(infoBoard => {
+          return {
+            player: {
+              ...infoBoard.player,
+              draws: infoBoard.player.draws + 1,
+            },
+            creator: {
+              ...infoBoard.creator,
+              draws: infoBoard.player.draws + 1
+            }
+          }
+        })
+      }
     }
   }
   const addBoard = ({ newBoard, location, isCreator }) => {
@@ -204,13 +268,23 @@ const RoomPage = ({ match }) => {
         .then(
           (data) => {
             let { player, creator, isCreator } = data;
-            socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator });
+            socket.emit('join-room', { name: userInfo.name, roomId: match.params.roomId, isCreator: isCreator, userId: userInfo._id });
             if (isCreator) {
               socket.emit('new-room-created');
               //player join the room
-              socket.on('player-joined', (name) => {
-                player = { name: name, mark: 0 };
+              socket.on('player-joined', (playerJoined) => {
+                player = {
+                  name: playerJoined.name,
+                  mark: 0,
+                  cups: playerJoined.cups,
+                  wins: playerJoined.wins,
+                  draws: playerJoined.draws,
+                  loses: playerJoined.loses
+                };
                 setInfoBoard({ creator: creator, player: player });
+                dispatch(addInvitePlayerDialog({
+                  open: false
+                }))
               });
 
               //player play
@@ -225,7 +299,9 @@ const RoomPage = ({ match }) => {
                 dispatch(updateResult({
                   open: true,
                   image: WIN_IMAGE,
-                  content: 'You Win'
+                  content: 'You Win',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }));
               })
 
@@ -240,13 +316,20 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('creator-reply-draw', {roomId: match.params.roomId, accept: true});
+                  setHistory(history => {
+                    socket.emit('creator-reply-draw', { roomId: match.params.roomId, accept: true, history: convertBoardArray(history) });
+                    return history
+                  })
+
 
                   dispatch(updateResult({
                     open: true,
                     image: DRAW_IMAGE,
-                    content: 'Draw'
+                    content: 'Draw',
+                    buttonText: 'Play Again',
+                    onClose: handleCloseResultDialog
                   }));
+                  updateMark();
                   resetState();
                 }
 
@@ -259,7 +342,7 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('creator-reply-draw', {roomId: match.params.roomId, accept: false});
+                  socket.emit('creator-reply-draw', { roomId: match.params.roomId, accept: false });
                 }
 
                 dispatch(addConfirmDialog({
@@ -282,7 +365,9 @@ const RoomPage = ({ match }) => {
                 dispatch(updateResult({
                   open: true,
                   image: WIN_IMAGE,
-                  content: 'You Win'
+                  content: 'You Win',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }));
               })
 
@@ -297,14 +382,20 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('player-reply-draw', {roomId: match.params.roomId, accept: true});
+                  setHistory(history => {
+                    socket.emit('player-reply-draw', { roomId: match.params.roomId, accept: true, history: convertBoardArray(history) });
+                    return history;
+                  })
+
 
                   dispatch(updateResult({
                     open: true,
                     image: DRAW_IMAGE,
-                    content: 'Draw'
+                    content: 'Draw',
+                    buttonText: 'Play Again',
+                    onClose: handleCloseResultDialog
                   }));
-
+                  updateMark();
                   resetState();
                 }
 
@@ -317,7 +408,7 @@ const RoomPage = ({ match }) => {
                     handleNo: () => { }
                   }));
 
-                  socket.emit('player-reply-draw', {roomId: match.params.roomId, accept: false});
+                  socket.emit('player-reply-draw', { roomId: match.params.roomId, accept: false });
                 }
 
                 dispatch(addConfirmDialog({
@@ -345,13 +436,31 @@ const RoomPage = ({ match }) => {
                 return start;
               })
             })
+
+            //player out room
+            socket.on('player-exited', () => {
+              const handleOK = () => {
+                handleCloseResultDialog();
+                setPlayerExited(true);
+              }
+              dispatch(updateResult({
+                open: true,
+                image: WIN_IMAGE,
+                content: refStart.current ? `Player exited, You win and will be redirected to home.` : `Player exited, You will be redirected to home.`,
+                buttonText: 'OK',
+                onClose: handleOK,
+                textSize: '1.5rem'
+              }))
+            })
             //event result
             socket.on('game-done', ({ result }) => {
               if (result === -1) {
                 dispatch(updateResult({
                   open: true,
                   image: LOSE_IMAGE,
-                  content: 'You Lose'
+                  content: 'You Lose',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }))
                 resetState()
                 updateMark(!isCreator);
@@ -359,8 +468,11 @@ const RoomPage = ({ match }) => {
                 dispatch(updateResult({
                   open: true,
                   image: DRAW_IMAGE,
-                  content: 'Draw Game'
+                  content: 'Draw Game',
+                  buttonText: 'Play Again',
+                  onClose: handleCloseResultDialog
                 }))
+                updateMark();
                 resetState();
               }
             })
@@ -370,6 +482,7 @@ const RoomPage = ({ match }) => {
           },
           (error) => {
             alert(error.message);
+            setPlayerExited(true)
           }
         )
     }
@@ -383,16 +496,38 @@ const RoomPage = ({ match }) => {
       socket.off('player-resigned');
       socket.off('creator-claimed-draw');
       socket.off('player-claimed-draw');
+      socket.off('player-exited')
+      socket.emit('player-exit', { roomId: match.params.roomId, isCreator: refIsCreator.current, history: convertBoardArray(refHistory.current), start: refStart.current });
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    refHistory.current = history.slice();
+  }, [history])
+
+  useEffect(() => {
+    refIsCreator.current = isCreator;
+  }, [isCreator])
+
+  useEffect(() => {
+    refStart.current = start;
+  }, [start])
 
   if (!isLogined) {
     return <Redirect to='/login' />
   }
 
+  if (playerExited) {
+    return <Redirect to='/home' />
+  }
 
   return (
     <RoomContext.Provider value={{ dispatch, state }}>
+      <Prompt
+        message={(location, action) => {
+          return !playerExited && infoBoard.player.name !== 'N/A' ? 'Are you sure to leave this room?\nYou will be lose if the game is beginning' : true;
+        }}
+      />
       <Grid container>
         <MyAppBar isLogined />
       </Grid>
@@ -417,6 +552,7 @@ const RoomPage = ({ match }) => {
             player={infoBoard.player}
             roomId={match.params.roomId}
             start={start}
+            history={history.slice()}
           />
         </Grid>
         <Grid container item xs={6} direction='row'>
@@ -426,14 +562,17 @@ const RoomPage = ({ match }) => {
         </Grid>
         <Grid style={{ paddingLeft: '1%' }} item xs={3}>
           <HistoryLog histoy={history.slice()} creatorName={infoBoard.creator.name} playerName={infoBoard.player.name} />
-          <Chat roomId={match.params.roomId} />
+          <Chat roomId={match.params.roomId} isCreator={isCreator} history={history.slice()} />
         </Grid>
       </Grid>
       <ResultDialog
         open={state.resultDialog.open}
         content={state.resultDialog.content}
         image={state.resultDialog.image}
-        onClose={handleCloseResultDialog} />
+        onClose={state.resultDialog.onClose}
+        buttonText={state.resultDialog.buttonText}
+        textSize={state.resultDialog.textSize}
+      />
       <ConfirmDialog
         open={state.confirmDialog.open}
         content={state.confirmDialog.content}
@@ -443,6 +582,10 @@ const RoomPage = ({ match }) => {
       />
       <WaitingDialog
         open={state.waitingDialog.open}
+      />
+      <InviteUserDialog
+        open={state.invitePlayerDialog.open}
+        roomId={match.params.roomId}
       />
     </RoomContext.Provider>
   );
@@ -461,14 +604,16 @@ const useStyle = makeStyles({
     fontSize: '1.6rem',
     marginTop: '2%',
     width: '100%',
-    marginLeft: '20%'
+    marginLeft: '20%',
+    fontFamily: 'NerkoOne',
   },
   turn: {
     fontWeight: 'bold',
     fontSize: '1.6rem',
     marginTop: '1%',
     width: '100%',
-    marginLeft: '4%'
+    marginLeft: '4%',
+    fontFamily: 'NerkoOne',
   }
 });
 

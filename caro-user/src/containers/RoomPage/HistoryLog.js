@@ -3,7 +3,7 @@ import { makeStyles, Typography } from '@material-ui/core';
 import History from '../../components/History';
 
 
-const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
+const HistoryLog = ({ histoy = [], creatorName, playerName, isViewer = false }) => {
   const classes = useStyle();
   const divRef = useRef(null);
 
@@ -31,7 +31,7 @@ const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
       return <div key={index}> </div>;
   })
   return (
-    <div ref={divRef} className={classes.container}>
+    <div ref={divRef} className={classes.container} style={{height: isViewer ? '500px' : '210px'}}>
       <Typography align='center' className={classes.text}>History</Typography>
       {renderHistory}
     </div>
@@ -45,19 +45,18 @@ const HistoryLog = ({ histoy = [], creatorName, playerName }) => {
 const useStyle = makeStyles({
   container: {
     width: '100%',
-    height: '200px',
-    backgroundColor: '#bdbdbd',
     borderRadius: '5px',
     display: 'flex',
     flexDirection: 'column',
     overflowX: 'hidden',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
+    border: 'solid #bdbdbd 2px'
   },
   text: {
     marginTop: '2%',
     fontWeight: 'bold',
-    fontSize: '1.2rem',
+    fontSize: '1.5rem',
     marginBottom: '2%',
+    fontFamily: 'NerkoOne',
   }
 });
 

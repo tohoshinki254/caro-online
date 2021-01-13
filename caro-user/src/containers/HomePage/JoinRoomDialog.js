@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { Dialog, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MyTextField from '../../components/MyTextField';
@@ -11,7 +11,8 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
   const classes = useStyle();
   let history = useHistory();
   const [roomId, setRoomId] = useState('');
-  const [joinSuccessful, setJoinSuccessful] = useState({ status: false, message: '' });
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const joinRoom = () => {
     if (roomId.length === 0) {
       alert('Room Id is empty.');
@@ -21,29 +22,26 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
     if (localStorage.getItem("caro-online-token") !== undefined) {
       setLoading(true);
       const data = {
-        roomId: roomId
+        roomId: roomId,
+        password: password
       }
       fetchWithAuthentication(API_URL + 'room/join', 'POST', localStorage.getItem("caro-online-token"), data)
         .then(
           (data) => {
             setLoading(false);
-            setJoinSuccessful({ status: true, message: data.message });
+            if (data.viewer === true) {
+              history.push(`/viewer/room/${roomId}`)
+            } else {
+              history.push(`/room/${roomId}`);
+            }
           },
           (error) => {
             setLoading(false);
-            setJoinSuccessful({ status: false, message: error.message });
-            alert(error.message);
+            setErrorMessage(error.message);
           }
         )
     }
   }
-
-  useEffect(() => {
-    if (joinSuccessful.status){
-      const to = '/room/' + roomId;
-      history.push(to);
-    }
-  }, [joinSuccessful, history, roomId])
 
   return (
     <Dialog
@@ -69,9 +67,19 @@ const JoinRoomDialog = ({ open = false, onClose, setLoading }) => {
           label='Room ID'
           onChange={(event) => setRoomId(event.target.value)}
           value={roomId}
+          type='number'
         />
+
+        <MyTextField
+          style={{ marginTop: '4%' }}
+          placeholder='Password (set empty if join public room)'
+          onChange={(event) => setPassword(event.target.value)}
+          value={password}
+          type='password'
+        />
+        <Typography style={{ marginTop: '2%', color: 'red' }}>{errorMessage}</Typography>
         <MyButton
-          style={{ marginTop: '2.5%' }}
+          style={{ marginTop: '4%' }}
           onClick={() => joinRoom()}
         >
           Join

@@ -3,7 +3,7 @@ import { Grid } from '@material-ui/core';
 import Cell from '../../components/Cell';
 
 
-const Board = ({board, onClick, lastMove = {i: -1, j: -1}}) => {
+const Board = ({board, onClick = () => {}, lastMove = {i: -1, j: -1}}) => {
     if (lastMove === null) lastMove = {i: -1, j: -1}
     const generateBoard = () => {
         const SIZE = 18;

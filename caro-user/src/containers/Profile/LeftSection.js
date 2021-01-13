@@ -17,7 +17,7 @@ const LeftSection = ({ userId }) => {
                     alert('Error');
                 }
             )
-    }, [setUserInfo]);
+    }, [setUserInfo]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     return (
@@ -28,16 +28,16 @@ const LeftSection = ({ userId }) => {
                     <Avatar className={classes.avatar} src="https://hinhnendephd.com/wp-content/uploads/2019/10/anh-avatar-dep.jpg"/>
                     <Typography className={classes.name}>{userInfo.name}</Typography>
                 </div>
-                <div style={{ marginLeft: '10%' }}>
+                <div style={{ marginLeft: '5%' }}>
                     <List>
                         <ListItem>
-                            <ListItemText primary="Join Date: " className={classes.listItem}/>
+                            <ListItemText primary={`Username: ${userInfo.username}`} className={classes.listItem}/>
                         </ListItem>
                         <ListItem>
-                            <ListItemText primary={`Matches: ${userInfo.wins + userInfo.draws + userInfo.loses}`} className={classes.listItem}/>
+                            <ListItemText primary={`Matches: ${userInfo.wins + userInfo.loses + userInfo.draws}`} className={classes.listItem}/>
                         </ListItem>
                         <ListItem>
-                            <ListItemText primary="Win Rate: " className={classes.listItem}/>
+                            <ListItemText primary={`Win Rate: ${((userInfo.wins / (userInfo.wins + userInfo.loses + userInfo.draws)) * 100).toString().slice(0, 5)}%`} className={classes.listItem}/>
                         </ListItem>
                         <ListItem>
                             <ListItemText primary="Rank: " className={classes.listItem}/>

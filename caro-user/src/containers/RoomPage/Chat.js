@@ -3,16 +3,19 @@ import { makeStyles, Typography } from '@material-ui/core';
 import Message from '../../components/Message';
 import MyTextField from '../../components/MyTextField';
 import MyButton from '../../components/MyButton';
-import { TOKEN_NAME } from '../../global/constants';
+import { API_URL, TOKEN_NAME } from '../../global/constants';
 import decode from 'jwt-decode';
 import socket from '../../global/socket';
+import { fetchWithAuthentication } from '../../api/fetch-data';
+import {convertChatList } from './util';
 
-const Chat = ({ roomId }) => {
+const Chat = ({ roomId, isCreator }) => {
   const classes = useStyle();
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState([]);
   const divRef = useRef(null);
   const userInfo = decode(localStorage.getItem(TOKEN_NAME));
+
 
   useEffect(() => {
     socket.on('message', data => {
@@ -21,12 +24,17 @@ const Chat = ({ roomId }) => {
         temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
         setMessages([...temp]);
       }
-    });
+    }); 
 
-    return () => { 
-      socket.off('message'); 
+    return () => {
+      const data = {
+        roomId: roomId,
+        chatList: convertChatList(userInfo._id, messages.slice())
+      }
+      socket.off('message');
+      fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (divRef) {
@@ -50,7 +58,7 @@ const Chat = ({ roomId }) => {
           <Message key={index} isX isSender username={message.name} content={message.mess} time={message.time} />
           : <Message key={index} username={message.name} content={message.mess} time={message.time} />)}
       </div>
-      <form className={classes.textField} onSubmit={(e) => {e.preventDefault(); sendMessage(content)}}>
+      <form className={classes.textField} onSubmit={(e) => { e.preventDefault(); sendMessage(content) }}>
         <MyTextField
           placeholder='Enter content...'
           style={{ width: '60%' }}
@@ -69,16 +77,18 @@ const Chat = ({ roomId }) => {
 const useStyle = makeStyles({
   container: {
     width: '100%',
-    height: '350px',
-    backgroundColor: '#bdbdbd',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-    marginTop: '5%'
+    height: '370px',
+    marginTop: '5%',
+    borderRadius: '5px',
+    border: 'solid #bdbdbd 2px'
   },
   text: {
     marginTop: '2%',
+    paddingTop: '2%',
     fontWeight: 'bold',
-    fontSize: '1.2rem',
+    fontSize: '1.5rem',
     marginBottom: '1%',
+    fontFamily: 'NerkoOne',
   },
   chatContent: {
     width: '100%',

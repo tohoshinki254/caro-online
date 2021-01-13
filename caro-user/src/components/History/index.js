@@ -2,11 +2,16 @@ import React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 
 
-const History = ({isX = false, name, i, j, step}) => {
+const History = ({isX = false, name, i, j, step, setHistory = () => {}}) => {
   const classes = useStyle();
   const color = isX ? '#b71c1c' : '#2f78f7';
   return (
-    <Typography className={classes.container} style={{backgroundColor: color}}>{`#${step} ${isX ? '[X]' : '[O]'} ${name} (${i}, ${j})`}</Typography>
+    <Typography className={classes.container} 
+      style={{backgroundColor: color}}
+      onClick={() => setHistory(step)}
+    >
+      {`#${step} ${isX ? '[X]' : '[O]'} ${name} (${i}, ${j})`}
+    </Typography>
   );
 }
 
@@ -22,6 +27,7 @@ const useStyle = makeStyles({
     paddingBottom: '1%',
     borderRadius: '8px',
     marginBottom: '1.5%',
+    cursor: 'pointer'
   }
 });
 

@@ -3,7 +3,7 @@ import { Dialog, Grid, makeStyles, Typography } from '@material-ui/core';
 import MyButton from '../../components/MyButton';
 
 
-const ResultDialog = ({open = false, onClose, image, content}) => {
+const ResultDialog = ({open = false, onClose, image, content, buttonText, textSize = '3rem'}) => {
     const classes = useStyle();
     return (
       <Dialog
@@ -17,7 +17,7 @@ const ResultDialog = ({open = false, onClose, image, content}) => {
             <img className={classes.image} src={image} alt="result"/>
           </Grid>
           <Grid container item xs={7} justify='center' alignContent='center'> 
-            <Typography className={classes.text}>{content}</Typography>
+            <Typography className={classes.text} style={{fontSize: textSize}}>{`${content}`}</Typography>
           </Grid>
         </Grid>
         <Grid container style={{padding: '0% 5% 3% 5%'}}>
@@ -25,7 +25,7 @@ const ResultDialog = ({open = false, onClose, image, content}) => {
             fullWidth
             onClick={onClose}
           >
-            Play again
+            {buttonText}
           </MyButton>
         </Grid>
 
@@ -40,7 +40,6 @@ const useStyle = makeStyles({
   },
   text: {
     fontFamily: 'NerkoOne',
-    fontSize: '3rem',
   }
 });
 

@@ -2,16 +2,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import UserCard from '../../components/UserCard';
 import MyButton from '../../components/MyButton';
-import { DRAW_IMAGE, FLAG_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
+import { DRAW_IMAGE, ERRO_IMAGE, FLAG_IMAGE, LOSE_IMAGE, WIN_IMAGE } from '../../global/constants';
 import { RoomContext } from './context';
-import { addConfirmDialog, addWatingDialog, updateResult } from './actions';
+import { addConfirmDialog, addInvitePlayerDialog, addWatingDialog, updateResult } from './actions';
 import socket from '../../global/socket';
+import { convertBoardArray } from './util';
 
 
-const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId, start }) => {
+const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCreator, resetState, updateMark, yourTurn, roomId, start, history }) => {
   const classes = useStyle();
-  const [xRemain, setXRemain] = useState(120);
-  const [oRemain, setORemain] = useState(120);
+  const [xRemain, setXRemain] = useState(30);
+  const [oRemain, setORemain] = useState(30);
   const [counter, setCounter] = useState(null);
   const { dispatch } = useContext(RoomContext);
   const defaultInfo = { name: 'N/A', mark: 0 };
@@ -19,6 +20,14 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
   if (creator === null) creator = defaultInfo;
   if (player === null) player = defaultInfo;
 
+  const handleCloseResultDialog = () => {
+    dispatch(updateResult({
+      open: false,
+      image: null,
+      content: null
+    }))
+  }
+  
   const handleResign = () => {
     if (!start)
       return;
@@ -38,11 +47,13 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
       dispatch(updateResult({
         open: true,
         image: LOSE_IMAGE,
-        content: 'You Lose'
+        content: 'You Lose',
+        buttonText: 'Play Again',
+        onClose: handleCloseResultDialog
       }))
 
       const eventResign = isCreator ? 'creator-resign' : 'player-resign';
-      socket.emit(eventResign, { roomId: roomId });
+      socket.emit(eventResign, { roomId: roomId, history: convertBoardArray(history) });
     }
     const handleNo = () => {
       dispatch(addConfirmDialog({
@@ -92,10 +103,13 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
 
         if (accept) {
           resetState();
+          updateMark();
           dispatch(updateResult({
             open: true,
             image: DRAW_IMAGE,
-            content: 'Draw'
+            content: 'Draw',
+            buttonText: 'Play Again',
+            onClose: handleCloseResultDialog
           }));
         } else {
 
@@ -124,6 +138,23 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
     }))
   }
 
+  const handleInvite = () => {
+    if (creator.name !== 'N/A' && player.name !== 'N/A') {
+      dispatch(updateResult({
+        open: true,
+        image: ERRO_IMAGE,
+        content: 'Room is full.',
+        onClose: handleCloseResultDialog,
+        buttonText: 'OK',
+        textSize: '2rem'
+      }))
+      return;
+    }
+
+    dispatch(addInvitePlayerDialog({
+      open: true
+    }));
+  }
   useEffect(() => {
     if (yourTurn) {
       if (isCreator) {
@@ -134,7 +165,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           });
         }, 1000);
         setCounter(countDown);
-        setORemain(120);
+        setORemain(30);
       } else {
         let countDown = setInterval(() => {
           setORemain(oRemain => {
@@ -143,32 +174,34 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           });
         }, 1000);
         setCounter(countDown);
-        setXRemain(120);
+        setXRemain(30);
       }
     } else {
       if (counter !== null) {
         clearInterval(counter)
-        isCreator ? setXRemain(120) : setORemain(120);
+        isCreator ? setXRemain(30) : setORemain(30);
       }
     }
-  }, [yourTurn]);
+  }, [yourTurn]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!start) {
-      setXRemain(120);
-      setORemain(120);
+      setXRemain(30);
+      setORemain(30);
       if (counter !== null) clearInterval(counter)
     }
-  }, [start])
+  }, [start]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (xRemain === 0) {
       if (isCreator) {
-        socket.emit('countdown-creator', { remain: xRemain, roomId: roomId });
+        socket.emit('countdown-creator', { remain: xRemain, roomId: roomId, history: convertBoardArray(history) });
         dispatch(updateResult({
           open: true,
           image: LOSE_IMAGE,
-          content: 'You Lose'
+          content: 'You Lose',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }));
         resetState();
         updateMark(!isCreator)
@@ -176,14 +209,16 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
-          content: 'You Win'
+          content: 'You Win',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark(isCreator)
         resetState();
-        setXRemain(120)
+        setXRemain(30)
       }
     }
-  }, [xRemain])
+  }, [xRemain]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (oRemain === 0) {
@@ -191,23 +226,27 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         dispatch(updateResult({
           open: true,
           image: WIN_IMAGE,
-          content: 'You Win'
+          content: 'You Win',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark(isCreator)
         resetState();
-        setORemain(120);
+        setORemain(30);
       } else {
-        socket.emit('countdown-player', { remain: oRemain, roomId: roomId });
+        socket.emit('countdown-player', { remain: oRemain, roomId: roomId, history: convertBoardArray(history) });
         dispatch(updateResult({
           open: true,
           image: LOSE_IMAGE,
-          content: 'You Lose'
+          content: 'You Lose',
+          buttonText: 'Play Again',
+          onClose: handleCloseResultDialog
         }))
         updateMark(!isCreator)
         resetState();
       }
     }
-  }, [oRemain])
+  }, [oRemain]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isCreator) {
@@ -237,20 +276,26 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
           {startStatus}
         </MyButton>
         <MyButton
-          style={{ width: '45%', marginTop: '3%' }}
+          style={{ width: '100%', marginTop: '2%' }}
+          onClick={handleInvite}
+        >
+          INVITE PLAYER
+        </MyButton>
+        <MyButton
+          style={{ width: '45%', marginTop: '2%' }}
           onClick={handleResign}
         >
           Resign
         </MyButton>
         <MyButton
-          style={{ width: '45%', marginLeft: '10%', marginTop: '3%' }}
+          style={{ width: '45%', marginLeft: '10%', marginTop: '2%' }}
           onClick={handleDraw}
         >
           Draw
         </MyButton>
       </div>
-      <UserCard isBorder marginTop='10%' name={player.name} minutes={oRemain} mark={player.mark} />
-      <UserCard isBorder marginTop='10%' name={creator.name} minutes={xRemain} mark={creator.mark} isX />
+      <UserCard isBorder userStat={player} marginTop='5%'  minutes={oRemain} />
+      <UserCard isBorder userStat={creator} marginTop='5%' minutes={xRemain} isX />
 
     </div>
   );
