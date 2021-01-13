@@ -361,7 +361,7 @@ module.exports = {
 
 			const totalPlayers = await accountDAO.countDocuments({isAdmin: false});
 			let totalPages = Math.floor(totalPlayers / SIZE);
-			totalPages % SIZE > 0 && totalPages++;
+			totalPlayers % SIZE > 0 && totalPages++;
 			const skip = SIZE * (page - 1);
 			const result = await accountDAO.find({isAdmin: false}).sort('-cups').skip(skip).limit(SIZE).lean();
 
