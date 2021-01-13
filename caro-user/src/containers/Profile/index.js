@@ -32,7 +32,7 @@ const Profile = () => {
     return (
         <>
             <Grid container>
-                <MyAppBar isLogined />
+                <MyAppBar isLogined={isLogined} />
             </Grid>
             <Grid container>
                 <Grid className={classes.leftSection} item xs={3}>

@@ -45,7 +45,7 @@ const RankingBoard = () => {
           setLoading(false)
         }
       )
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLogined) {
     return <Redirect to='/login' />

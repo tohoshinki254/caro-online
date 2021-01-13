@@ -22,7 +22,7 @@ const VerifyEmailPage = (props) => {
                     alert('Error');
                 }
             )
-    }, [])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className={classes.container}>

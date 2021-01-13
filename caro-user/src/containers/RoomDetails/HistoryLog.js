@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
 import History from '../../components/History';
 

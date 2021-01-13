@@ -29,7 +29,7 @@ const RoomDetails = () => {
 
                 }
             )
-    }, [setMatch])
+    }, [setMatch]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const changeMatch = (match) => {
         setMatch(match);

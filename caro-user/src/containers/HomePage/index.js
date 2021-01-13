@@ -91,7 +91,7 @@ const HomePage = () => {
     return () => {
       socket.off('receive-invitation');
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLogined) {
     return <Redirect to='/login' />

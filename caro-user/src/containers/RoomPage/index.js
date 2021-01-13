@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useReducer, useRef, useState } from 'reac
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import MyAppBar from '../../components/MyAppBar';
 import { AppContext } from '../../contexts/AppContext';
-import { Prompt, Redirect, useHistory } from 'react-router-dom';
+import { Prompt, Redirect } from 'react-router-dom';
 import Board from './Board';
 import InfoBoard from './InfoBoard';
 import HistoryLog from './HistoryLog';
@@ -493,7 +493,7 @@ const RoomPage = ({ match }) => {
       socket.off('player-exited')
       socket.emit('player-exit', { roomId: match.params.roomId, isCreator: refIsCreator.current, history: convertBoardArray(refHistory.current), start: refStart.current });
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     refHistory.current = history.slice();

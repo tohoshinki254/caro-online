@@ -17,7 +17,7 @@ const LeftSection = ({ userId }) => {
                     alert('Error');
                 }
             )
-    }, [setUserInfo]);
+    }, [setUserInfo]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     return (

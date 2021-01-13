@@ -1,5 +1,5 @@
 import { Grid, makeStyles, Typography } from '@material-ui/core';
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer} from 'react';
 import { Redirect, useHistory } from 'react-router-dom';
 import MyAppBar from '../../components/MyAppBar';
 import UserCard from '../../components/UserCard';
@@ -166,7 +166,7 @@ const RoomForViewer = ({ match }) => {
       socket.off('viewer-result');
       socket.off('player-exited');
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLogined) {
     return <Redirect to="/login" />

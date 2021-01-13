@@ -182,7 +182,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         isCreator ? setXRemain(30) : setORemain(30);
       }
     }
-  }, [yourTurn]);
+  }, [yourTurn]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!start) {
@@ -190,7 +190,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
       setORemain(30);
       if (counter !== null) clearInterval(counter)
     }
-  }, [start])
+  }, [start]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (xRemain === 0) {
@@ -218,7 +218,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         setXRemain(30)
       }
     }
-  }, [xRemain])
+  }, [xRemain]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (oRemain === 0) {
@@ -246,7 +246,7 @@ const InfoBoard = ({ creator, player, startStatus = 'Start', handleStart, isCrea
         resetState();
       }
     }
-  }, [oRemain])
+  }, [oRemain]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isCreator) {

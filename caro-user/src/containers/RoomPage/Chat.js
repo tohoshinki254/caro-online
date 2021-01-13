@@ -7,7 +7,7 @@ import { API_URL, TOKEN_NAME } from '../../global/constants';
 import decode from 'jwt-decode';
 import socket from '../../global/socket';
 import { fetchWithAuthentication } from '../../api/fetch-data';
-import { convertBoardArray, convertChatList } from './util';
+import {convertChatList } from './util';
 
 const Chat = ({ roomId, isCreator }) => {
   const classes = useStyle();
@@ -24,7 +24,7 @@ const Chat = ({ roomId, isCreator }) => {
         temp.push({ id: data.id, name: data.name, mess: data.text, time: data.time });
         setMessages([...temp]);
       }
-    });
+    }); 
 
     return () => {
       const data = {
@@ -34,7 +34,7 @@ const Chat = ({ roomId, isCreator }) => {
       socket.off('message');
       fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (divRef) {

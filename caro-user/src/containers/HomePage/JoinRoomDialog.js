@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { Dialog, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MyTextField from '../../components/MyTextField';
