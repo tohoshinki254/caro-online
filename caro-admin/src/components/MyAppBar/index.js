@@ -51,16 +51,6 @@ const MyAppBar = ({isLogined}) => {
                 {`Hi, ${userInfo.name}`}
               </Typography>
             </MenuItem>
-            <Link style={{ textDecoration: 'none', color: 'inherit' }}  to="/profile">
-              <MenuItem>
-                <ListItemIcon>
-                  <AccountCircleIcon/>
-                </ListItemIcon>
-                <Typography  >
-                  Profile
-                </Typography>
-              </MenuItem>
-            </Link>
             <Link style={{ textDecoration: 'none', color: 'inherit' }}  to="/logout">
               <MenuItem>
                 <ListItemIcon>
