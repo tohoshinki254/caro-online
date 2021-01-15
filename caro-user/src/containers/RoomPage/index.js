@@ -182,16 +182,10 @@ const RoomPage = ({ match }) => {
     }))
   }
   const resetState = () => {
-    setIsCreator(isCreator => {
-      setYourTurn(isCreator);
-      return isCreator;
-    })
-    setStepNumber(0);
-    setHistory(history => [{
-      board: initBoard(),
-      lastMove: null,
-      isCreator: null
-    }])
+    setYourTurn(false);
+    setStart(false);
+    setStartStatus('start');
+    setPlayerStart(false);
   }
 
   const updateMark = (isCreatorWin) => {
@@ -481,7 +475,6 @@ const RoomPage = ({ match }) => {
             setInfoBoard({ creator: creator, player: player });
           },
           (error) => {
-            alert(error.message);
             setPlayerExited(true)
           }
         )

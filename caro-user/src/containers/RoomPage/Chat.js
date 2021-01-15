@@ -32,7 +32,15 @@ const Chat = ({ roomId, isCreator }) => {
         chatList: convertChatList(userInfo._id, messages.slice())
       }
       socket.off('message');
-      fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data);
+      fetchWithAuthentication(API_URL + 'room/end', 'POST', localStorage.getItem(TOKEN_NAME), data)
+        .then(
+          (data) => {
+
+          },
+          (error) => {
+            
+          }
+        )
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
